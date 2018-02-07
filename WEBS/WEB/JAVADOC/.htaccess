@@ -1,0 +1,8 @@
+Options Indexes FollowSymLinks
+AuthType Basic
+AuthName "JavaDoc Access"
+AuthUserFile /var/www/html/JAVADOC/.htpasswd
+<Limit POST GET>
+require user devel
+</Limit>
+

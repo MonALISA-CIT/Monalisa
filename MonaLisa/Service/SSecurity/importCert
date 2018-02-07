@@ -1,0 +1,19 @@
+echo_usage() {
+	echo
+	echo Usage: $0 aliasName_for_cert path_to_fileCertToImport
+	echo
+}
+
+if [ $# -ne 2 ]; then
+
+	echo_usage
+	exit 1
+fi
+
+echo "#############################################################"
+echo
+echo "Importing certificate FROM $2 TO FarmMonitor.ks. $1 will be used as alias"
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+keytool -import -keystore FarmMonitor.ks -storepass monalisa -alias $1 -file $2

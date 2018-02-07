@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+export CLASSPATH=`../../classpath.sh ../../`:.
+
+if [ $# -eq 2 ] 
+  then
+    `cat ../../../../conf/env.JAVA_HOME`/bin/java Client "$1" $2
+  else
+    if [ $# -eq 1 ] 
+     then
+	`cat ../../../../conf/env.JAVA_HOME`/bin/java Client "$1" "`../../../../conf/MWS.sh`?wsdl"
+     else
+        echo "Arguments : <farm-name> <location of the wsdl file>(optional)";	
+    fi    	
+fi

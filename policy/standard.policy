@@ -1,0 +1,13 @@
+
+grant codeBase "file:/-" {
+	permission java.security.AllPermission;
+};
+
+// foreign code has only restricted permissions
+
+grant {
+	permission java.net.SocketPermission "*", "connect,accept,resolve";
+	permission java.util.PropertyPermission "*", "read";
+	permission java.io.FilePermission "*", "read";
+        permission com.sun.rmi.rmid.ExecOptionPermission "*", "execute" ;
+};

@@ -1,0 +1,10 @@
+java -jar \
+ -Djava.security.policy=policy.all \
+       -Dlia.Monitor.LUSs=monalisa-starlight.cern.ch,vrvs-us.cern.ch \
+        -Dlia.Monitor.ConfigURL=file:/home/ramiro/WORK/MSRC.NEW/MonaLisa/Service/TEST/ml.properties \
+         -Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+	  -Dlia.Monitor.showPanels=globe\
+          -Dlia.Monitor.sleepTime=15 \
+          -Dlia.Monitor.group=vrvst1,vrvs-test,vrvs-serv \
+	  -Dlia.Monitor.ClientsFarmProxy.ProxyGroup=vrvs_proxy \
+  ../lib/vrvs3dJMonitorClient.jar 

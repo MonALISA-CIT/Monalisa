@@ -1,0 +1,121 @@
+
+This directory contains two simple examples of dynamic filters
+
+One of them (ExTrigger) is a simple alarm which send an email if the
+Load5 parameter on master node reaches a threshold value, and the other
+one (ExLoadFilter) computes min, max and mean value for a cluster.
+
+Each Filter has it's own Thread in MonALISA Service, so that they can
+run independently from each other.
+
+To write your own Filters/Triggers please follow the following steps:
+
+1) Your filter MUST extend lia.Monitor.Filters.GenericMLFilter;
+
+2) It must have a constructor with a String param (the FarmName) in
+which you must call super(farmName). This constructor is used to
+dynamicaly instantiate your filter at runtime.
+
+3) Your filter MUST override the following methods:
+
+    a)public String getName() - returns the Filter name. 
+    
+        It is a short name to identify data sent by your filter in the
+client. It is also used by MonALISA clients to inform the Service that
+they are interested in the data processed by this filter. It MUST be
+unique because all the filters in ML are identified by their name.
+    
+    b) public monPredicate[] getFilterPred() - returns a vector of 
+    monPredicate(s)
+    
+        These predicates are used to filter only the interested results
+that they want to receive from the entire data flow. If it returns null,
+the filter will receive all the monitoring information.
+        
+    c) public void notifyResult(Object o)
+    
+        This method is called every time a Result matches a predicate
+defined at b). The Filter could save this in a local buffer for future
+analysis, or it can take some real time decision(s)/action(s) if it is a
+trigger.
+        
+    d) public Object expressResults()
+        
+        This method is called from time to time to let the filter to
+process the data that it has received. It should return a Vector of
+Gresults and/or Results that will be further sent to all the registered
+clients, or null if no data should be sent to Clients (e.g. the filter
+is a trigger). 
+        
+    e) public long getSleepTime()
+    
+        Returns a time(in milliseconds) for how often expressResults()
+should be called.
+
+        E.g.: If this method returns 2*60*1000 the function
+expressResults() will be called every 2 minutes.
+        
+4) In your ml.properties file please add the path to the directory where
+filter has it's .class files. The parameter is lia.Monitor.CLASSURLs. 
+
+E.g:
+lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/FilterExamp
+les/ExTrigger/
+
+If there are more filters/directories please separate them by ,(commas).
+
+5) In ml.properties you must specify what filters should be loaded,
+separated by commas.
+
+E.g:
+lia.Monitor.ExternalFilters=ExTrigger,ExLoadFilter
+
+To compile the Filters please use ./comp script
+
+The data flux between MonALISA Service and clients can contain, more or
+less, the following two classes:
+
+lia.Monitor.monitor.Result Class 
+**************************
+
+ It is also the main class inside ML Service. A fiter can subscribe
+with predicates to receive only a smaller set of Result(s). The fields
+of a Result are:
+
+   public String NodeName;
+   public String ClusterName;
+   public String FarmName;
+   public String[]  param_name;
+   public long   time;
+   public double[] param;
+
+   The array param_name has the same length as param; the first one
+contains the name of params for which values are in param[]. The
+mapping is one to one.
+   
+
+lia.Monitor.monitor.Gresult Class 
+**************************
+
+   This class is used to aggregate some online informations on Cluster
+basis. To have a general overview over a Cluster (e.g. Load5) ypu can
+divide Nodes (number of active nodes) in nbin interval (e.g nbin=5 for
+nodes between 0-0.25, 0.25-0.5, 0.5-0.75, 0.75-1.0, and over 1.0) and
+use hist[] to express how many of nodes belong to each interval.
+TotalNodes can express Nodes + Dead Nodes. Module should store the name
+of the param for which this Gresult was calculated.
+   
+   
+   public long   time;
+   public String ClusterName;
+   public String FarmName;
+   public String Module;
+
+   public int TotalNodes ;
+   public int Nodes ;
+   public double mean;
+   public double max ;
+   public double min;
+   public double sum ;
+   public int nbin ;
+   public int[]  hist ;

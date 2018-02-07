@@ -1,0 +1,9 @@
+#!/bin/sh
+
+#PATH to YOUR Java instalation. Please use Sun JVM >= 1.4.1_02
+JAVA_HOME="/usr/local/j2sdk1.4.1_02"
+
+#This should be your FQDN hostname ( e.g. output for `hostname --fqdn` or `hostname -f` ). The setting below should work for all systems. If you have problems please set this with your FQDN hostname. 
+#JINI_SER_HOSTNAME="monalisa.cern.ch"
+JINI_SER_HOSTNAME="ui.rogrid.pub.ro"
+JINI_SER_PORT="8288"

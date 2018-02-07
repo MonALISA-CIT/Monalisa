@@ -1,0 +1,2 @@
+Main-Class: lia.Monitor.JiniClient.Store.Main
+Class-Path: jini-core.jar jini-ext.jar tools.jar FarmClient.jar mysql-driver.jar

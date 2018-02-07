@@ -1,0 +1,74 @@
+#!/bin/sh
+#####################################################################
+# This script compiles the 3 java files needed for the VO_IO and VO_JOB
+# java files.
+#
+# The Monalisa FarmMonitor.jar file is required to compile and run.
+# This file is generally in $MonaLisa_HOME/Services/lib, but if you
+# are building and unit testing on a machine that does not have Monalisa
+# installed, you can copy it from a machine that does and place it in
+# this directory.
+#
+######################################################################
+CODE="*.java"
+
+
+#---- check for Monalisa_HOME variable ----
+if [ -z "$MonaLisa_HOME" ]; then
+  export MonaLisa_HOME=$PWD/../../..
+fi
+
+ML_LIB=$MonaLisa_HOME/Service/lib # ML location of jar files
+JAR_FILE=$ML_LIB/FarmMonitor.jar          # jar file needed for comp and test
+
+echo
+echo "...MonaLisa_HOME=$MonaLisa_HOME"
+
+#---- check for FarmMonitor.jar file needed to compile and run --
+if [ ! -f $JAR_FILE ]; then
+  echo " 
+   ERROR: Cannot find the required ML jar file to compile.
+          ($JAR_FILE)
+
+  The Monalisa FarmMonitor.jar file is required to compile and run.
+  This file is generally in \$MonaLisa_HOME/Services/lib, but if you
+  are building and unit testing on a machine that does not have Monalisa
+  installed, you can copy it from a machine that does and place it in
+  this directory.
+
+  If you are on a machine with ML/VDT installed, please run your 
+  setup.sh/csh/ksh for the VDT.  This will set the MonaLisa_HOME variable.
+"
+  exit 1
+fi
+
+#---- check for java ----
+rtn=$(type java >/dev/null 2>&1 ; echo $?)
+if [ "$rtn" != "0" ];then
+  echo 
+  echo "...ERROR: Please setup java. It is not available"
+  echo
+  echo "... better yet, please run your setup.sh/csh/ksh for the VDT"
+  echo "    if you are on a machine with it installed"
+  echo 
+  exit
+fi
+
+# ---- compile all the code -----------
+classpath=".:$JAR_FILE" 
+echo "classpath is: $classpath"
+for code in $CODE
+do
+ echo "...compiling $code" 
+ javac -classpath $classpath $code
+ rtn=$?
+ if [ "$rtn" != "0" ];then
+   echo "
+   ... compile FAILED for $code
+   "
+   exit 1
+ fi
+done
+
+echo DONE
+exit 0

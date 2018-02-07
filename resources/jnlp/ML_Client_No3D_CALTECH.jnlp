@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://monalisa.caltech.edu/ml_client">
+    <information>
+        <title>MonALISA</title>
+        <vendor>Caltech</vendor>
+        <description>MonaLisa Monitoring System</description>
+        <description kind="short">ML GUI No3D</description>
+        <icon href="img/ml_javaws_logo.jpg"/>
+    </information>
+    <security>
+        <all-permissions/>
+    </security>
+    <resources>
+        <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se" initial-heap-size="128m" max-heap-size="1024m"/>
+        <jar href="lib/JMonitorClient-No3D-CALTECH.jar"/>
+        <jar href="lib/jini-core.jar"/>
+        <jar href="lib/jini-ext.jar"/>
+        <jar href="lib/plot.jar"/>
+        <jar href="lib/jcommon-0.9.0.jar"/>
+        <jar href="lib/map_base512.jar"/>	
+        <jar href="lib/jfreechart-0.9.15.jar"/>
+        <jar href="lib/backport-util-concurrent.jar"/>
+        <jar href="lib/cog-jglobus.jar"/>
+        <jar href="lib/cryptix.jar"/>
+        <jar href="lib/jgsi.jar"/>
+        <jar href="lib/puretls.jar"/>
+        <extension name="jce" href="http://monalisa.caltech.edu/ml_client/BouncyCastle-JCE.jnlp" />
+        <extension name="jogl" href="http://monalisa.caltech.edu/jogl/jogl.jnlp" />
+        <property name="lia.Monitor.AppConfig.WebStart" value="true"/>
+        <property name="lia.Monitor.ConfigURL" value="http://monalisa.caltech.edu/ml_client/ml-client-no3d-caltech.properties"/>
+        <property name="sun.java2d.noddraw" value="true"/>
+    </resources>
+    <application-desc main-class="lia.Monitor.JiniClient.Farms.Main" name="MonALISA Client (3D Panels DISABLED)"/>
+</jnlp>

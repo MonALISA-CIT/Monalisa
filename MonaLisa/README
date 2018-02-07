@@ -1,0 +1,46 @@
+
+
+If you have previously installed v09x for MonALISA,
+we recommend to update to v1.0
+
+To start a MonaLisa service you should read the
+README under Service
+
+To start a GUI Client go to Clients/Gui please visit
+http://monalisa.cacr.caltech.edu/
+
+You should have Java Web Start installed.
+
+
+====================================
+How to upgrade from v09x
+====================================
+
+After you have unpacked the distribution from the site
+(http://monalisa.cacr.caltech.edu/) please follow these
+steps:
+
+1) Go to ${MonaLisa_HOME}/Service and copy the entire TEST
+directory into a new directory ( same name as your previously ${FARM_HOME} ).
+$cd MonaLisa.v1.0/Service
+$cp -r TEST <your_farm_name>
+
+2) Edit ml.properties in your farm directory according to your previously values
+(Location, SNMP_community, etc). Please fill the contact informations( your name and email)
+
+3) Copy your farm.conf file from MonaLisa.v09x into your new $FARM_HOME
+
+4) Go to CMD directory and edit ml_env with the same values as v09x. The only difference is
+a new variable MONALISA_USER, which must be set to the username that will run MonALISA.
+
+ From v1.0 MonALISA will not run as root ( by default ). Please edit MONALISA_USER with
+ the username that will run MonALISA. MonALISA does not require root privileges so it's
+ better to run it from a normal account.
+
+=========
+IMPORTANT
+=========
+
+ If you have autoupdate enable please update your crontab with your new path to MonALISA.
+ Use the ./ML_SER stop to stop MonaLisa.v09x
+ 

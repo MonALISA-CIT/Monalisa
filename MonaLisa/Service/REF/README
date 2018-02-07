@@ -1,0 +1,10 @@
+This is a simple MonaLisa Service for VRVS reflectors that uses 
+an embedded DB to store values.
+
+In test.conf you can define anything you want MonaLisa to monitor
+
+Starting from this example you can build your own farm...
+(e.g ${MonaLisa_HOME}/Service/MyFarm)
+
+Please read the User Guide from
+http://monalisa.cacr.caltech.edu/

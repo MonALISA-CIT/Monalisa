@@ -1,0 +1,80 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+if [ -d ../tomcat/bin ]; then
+    STORE=`pwd`
+    ML=`(cd ..; pwd)`
+    TOMCAT=${ML}/tomcat
+    
+    CLASSPATH=$JAVA_HOME/lib/tools.jar:../../lib/classes
+
+    cd ${TOMCAT}/bin
+
+    for a in ../../lib/image*.jar ../../lib/pg7*.jar ../../lib/postgres*.jar; do
+	CLASSPATH=${CLASSPATH}:$a
+    done
+    
+    for a in *.jar; do
+        CLASSPATH=${CLASSPATH}:${a}
+    done
+    for a in ../lib/*.jar; do
+        CLASSPATH=${CLASSPATH}:${a}
+    done
+    
+    for a in tools.jar axis.jar mysql-driver.jar wsdl4j.jar JStoreClient.jar jcommon-1.0.9.jar jfreechart-1.0.5.jar MSRC_WEB.jar jce-jdk13.jar puretls.jar jgsi.jar cryptix.jar smackx.jar smack.jar ymsg.jar dnsjava-1.3.2.jar jep-2.4.0.jar ML_WS.jar log4j-1.2.8.jar saaj.jar commons-discovery.jar commons-logging.jar grid3.jar jaxrpc.jar backport-util-concurrent.jar lazyj.jar; do
+        CLASSPATH=${CLASSPATH}:../../lib/${a}
+    done
+    
+    BASEDIR=${TOMCAT}
+    CATALINA_BASE=${TOMCAT}
+    CATALINA_HOME=${TOMCAT}
+    CATALINA_TMPDIR=${TOMCAT}/temp
+    JAVA_ENDORSED_DIRS=${TOMCAT}/common/endorsed
+    
+    TOMCATPORT=`cat ../conf/server.xml | grep Connector | awk '{for (i=1; i<=NF; i++) { split($i, valori, "="); if (valori[1]=="port") {split(valori[2], val2, "\""); for (j in val2) printf("%s", val2[j]);} } print ""}' | head -n 1`
+    
+    if [ ! -z "$TOMCATPORT" ]; then
+	TOMCATPORT="-Dlia.Repository.tomcat_port=${TOMCATPORT}"
+    fi
+    
+    if [ -z "$JAVA_MEM" ]; then
+	JAVA_MEM=512
+    fi
+    
+    if [ -z "$DISABLE_JAVA_MEM" ]; then	
+	JAVA_MEM="-Xmx${JAVA_MEM}m -Xms${JAVA_MEM}m"
+    else
+	JAVA_MEM=""
+    fi
+    
+    java \
+	-server ${JAVA_MEM} ${JAVA_OPTS} -XX:CompileThreshold=500 \
+	-Djava.endorsed.dirs=${JAVA_ENDORSED_DIRS} \
+	-Djava.awt.headless=true \
+	-classpath ${CLASSPATH} \
+	-Dcatalina.base=${CATALINA_BASE} \
+	-Dcatalina.home=${CATALINA_HOME} \
+	-Djava.io.tmpdir=${CATALINA_TMPDIR} \
+	-Dcom.sun.jini.jeri.tcp.useNIO=true \
+	-Dlazyj.config.folder=${ML}/JStoreClient/conf/lazyj \
+	${TOMCATPORT} \
+	-Djava.security.policy=${STORE}/policy.all \
+	-Dlia.Monitor.ConfigURL=file:${STORE}/conf/App.properties \
+	-Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+	-Dnetworkaddress.cache.ttl=60 \
+	-Dnetworkaddress.cache.negative.ttl=30 \
+	lia.Monitor.JiniClient.Store.Main \
+	>> ${STORE}/log.out 2>&1 &
+else
+    echo "No Tomcat"
+
+    java \
+	-server -Xmx256m -Xms256m -XX:CompileThreshold=500 \
+	-classpath ../lib/JStoreClient.jar \
+	-Djava.security.policy=policy.all \
+	-Dlia.Monitor.ConfigURL=file:conf/App.properties \
+	-Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+	lia.Monitor.JiniClient.Store.Main \
+	>> log.out 2>&1 &
+fi

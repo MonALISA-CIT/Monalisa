@@ -1,0 +1,42 @@
+
+Client developed using Apache Axis for the "MLWebService".
+Invoking the "getValues" function of the MLWebService.
+
+Apache Axis is an implementation of the SOAP (Simple Object Access
+Protocol).  
+
+The "getValues" operation interrogates the database for getting
+parameter results. It takes as input farm name - the name of the farm 
+interested in, cluster name -the name of the cluster intrested in, node 
+name - the name of the node interested in, parameter name - the
+parameter name interested in, from time and to time - the return results 
+will be those that were received in the database between these moments of time
+(given in milliseconds). The return value is complex schema type, an array of
+results.
+
+This client is called from the command line running the following scripts:
+     - ./generate_classes - generate classes from service wsdl file;
+                            The tool used for generating the needed classes
+			    is "WSDL2Java" which generates Bean classes for
+			    return and parameter complex types  starting
+			    from the wsdl service description file.
+			     
+     - ./compile_classes - compile client classes
+     - ./run_client "*" "*" "*" "*" -999900000 0 - in this case the service URL will be
+    						   taken from the environment variable
+						   MONALISA_WS;
+        or
+       ./run_client "*" "*" "*" "*" -999900000 0 "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService"    	
+
+and will return the results from all the farms ("*") - the first argument,
+all the clusters ("*") - the second argument, all the nodes ("*") - the
+third argument, all the parameters ("*") - the forth argument, that were 
+registered in the database between the fifth argument and the sixth argument.
+
+Another example 
+
+./run_client  "*" "*" "*" "DataTag0_OUT" -999900000 0 "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService"
+and will return the results from all farms ("*") - the first argument,
+all the clusters ("*") - the second argument, all the nodes ("*") - the
+third argument, the "DataTag0_OUT"  parameter  - the forth argument, that were 
+registered in the database between the fifth argument and the sixth argument.

@@ -1,0 +1,197 @@
+<!DOCTYPE doctype PUBLIC "-//w3c//dtd html 4.01 transitional//en" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    
+  <meta http-equiv="Content-Type"
+ content="text/html; charset=iso-8859-1">
+    
+  <meta name="GENERATOR"
+ content="Mozilla/4.78 [en] (X11; U; Linux 2.4.7-10 i686) [Netscape]">
+  <title>Web Demos of Iosif's MonaLisa</title>
+     <!--- JavaScript to detect if Java Web Start is installed or not ---> 
+  <script language="Javascript">
+
+   var javawsInstalled = 0;
+   isIE = "false";
+
+   if (navigator.mimeTypes && navigator.mimeTypes.length) {
+      x = navigator.mimeTypes['application/x-java-jnlp-file'];
+      if (x) javawsInstalled = 1;
+    } else { 
+      isIE = "true";
+    }
+
+    function launchLink(imageUrl, jnlpUrl, title, desc) {       
+       var realUrl = "http://java.sun.com/products/javawebstart/needdownload.html";
+       if (javawsInstalled) {
+         realUrl = jnlpUrl;
+       }
+       document.write("<center><div align=center>");
+       document.write("<a href=" + realUrl + "><img src=" + imageUrl + " width=\"60\" height=\"60\" BORDER=\"0\"></a></div>");
+       document.write("<form action=\"" + realUrl + "\" METHOD=\"GET\"><input type=\"submit\" value=\"Launch\"></form>");
+       document.write("</center>");
+    }    
+
+  </script> 
+  <script language="VBScript">
+
+on error resume next
+If isIE = "true" Then
+  If Not(IsObject(CreateObject("JavaWebStart.IsInstalled"))) Then
+     javawsInstalled = 0
+  Else
+    javawsInstalled = 1
+  End If
+End If
+
+  </script>
+</head>
+  <body text="#000000" bgcolor="#ffffff" link="#0000ff" vlink="#660066"
+ alink="#ff0000">
+ &nbsp; 
+<center> 
+<p><b><font color="#cc0000"><font size="+2">Web Start Client&nbsp; for the
+Monitoring Service</font></font></b></p>
+</center>
+  
+<p><br>
+ <br>
+ <br>
+ <br>
+ <font color="#000099"><b><big>This is a global monitoring service client
+.&nbsp; It allows to discover all the active services, and display real-time
+global views for connectivity and traffic as well as the usage and load of
+the farms. <br>
+It allows to access the configuration of any site and display real-time or
+historical values for any monitored parameter in the system. <br>
+</big></b></font></p>
+<p><br>
+</p>
+<blockquote><font color="#ff0000"><big><font color="#000099"><b>* You will
+need to have <font color="#cc0000">Java Web Start</font> installed in order
+for the monitoring tool to launch. If it &nbsp; &nbsp;is not installed, you 
+will be redirected to the Java Web Start setup page.</b> </font><br>
+  </big></font></blockquote>
+<blockquote>
+  <p><small><b style="color: rgb(51,0,153);"><font size="+2"><small>* This
+Client&nbsp;</small></font></b></small><big><span
+ style="color: rgb(51,51,153);"> is using  </span></big><big><span
+ style="color: rgb(51,51,153);"> the <font color="#cc0000"><b>Java 3D</b></font>
+Runtime which can be found :</span></big><font color="#000099"><b>&nbsp;&nbsp;</b></font></p>
+</blockquote>
+<div style="margin-left: 40px; color: rgb(51,51,153);"> 
+<ul>
+  <li><big>&nbsp;&nbsp;&nbsp; Windows and Solaris: <a
+ href="http://java.sun.com/products/java-media/3D/">http://java.sun.com/products/java-media/3D/</a></big></li>
+  <li><big>&nbsp;&nbsp;&nbsp;&nbsp; Linux: <a
+ href="http://www.blackdown.org/java-linux/java2-status/java-3d-status.html">http://www.blackdown.org/java-linux/java2-status/java-3d-status.html<br>
+     </a></big></li>
+</ul>
+ </div>
+      
+<blockquote><font color="#000099"><big> If you do not have</big> <big><span
+ style="color: rgb(51,51,153);"> </span></big><big><span
+ style="color: rgb(51,51,153);">Java 3D Runtime installed on your computer,
+please install it first, or the client will start without the 3D panel enabled!
+  </span></big></font><br>
+  <big><span style="color: rgb(51,51,153);"> </span></big></blockquote>
+ <big><span style="color: rgb(51,51,153);">&nbsp;</span></big>
+<p><br>
+&nbsp; </p>
+<p>
+<script language="Javascript" type="text/javascript">
+ launchLink("images/flame.gif", "MonaLisa.jnlp", 60, 30);
+</script> </p>
+<p><br>
+ </p>
+<center><font size="+1" color="#000099"> If you are using Netscape/Mozilla
+&gt; 6.0 please click this  <a
+ href="http://monalisa.cacr.caltech.edu/jClient/MonaLisa.jnlp">link</a></font></center>
+ <br>
+&nbsp; <br>
+&nbsp; 
+<p> <br>
+&nbsp;</p>
+<p><b><font color="#000099"></font></b><br>
+&nbsp; </p>
+<p> </p>
+<center> 
+<p><b><i><font size="+1">Instructions in how&nbsp; to use it :</font></i></b></p>
+</center>
+  
+<p><i>At the start time, the application is using a set of JINI Lookup Discovery
+Services&nbsp; (unicast mode) to&nbsp; find all the active monitoring services
+registered.</i> <br>
+<i>For each active service the GUI connects to the center and you can get
+any global views as well as any parameter which was collected.</i> </p>
+<p><b><i>A few Examples :</i></b> </p>
+<p><i>MonaLisa&nbsp; starts with GUI which shows all the discovered centers 
+and provides several global views :</i> <br>
+<img src="globe.jpg" height="413" width="852">
+ </p>
+<p>The load of the centers is shown using different colors and this view the
+traffic on the transatlantic&nbsp; line from CERN to Chicago is shown. </p>
+<p>In the Graph view, </p>
+<p><img src="gmap.jpg" height="413" width="852">
+ </p>
+<p>the global&nbsp; load, Cpu usage, aggregate IO traffic&nbsp; can be selected
+from the top/right menu.&nbsp; The measured bandwidth between sites is also
+shown and updated in real-time. <br>
+If a Regional Center is selected with the first mouse button the Configuration 
+widow will pop up. <br>
+Drag and drop with the second mouse button to move centers on the graph <br>
+Click with the third mouse button on a center to see the best replication 
+path (blue lines ) from that Center to all the other centers. </p>
+<p>By Selecting Table option : </p>
+<p><img src="tab.jpg" height="413" width="852">
+ </p>
+<p>a set of values provided by global filters are update in real-time. Selecting
+the top of a column allows to sort centers based on that value. </p>
+<p>The global load view shows a distribution of load for the nodes in all 
+the regional centers : <br>
+<img src="gload.jpg" height="413" width="852">
+ <br>
+&nbsp; </p>
+<p>The traffic with major networks is presented in WAN view : </p>
+<p><img src="wan.jpg" height="413" width="852">
+ <br>
+&nbsp; <br>
+&nbsp; </p>
+<p>If you select with the&nbsp; mouse a center in&nbsp; one of the global 
+views, the configuration of the center <br>
+is presented. </p>
+<p><img src="rc.gif" height="377" width="500">
+ <br>
+&nbsp; </p>
+<p>You can now selected individual nodes or clusters and plot the time evolution
+os the selected parameters. <br>
+&nbsp; </p>
+<p>A few examples </p>
+<p>( Select Internet &amp; Select RTT , and press Plot ) <br>
+<img src="rtt.gif" height="530" width="573">
+ <br>
+&nbsp; </p>
+<p>Select PN&nbsp; &amp; select ( Load 5 &amp; Load 10 -- keep shift press 
+) and&nbsp; press RL_Plot <br>
+<img src="load.gif" height="483" width="828">
+ <br>
+&nbsp; <br>
+&nbsp; </p>
+<p>Select PN Select Load10 and press Plot </p>
+<p><img src="load_all.gif" height="606" width="595">
+ <br>
+&nbsp; <br>
+&nbsp; </p>
+<p>If in the Gmap view you select a node with the third button : </p>
+<p><img src="algo.gif" height="304" width="600">
+ </p>
+<p>The system shows the best replication path from that center to all the 
+others. </p>
+<p>With the second button you can move the centers in the Gmap view. <br>
+&nbsp; </p>
+<p>Enjoy ! MonaLisa <br>
+&nbsp; </p>
+<p> </p>
+<hr><font size="-2">Last Update:&nbsp; Oct 20 , 2002</font> <br>
+</body>
+</html>

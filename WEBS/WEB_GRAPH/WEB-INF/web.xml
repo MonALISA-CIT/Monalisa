@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+  <servlet>
+    <servlet-name>display</servlet-name>
+    <display-name>display</display-name>
+    <servlet-class>
+	lia.web.servlets.web.display
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>stats</servlet-name>
+    <display-name>stats</display-name>
+    <servlet-class>
+	lia.web.servlets.web.stats
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>genimage</servlet-name>
+    <display-name>genimage</display-name>
+    <servlet-class>
+	lia.web.servlets.web.genimage
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>abping</servlet-name>
+    <display-name>abping</display-name>
+    <servlet-class>
+	lia.web.servlets.web.ABPing
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>FarmMap</servlet-name>
+    <display-name>FarmMap</display-name>
+    <servlet-class>
+        lia.web.servlets.map2d.FarmMap
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+			      
+  <servlet>
+      <servlet-name>Map2D</servlet-name>
+      <display-name>Map2D</display-name>
+      <servlet-class>
+          lia.web.servlets.map2d.Map2D
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
+								
+    <servlet>
+      <servlet-name>show</servlet-name>
+      <display-name>show</display-name>
+      <servlet-class>
+          lia.web.servlets.map2d.show
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <servlet>
+      <servlet-name>simple</servlet-name>
+      <display-name>simple</display-name>
+      <servlet-class>
+	  lia.web.servlets.web.simple
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+                                    
+
+    <servlet-mapping>
+      <servlet-name>simple</servlet-name>
+      <url-pattern>/simple</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+      <servlet-name>Correlations</servlet-name>
+      <display-name>Correlations</display-name>
+      <servlet-class>
+	  lia.web.servlets.web.Correlations
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+    </servlet>
+                                    
+
+    <servlet-mapping>
+      <servlet-name>Correlations</servlet-name>
+      <url-pattern>/Correlations</url-pattern>
+    </servlet-mapping>
+
+
+
+
+  <!-- .............................. -->
+
+  <servlet-mapping>
+    <servlet-name>display</servlet-name>
+    <url-pattern>/display</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>stats</servlet-name>
+    <url-pattern>/stats</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>genimage</servlet-name>
+    <url-pattern>/genimage</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>abping</servlet-name>
+    <url-pattern>/abping</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+      <servlet-name>FarmMap</servlet-name>
+      <url-pattern>/FarmMap</url-pattern>
+    </servlet-mapping>
+	    
+  <servlet-mapping>
+      <servlet-name>Map2D</servlet-name>
+      <url-pattern>/Map2D</url-pattern>
+    </servlet-mapping>
+			
+    <servlet-mapping>
+      <servlet-name>show</servlet-name>
+      <url-pattern>/show</url-pattern>
+    </servlet-mapping>        
+  
+  
+  <!-- .............................. -->
+
+  <welcome-file-list>
+    <welcome-file>
+      index.jsp
+    </welcome-file>
+  </welcome-file-list>
+
+  <!-- SECURITY CONSTRAINT -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>ABPing configuration</web-resource-name>
+      <url-pattern>/abping</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Repository configuration</web-resource-name>
+      <url-pattern>/admin.jsp</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Documentation edit</web-resource-name>
+      <url-pattern>/doc/edit.jsp</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+  
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Annotations editor</web-resource-name>
+      <url-pattern>/annotation.jsp</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Administrative priviledges required</web-resource-name>
+      <url-pattern>/dologin.jsp</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Admistrative priviledges required</web-resource-name>
+      <url-pattern>/admin/*</url-pattern>
+      <http-method>GET</http-method>
+      <http-method>POST</http-method>
+    </web-resource-collection>
+
+    <auth-constraint>
+      <role-name>admin</role-name>
+    </auth-constraint>
+
+    <user-data-constraint>
+      <transport-guarantee>NONE</transport-guarantee>
+    </user-data-constraint>
+  </security-constraint>
+
+
+  <login-config>
+    <auth-method>BASIC</auth-method>
+    <realm-name>ML Repository administrative section</realm-name>
+  </login-config>
+
+  <!-- SECURITY ROLES -->
+  <security-role>
+    <role-name>admin</role-name>
+  </security-role>
+
+</web-app>

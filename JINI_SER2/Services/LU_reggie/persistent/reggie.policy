@@ -1,0 +1,74 @@
+grant {
+    permission java.util.PropertyPermission "jini.ser.*", "read";
+};
+
+grant codebase "file:${jini.ser.home}/lib/jsk-platform.jar" {
+    permission java.security.AllPermission;
+};
+
+grant codebase "file:${jini.ser.home}/lib/reggie.jar" {
+    permission java.security.AllPermission;
+};
+
+
+
+/*remote method invocation permissions*/
+grant {
+    /*  ----remote methods from ServiceRegistrar.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "getEntryClasses";
+    permission com.sun.jini.reggie.RegistrarPermission "getFieldValues";
+    permission com.sun.jini.reggie.RegistrarPermission "getMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getLocator";
+    permission com.sun.jini.reggie.RegistrarPermission "getServiceTypes";
+    permission com.sun.jini.reggie.RegistrarPermission "lookup";
+    permission com.sun.jini.reggie.RegistrarPermission "notify";
+    permission com.sun.jini.reggie.RegistrarPermission "register";
+
+    /*  ----remote methods from ServiceProxyAccessor.* ---- */
+    permission com.sun.jini.reggie.RegistrarPermission "getServiceProxy";
+
+    /*  ----remote methods from ServiceRegistration.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "addAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "modifyAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "setAttributes";
+
+    /*  ----remote methods from Lease.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "cancelEventLease";
+    permission com.sun.jini.reggie.RegistrarPermission "renewEventLease";
+    permission com.sun.jini.reggie.RegistrarPermission "cancelServiceLease";
+    permission com.sun.jini.reggie.RegistrarPermission "renewServiceLease";
+
+    /*  ----remote methods from LeaseMap.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "cancelLeases";
+    permission com.sun.jini.reggie.RegistrarPermission "renewLeases";
+
+		/* ADMIN !!! use with care */
+    /*  ----remote methods from Administrable.* ----    */
+    
+    //permission com.sun.jini.reggie.RegistrarPermission "getAdmin";
+    
+    /*  ----remote methods from DiscoveryAdmin.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "addMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getUnicastPort";
+    permission com.sun.jini.reggie.RegistrarPermission "removeMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "setMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "setUnicastPort";
+
+    /*  ----remote methods from JoinAdmin.* ----    */
+    permission com.sun.jini.reggie.RegistrarPermission "addLookupAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "addLookupGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "addLookupLocators";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupLocators";
+    permission com.sun.jini.reggie.RegistrarPermission "modifyLookupAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "removeLookupGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "removeLookupLocators";
+    permission com.sun.jini.reggie.RegistrarPermission "setLookupGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "setLookupLocators";
+
+    /*  ----remote methods from DestroyAdmin.* ----    */
+    //permission com.sun.jini.reggie.RegistrarPermission "destroy";
+};

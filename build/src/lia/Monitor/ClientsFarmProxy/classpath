@@ -1,0 +1,1 @@
+export CLASSPATH=:../../..:/root/RAMIRO/MSRC/lib/jini-core.jar:/root/RAMIRO/MSRC/lib/jini-ext.jar:/root/RAMIRO/MSRC/lib/monarc_plot.jar:/root/RAMIRO/MSRC/lib/tools.jar

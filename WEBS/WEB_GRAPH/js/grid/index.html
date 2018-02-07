@@ -1,0 +1,142 @@
+<html>
+<head>
+<script>var currentTab;</script>
+<script src="prototype.js" type="text/javascript"></script>
+<script src="scriptaculous.js" type="text/javascript"></script>
+<script src="controls.js" type="text/javascript"></script>
+<script src="effects.js" type="text/javascript"></script>
+<style>
+
+.text_normal{
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+form.inplaceeditor-form { /* The form */
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+form.inplaceeditor-form input { /* Input box */
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 11px;
+    text-decoration: none;
+    border: solid 1px #CCCCCC;
+    width: 50px;
+}
+
+.inplaceeditor-saving { /* The form */
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 11px;
+    text-decoration: none;
+}
+
+.inplaceeditor-loading{
+    font-family: Verdana, Arial, Tahoma;
+    font-size: 11px;
+    text-decoration: none;
+
+}
+
+</style>
+
+<script type="text/javascript">
+	var djConfig = { isDebug: true };
+</script>
+<script type="text/javascript" src="dojo.js"></script>
+<script type="text/javascript">
+	dojo.require("dojo.widget.TabContainer");
+	dojo.require("dojo.widget.ContentPane");
+</script>
+
+<style type="text/css">
+body {
+	font-family : sans-serif;
+}
+
+/* add padding to each contentpane inside the tab container, and scrollbar if necessary */
+.dojoTabPane {
+  padding : 10px 10px 10px 10px;
+  overflow: auto;
+}
+
+</style>
+
+
+</head>
+<script>
+function updateTableCols(rowElement, rowValue){
+    var iTotalRows = 4;
+    var temp = rowElement.id.split("_");
+    
+    var sRowName = temp[0]+"_"+temp[1];
+    var iRowId = temp[2];
+    
+    for(i=iRowId; i<=iTotalRows; i++){
+	
+	if(document.getElementById(sRowName+"_"+i).innerHTML == "-"){
+	    document.getElementById(sRowName+"_"+i).innerHTML = rowValue;
+	}
+    }
+    
+}
+</script>
+<body>
+    <div id="mainTabContainer" dojoType="TabContainer" style="width: 100%; height: 20em;" selectedChild="tab1">
+	 <div dojoType="ContentPane" label="Tab 1" refreshOnShow="true" id="tab1">
+	    <table border="1" cellpadding="3">
+		<tr>	
+		    <td colspan="4">Tab1</td>
+		</tr>
+		<tr>
+		    <td width="150" valign="top">
+			<p id="t1_CERN_1" class="text_normal">&nbsp;</p>
+		        <script type="text/javascript">new Ajax.InPlaceEditor('t1_CERN_1', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" ,callback: function(form, value) { return 'value=' + escape(value)+ '&field=el11'}, onComplete : function(transport, element) {updateTableCols(element, transport.responseText)}  });</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="t1_CERN_2" class="text_normal">-</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('t1_CERN_2', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" ,callback: function(form, value) { return 'value=' + escape(value)+ '&field=el12'}, onComplete : function(transport, element) {}});</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="t1_CERN_3" class="text_normal">-</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('t1_CERN_3', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" , callback: function(form, value) { return 'value=' + escape(value)+ '&field=el13'}, onComplete : function(transport, element) {}});</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="t1_CERN_4" class="text_normal">-</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('t1_CERN_4', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" , callback: function(form, value) { return 'value=' + escape(value)+ '&field=el14'}, onComplete : function(transport, element) {}});</script>
+		    </td>
+		</tr>
+	    </table>
+	 </div>
+
+	 <div dojoType="ContentPane" label="Tab 2" id="tab2">
+	    <table border="1" cellpadding="3">
+		<tr>	
+		    <td colspan="4">Tab 2</td>
+		</tr>
+		<tr>
+		    <td width="150" valign="top">
+			<p id="fl11" class="text_normal">&nbsp;</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('fl11', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" ,callback: function(form, value) { return 'value=' + escape(value)+ '&field=el11'}, onComplete : function(transport, element) {}  });</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="fl12" class="text_normal">Click2</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('fl12', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" ,callback: function(form, value) { return 'value=' + escape(value)+ '&field=el12'}, onComplete : function(transport, element) {}});</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="fl13" class="text_normal">Click3</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('fl13', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" , callback: function(form, value) { return 'value=' + escape(value)+ '&field=el13'}, onComplete : function(transport, element) {}});</script>
+		    </td>
+		    <td width="150" valign="top">
+			<p id="fl14" class="text_normal">Click4</p>
+			<script type="text/javascript">new Ajax.InPlaceEditor('fl14', 'ajax.php', {okButton: false, cancelLink : false, highlightcolor:"#EDEDFF" , callback: function(form, value) { return 'value=' + escape(value)+ '&field=el14'}, onComplete : function(transport, element) {}});</script>
+    		    </td>
+		</tr>
+	    </table>
+	 </div>
+    </div>
+
+</body>
+</html>

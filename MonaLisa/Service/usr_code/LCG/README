@@ -1,0 +1,110 @@
+ 
+LCG VO-IO and VO-JOBS Modules Configuration
+==================================
+    
+    The LCG modules are located in $MonaLisa_HOME/Service/usr_code/LCG
+ 
+ monalisa@mon:usr_code$ cd $MonaLisa_HOME/Service/usr_code/LCG && ./comp 
+  
+Configuration
+=========
+        
+         a)  Edit your service configuration file (e.g $MonaLisa_HOME/Service/myFarm/myFarm.conf) and paste the fallowing configuration snippet at the end of file
+
+----------------------
+ #[LCG modules] set <your_ce_host> to your CE hostname/ip 
+
+ #Site configuration
+ *PN_PBS_LCG{monPN_LCG_PBS, localhost, GridDistribution=LCG2.4, RemoteHost=<your_ce_host>, Statistics}%60
+ 
+
+ #Jobs Monitoring
+ # Add to the following list the "MapFile" and "SiteInfoFile" parameters to the location of users.conf and site-inf.def files
+ # MapFile=<path.to.site_users.conf>, SiteInfoFile=<path.to.site.site-info.def>
+ # The default path for these files is: /opt/lcg/yaim/examples
+ *LcgVO_JOBS_CE{monLcgVoJobs, localhost, GridDistribution=LCG2.4, RemoteHost=<your_ce_host>, JobManager=PBS}%60 
+
+ #IO Traffic Monitoring
+ #Computing Element (remote)
+ # Add to the following list the "MapFile" and "SiteInfoFile" parameters to the location of users.conf and site-inf.def files
+ # MapFile=<path.to.site_users.conf>, SiteInfoFile=<path.to.site.site-info.def>
+ # The default path for these files is: /opt/lcg/yaim/examples
+ *LcgVO_IO_CE{monLcgVO_IO, localhost, GridDistribution=LCG2.4, RemoteHost=<your_ce_host>, RemoteFile=/var/log/globus-gridftp.log}%180 
+
+ #Storage Element (local)
+ # Add to the following list the "MapFile" and "SiteInfoFile" parameters to the location of users.conf and site-inf.def files
+ # MapFile=<path.to.site_users.conf>, SiteInfoFile=<path.to.site.site-info.def>
+ # The default path for these files is: /opt/lcg/yaim/examples
+ *LcgVO_IO_SE{monLcgVO_IO, localhost, GridDistribution=LCG2.4, FtpLog=/var/log/globus-gridftp.log}%180
+-------------------
+
+          b) Edit <MonALISA_HOME>/Service/myFarm/ml.properties, find the [Loading of Additional modules] section and set the path to 
+        your LCG modules  in order to be dynamically loaded:
+ lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/LCG/,file:${MonaLisa_HOME}/Service/usr_code/FilterExamples/ExLoadFilter/ 
+
+          c) Edit <MonALISA_HOME>/Service/myFarm/ml.properties, find the [REGISTRATION] section and set your group to "seegrid"
+				 lia.Monitor.group=seegrid 
+
+          d) Setup remote access from the MON node to the CE and SE nodes (remote_access.sh)
+ 
+            The MonALISA modules require remote access between CE and SE nodes in order to collect the site information:
+                     
+            1. It is recommended that on both CE and SE nodes a user named "monalisa" to be created
+            2. On the MON(SE) node install and run the MonALISA service under the "monalisa" user credentials
+            3. Set up the CE node so as the remote access via ssh between SE and CE to be executed without 
+            password challenge for the "monalisa" user.In order to do that you could use the "remote_access.sh" script which
+            run it on the CE and SE under "monalisa" account
+                  NOTE: 
+                   The following procedure may help you in respect with the 1.d) step:
+                   
+                   Create "monalisa" account on MON,CE,SE nodes:
+                   MON:
+				root@MON# groupadd monalisa && useradd -g monalisa monalisa
+				root@MON# passwd monalisa 
+				New Password: <PASS>
+				Re-enter ...: <PASS> 
+				root@MON# id monalisa 
+				//example output
+				uid=20947(monalisa) gid=2689(monalisa) groups=2689(monalisa) 
+	
+                     CE
+				
+				//replace XXXX with the GID returned by the "id" command on the MON
+				root@CE# groupadd -g XXXX monalisa 
+				
+				//replace XXXX with the UID returned by the "id" command on the MON
+				root@CE# useradd -u XXXXX -g monalisa monalisa 
+				
+				//same password as on the MON 
+				root@CE# passwd monalisa 
+				New Password: <PASS> 
+				Re-enter ...: <PASS> 
+ 
+                     SE (optional, if SE is not the same as MON node)
+
+				//replace XXXX with the GID returned by the "id" command on the MON
+				root@SE# groupadd -g XXXX monalisa 
+				
+				//replace XXXX with the UID returned by the "id" command on the MON
+				root@SE# useradd -u XXXXX -g monalisa monalisa 
+				
+				//same password as on the MON 
+				root@SE# passwd monalisa 
+				New Password: <PASS> 
+				Re-enter ...: <PASS>
+ 
+                     Back on the MON host
+                   Distribute the ssh "monalisa" public key from the MON node to CE,SE nodes
+                   Download the remote access setup script from http://gw01.rogrid.pub.ro/monalisa/lcg-modules/remote_access.sh         
+                   The remote_access.sh script (distributed with LCG modules) may help you to copy the SSH public key from local system to the .ssh/authorized_keys on the specified remote system. 
+                   If the identity public key does not exist this script will generate a *fresh* key-pair.
+
+				root@MON# su - monalisa
+				monalisa@MON$ wget http://gw01.rogrid.pub.ro/monalisa/lcg-modules/remote_access.sh
+				monalisa@MON$ chmod 700 remote_access.sh
+				monalisa@MON$ ./remote_access.sh <CE_HOST>
+				monalisa@MON$ ./remote_access.sh <SE_HOST>
+ 
+          e) Start/Restart MonALISA service:
+
+ 			root@MON:Service/CMD# ML_SER start

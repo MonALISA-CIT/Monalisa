@@ -1,0 +1,8 @@
+#!/bin/bash
+for png in images/*.png
+do
+	eps="`echo $png | cut -f1 -d.`.eps"
+	echo $png "->" $eps
+	convert $png -density 200 $eps
+done
+

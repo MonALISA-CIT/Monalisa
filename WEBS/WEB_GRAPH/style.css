@@ -1,0 +1,133 @@
+.alternate {
+    font-family:Verdana,Helvetica,Arial;
+    font-size:12px;
+}
+
+a.stats {
+    font-family:Verdana,Helvetica,Arial;
+    font-size:12px;
+    text-decoration: none;
+    color:#000000;
+}
+		
+a.stats:hover {
+    color:#0000FF;
+    text-decoration: underline;
+}
+
+body {
+	background-color: #eaeaea;
+	margin-top: 0px;
+}
+
+
+.checkboxmenu{
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #333;
+}
+
+.checkboxmenu a{
+	color: #000066;
+	text-decoration:none;
+}
+
+
+.whitetextsmall{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+}
+
+.whitetextlarge{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 22px;
+	font-weight: bold;
+	color: #FFFFFF;	
+}
+
+.textupdate{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+}
+
+.textmenublue{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+}
+
+
+.linkmenublue{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.linkmenublue:active {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.linkmenublue:visited {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.linkmenublue:hover {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.linkmenublue:link {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #053887;
+	font-weight: bold;
+	text-decoration: underline;
+}
+
+.style1 {font-size: 9px}
+
+a.link_header:link { 
+	color: #0000EE;
+	padding: 2px; 
+	padding-right: 5px; 
+	padding-left: 5px; 
+        font-size: 11px;
+        text-decoration: none;
+        font-weight: normal;
+}
+
+a.link_header:visited { 
+	color: #0000EE;
+	padding: 2px; 
+	padding-right: 5px; 
+	padding-left: 5px; 
+        font-size: 11px;
+        text-decoration: none;
+        font-weight: normal;
+}
+
+a.link_header:hover{
+	padding: 2px;
+	padding-right: 5px;
+	padding-left: 5px;
+        font-size: 11px;
+        text-decoration: none;
+        font-weight: normal;
+}

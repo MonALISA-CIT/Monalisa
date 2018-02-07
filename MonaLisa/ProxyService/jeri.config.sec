@@ -1,0 +1,74 @@
+import net.jini.jeri.BasicILFactory;
+import net.jini.jeri.BasicJeriExporter;
+import net.jini.jeri.tcp.TcpServerEndpoint;
+import net.jini.jrmp.*;
+
+import java.security.Permission;
+
+import javax.security.auth.login.LoginContext;
+
+import net.jini.constraint.BasicMethodConstraints;
+import net.jini.core.constraint.ClientAuthentication;
+import net.jini.core.constraint.InvocationConstraint;
+import net.jini.core.constraint.InvocationConstraints;
+import net.jini.core.constraint.Integrity;
+import net.jini.core.constraint.ServerAuthentication;
+import net.jini.core.constraint.ServerMinPrincipal;
+import net.jini.discovery.LookupDiscovery;
+import net.jini.security.*;
+import net.jini.jeri.*;
+import net.jini.jeri.ssl.*;
+import net.jini.jeri.tcp.*;
+
+
+
+lia.Monitor.ClientsFarmProxy.ProxyService {
+    
+    /* JAAS login */
+    loginContext = new LoginContext("lia.Monitor.ClientsFarmProxy.ProxyService");    
+
+    //exporter = new JrmpExporter();
+    exporter =  new BasicJeriExporter(TcpServerEndpoint.getInstance(0),
+    			  new BasicILFactory());
+}
+
+/* Configuration block for the lookup discovery utility */
+net.jini.discovery.LookupDiscovery {
+
+    private serviceLookupConstraints = 
+	new BasicMethodConstraints( 
+	    new InvocationConstraints( 
+		new InvocationConstraint[]{
+		   /* require authenticate to LUS*/
+		   ClientAuthentication.YES		   
+		                         
+                    },
+                new InvocationConstraint[]{ServerAuthentication.NO
+		 /* prefer authenticate to LUS 
+		ClientAuthentication.YES*/}));
+
+    static registrarPreparer = new BasicProxyPreparer(
+	false, /*do not verify proxy from LUS*/
+        serviceLookupConstraints,    
+        new Permission[] {  });
+	
+   discoveryConstraints =
+   new BasicMethodConstraints(
+        new InvocationConstraints(new com.sun.jini.discovery.UnicastSocketTimeout(120000), null));
+
+
+}//end net.jini.discovery.LookupDiscovery
+
+/* Configuration block for the join manager */
+net.jini.lookup.JoinManager {
+
+    static registrarPreparer    = 
+	net.jini.discovery.LookupDiscovery.registrarPreparer;
+    static registrationPreparer = 
+	net.jini.discovery.LookupDiscovery.registrarPreparer;
+    static serviceLeasePreparer = 
+	net.jini.discovery.LookupDiscovery.registrarPreparer;
+
+}//end net.jini.lookup.JoinManager
+
+

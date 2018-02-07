@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment xmlns="http://xml.apache.org/axis/wsdd/" xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+ <globalConfiguration>
+  <parameter name="adminPassword" value="admin"/>
+  <parameter name="attachments.Directory" value="/root/MSRC/WEBS/axis/WEB-INF/attachments"/>
+  <parameter name="sendMultiRefs" value="true"/>
+  <parameter name="sendXsiTypes" value="true"/>
+  <parameter name="attachments.implementation" value="org.apache.axis.attachments.AttachmentsImpl"/>
+  <parameter name="sendXMLDeclaration" value="true"/>
+  <parameter name="axis.sendMinimizedElements" value="true"/>
+  <requestFlow>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="session"/>
+   </handler>
+   <handler type="java:org.apache.axis.handlers.JWSHandler">
+    <parameter name="scope" value="request"/>
+    <parameter name="extension" value=".jwr"/>
+   </handler>
+  </requestFlow>
+ </globalConfiguration>
+ <handler name="LocalResponder" type="java:org.apache.axis.transport.local.LocalResponder"/>
+ <handler name="Authenticate" type="java:org.apache.axis.handlers.SimpleAuthenticationHandler"/>
+ <handler name="URLMapper" type="java:org.apache.axis.handlers.http.URLMapper"/>
+ <service name="Version" provider="java:RPC">
+  <parameter name="allowedMethods" value="getVersion"/>
+  <parameter name="className" value="org.apache.axis.Version"/>
+ </service>
+ <service name="AdminService" provider="java:MSG">
+  <parameter name="allowedMethods" value="AdminService"/>
+  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="className" value="org.apache.axis.utils.Admin"/>
+  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
+ </service>
+ <service name="MLWebService" provider="java:RPC">
+  <operation name="getValues" qname="ns1:getValues" returnQName="getValuesReturn" returnType="ns1:ArrayOf_tns1_Result" xmlns:ns1="urn:lia.ws">
+   <parameter name="in0" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in1" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in2" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in3" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in4" type="xsd:long" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in5" type="xsd:long" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  </operation>
+  <operation name="getConfiguration" qname="ns2:getConfiguration" returnQName="getConfigurationReturn" returnType="ns2:ArrayOf_tns1_WSConf" xmlns:ns2="urn:lia.ws">
+   <parameter name="in0" type="xsd:long" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in1" type="xsd:long" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  </operation>
+  <operation name="getLatestConfiguration" qname="ns3:getLatestConfiguration" returnQName="getLatestConfigurationReturn" returnType="ns3:ArrayOf_tns1_WSConf" xmlns:ns3="urn:lia.ws">
+   <parameter name="in0" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  </operation>
+  <operation name="getLastValues" qname="ns1:getLastValues" returnQName="getLastValuesReturn" returnType="ns1:ArrayOf_tns1_Result" xmlns:ns1="urn:lia.ws">
+  </operation>
+  <operation name="getFilteredLastValues" qname="ns1:getFilteredLastValues" returnQName="getFilteredLastValuesReturn" returnType="ns1:ArrayOf_tns1_Result" xmlns:ns1="urn:lia.ws">
+   <parameter name="in0" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in1" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in2" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+   <parameter name="in3" type="xsd:string" xmlns:xsd="http://www.w3.org/2001/XMLSchema"/>
+  </operation>
+  <parameter name="allowedMethods" value="getConfiguration getValues getLatestConfiguration getLastValues getFilteredLastValues"/>
+  <parameter name="wsdlPortType" value="MLWebService"/>
+  <parameter name="className" value="lia.ws.MLWebServiceSoapBindingImpl"/>
+  <parameter name="wsdlServicePort" value="MLWebService"/>
+  <parameter name="wsdlTargetNamespace" value="urn:lia.ws"/>
+  <parameter name="wsdlServiceElement" value="MLWebServiceService"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns4:ArrayOf_tns1_Result" serializer="org.apache.axis.encoding.ser.ArraySerializerFactory" type="java:lia.ws.Result[]" xmlns:ns4="urn:lia.ws"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns5:WSNode" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:lia.ws.WSNode" xmlns:ns5="http://ws.lia"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns6:Result" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:lia.ws.Result" xmlns:ns6="http://ws.lia"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns7:ArrayOf_tns1_WSConf" serializer="org.apache.axis.encoding.ser.ArraySerializerFactory" type="java:lia.ws.WSConf[]" xmlns:ns7="urn:lia.ws"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns8:ArrayOf_xsd_string" serializer="org.apache.axis.encoding.ser.ArraySerializerFactory" type="java:java.lang.String[]" xmlns:ns8="urn:lia.ws"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns9:WSConf" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:lia.ws.WSConf" xmlns:ns9="http://ws.lia"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns10:ArrayOf_tns1_WSNode" serializer="org.apache.axis.encoding.ser.ArraySerializerFactory" type="java:lia.ws.WSNode[]" xmlns:ns10="urn:lia.ws"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns11:WSFarm" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:lia.ws.WSFarm" xmlns:ns11="http://ws.lia"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns12:WSCluster" serializer="org.apache.axis.encoding.ser.BeanSerializerFactory" type="java:lia.ws.WSCluster" xmlns:ns12="http://ws.lia"/>
+  <typeMapping deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" qname="ns13:ArrayOf_tns1_WSCluster" serializer="org.apache.axis.encoding.ser.ArraySerializerFactory" type="java:lia.ws.WSCluster[]" xmlns:ns13="urn:lia.ws"/>
+ </service>
+ <transport name="local">
+  <responseFlow>
+   <handler type="LocalResponder"/>
+  </responseFlow>
+ </transport>
+ <transport name="http">
+  <requestFlow>
+   <handler type="URLMapper"/>
+   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+  </requestFlow>
+ </transport>
+</deployment>

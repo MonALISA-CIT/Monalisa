@@ -1,0 +1,4 @@
+Make manipulators smoother, so the Earth is transformed at constant
+speed. Maybe even let the Earth keep spinning if the user gets it started.
+
+Add keyboard manipulators?

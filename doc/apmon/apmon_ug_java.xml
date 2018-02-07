@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+<bookinfo>
+  <title>ApMon Java User Guide</title>
+  <!--
+      <authorgroup>
+      <author>
+      <firstname>Iosif</firstname>
+      <surname>Legrand</surname>
+	<affiliation>
+	<address>
+	<email>Iosif.Legrand@cern.ch</email>
+	</address>
+	</affiliation>
+	</author>
+	</authorgroup>
+  -->	 
+  <copyright>
+    <year>2005</year>
+    <holder>California Institute of Technology</holder>
+  </copyright>
+</bookinfo>
+
+<chapter id="installation" xreflabel="Installation">
+  <title>Installation</title>
+  
+  <para>
+  The ApMon archive contains the following files and folders:
+  <itemizedlist>
+    <listitem><emphasis>apmon/</emphasis> - 
+    package that contains the ApMon class and other helper classes:
+    <itemizedlist>
+      <listitem><emphasis>XDRDataOutput</emphasis> and <emphasis>
+      XDROutputStream</emphasis>, which are a part of a library for XDR
+      encoding/decoding, provided under the LGPL license - see 
+      <ulink url="http://java.freehep.org">http://java.freehep.org</ulink>
+      </listitem>
+      <listitem>the <emphasis>lisa_host</emphasis> package, which contains
+      classes from LISA - see <ulink url="http://monalisa.cacr.caltech.edu/dev_lisa.html">
+      http://monalisa.cacr.caltech.edu/dev_lisa.html</ulink>.
+      </listitem>
+    </itemizedlist>
+    </listitem>
+    <listitem><emphasis>lib/</emphasis> - 
+    directory which will contain, after building, the libraries 
+    needed in order to use ApMon</listitem>
+    <listitem><emphasis>examples/</emphasis> 
+     examples for using the routines</listitem>
+    <listitem><emphasis>lesser.txt</emphasis>
+    - the LGPL license for the XDR library</listitem> 
+    <listitem><emphasis>destinations.conf</emphasis> - 
+    contains the IP addresses or DNS names of the 
+    destination hosts and the ports where the MonaLisa modules listen
+    </listitem>
+    <listitem><emphasis>build_apmon.sh, env_apmon</emphasis>
+    - for building on Linux systems</listitem>
+    <listitem><emphasis>build_apmon.bat</emphasis>
+    - for building on Windows systems</listitem>
+    <listitem><emphasis> README</emphasis></listitem>
+    <listitem><emphasis>Doxyfile</emphasis>
+    - for generating Doxygen documentation</listitem>
+  </itemizedlist>
+
+  There is an additional directory, <emphasis>ApMon_docs</emphasis>, which
+  contains the Doxygen documentation of the source files.
+ </para>
+  <para>
+  To build ApMon on Linux systems:
+  <orderedlist>
+    <listitem>
+      set the JAVA_HOME environment variable to the location where Java is 
+      installed
+    </listitem>
+    <listitem>
+      To build ApMon, cd to the ApMon directory and type:
+      <screen>
+	./build_apmon.sh
+      </screen>
+      The ApMon jar file (<emphasis>apmon.jar</emphasis>) and a small Linux 
+      library (<emphasis>libnativeapm.so</emphasis>) are now available in the 
+      <emphasis>lib/</emphasis> directory.
+      In order to use ApMon, the CLASSPATH must contain the path to <emphasis>
+      apmon.jar</emphasis> and, optionally, the LD_LIBRARY_PATH must contain 
+      the path to <emphasis>libnativeapm.so</emphasis> (this library only 
+      provides one function, mygetpid(), which has the functionality of 
+      <code>getpid()</code>. You might want to use it for job monitoring,   
+      as in <emphasis>Example_x1.java</emphasis> and <emphasis>Example_x2.java
+      </emphasis>). You can adjust the CLASSPATH and LD_LIBRARY_PATH manually 
+      or by sourcing the <emphasis>env_apmon</emphasis> script.
+    </listitem>
+    <listitem>
+      To build the ApMon examples, go to the examples/ directory and type:
+      <screen>./build_examples.sh</screen>
+    </listitem>
+  </orderedlist>
+  </para>
+  <para>
+  To build ApMon on Windows systems:
+  <orderedlist>
+    <listitem>
+      add the directory that contains the apmon package to the CLASSPATH
+    </listitem>
+    <listitem>
+      run build_apmon.bat
+    </listitem>
+    <listitem>
+      when running the examples, the directory <emphasis>
+      apmon\lisa_host\Windows</emphasis> must be in the library path (the 
+      <emphasis>system.dll</emphasis> library from this directory will be 
+      used).
+      This can be done by using the option <code>-Djava.library.path</code>:
+      <screen>
+	java -Djava.library.path=&lt;path to apmon\lisa_host\Windows&gt; exampleSend_1a
+      </screen>
+    </listitem>
+  </orderedlist>
+  </para>
+</chapter>
+<chapter id="using-apmon" xreflabel="Using ApMon">
+  <title>Using ApMon</title>
+
+  <sect1 id="initialization">
+    <title>ApMon Initialization</title>
+    
+    <para>
+      In the Java version, the ApMon features are available as methods of a 
+      class called ApMon. An ApMon object can be initialized with one of the 
+      constructors (see the API docs for more details):
+      <screen>ApMon(String filename);</screen>
+      - initializes ApMon from a configuration file whose name is given as 
+      parameter
+      
+      <screen>ApMon(Vector destList);</screen>
+      - initializes ApMon from a vector which contain strings of the form
+      "address:[port][ password]"  specifying destination hosts, and/or 
+      addresses of configuration webpages
+
+      <screen>ApMon(Vector destAddresses, Vector destPorts, Vector destPasswds);</screen>
+      - initializes ApMon from a list of destination hosts and the 
+      corresponding lists of ports and passwords
+    </para>
+  </sect1>
+
+  <sect1 id="sending-datagrams">
+    <title> Sending Datagrams</title>
+
+    <para>
+      There are two ways in which the user can send parameter values to MonALISA:
+      <orderedlist numeration="loweralpha">
+	<listitem>a single parameter in a datagram</listitem>
+	<listitem>multiple parameters in a datagram</listitem>
+      </orderedlist>
+    </para>
+    <para>
+      For sending a datagram with a single parameter, the user should call the
+      function <code>sendParameter()</code> which has several overloaded 
+      variants.
+    </para>
+    <para>
+      For sending multiple parameters in a datagram, the user should call the
+      function <code>sendParameters()</code>, which receives as arguments 
+      arrays with the names and the values of the parameters to be sent.
+    </para>
+    <para>
+      Since version 2.0 there are two additional functions, <code>
+      apMon_sendTimedParameter()</code> and <code>sendTimedParameters()
+      </code>, which allow the user to specify a timestamp for the parameters.
+    </para>
+    <para>
+      IMPORTANT:  When the ApMon object is no longer in use, the <code>
+      stopIt()</code> method should be called in order to close the UDP socket
+      used for sending the parameters.
+    </para>
+  </sect1>
+
+  <sect1 id="configuring-apmon">
+    <title>Configuring ApMon with the aid of the API</title>
+    
+    <para>
+      The behaviour of ApMon can be configured not only from the configuration 
+      files or webpages, but also with the aid of the API.
+      In order to enable the periodical reloading of the configuration files, 
+      the user should call <code>setConfCheck(true)</code>; the value of the 
+      time interval at which the recheck operatins are performed, can be set
+      with the functions <code>setConfRecheck()</code> or <code>
+      setRecheckInterval()</code>.
+    </para>
+    <para>
+      To enable/disable the automated job/system monitoring, and also to set 
+      the time intervals, the functions <code>setJobMonitoring()</code> and 
+      <code>setSysMonitoring()</code> can be used.
+    </para>
+  </sect1>
+
+  <sect1 id="automated-job-monitoring">
+    <title>Automated Job Monitoring</title>
+   
+    <para>
+      To monitor jobs, you have to specify the PID of the parent process for 
+      the tree of processes that you want to monitor, the working directory, 
+      the cluster and the node names that will be registered in MonALISA (and 
+      also the job monitoring must be enabled). If work directory is "", no 
+      information will be retrieved about disk:
+      <screen>
+	void addJobToMonitor(int pid, String workDir, String clusterName, String nodeName);
+      </screen>
+    </para>
+   <para>
+     To stop monitoring a job, the <code>removeJobToMonitor(int pid)</code>
+     should be called.
+      </para>
+ </sect1>
+
+ <sect1 id="logging">
+   <title>Logging</title>
+
+   <para>
+     ApMon prints its messages to a file called apmon.log, with the aid of the 
+     <code>Logger</code> class from the Java API. The user may print its own 
+     messages with the logger (see the examples). The ApMon loglevels are 
+     FATAL (equivalent to Level.SEVERE), WARNING, INFO, FINE, DEBUG 
+     (equivalent to Level.FINEST). The ApMon loglevel can be
+     set from the configuration file (by default it is INFO):
+     <screen>
+       xApMon_loglevel = &lt;level&gt;
+     </screen>
+     e.g.,
+     <screen>
+       xApMon_loglevel = FINE
+     </screen>
+
+     When setting the loglevel in the configuration file, you must use the 
+     ApMon level names rather than the Java names (so that the configuration 
+     file be compatible with the other ApMon versions). 
+   </para>
+   <para>
+     The loglevel can also be set with the function <code>setLogLevel()</code>
+     from the ApMon class.
+   </para>
+ </sect1>
+
+ <sect1 id="restrictions">
+   <title>Restrictions</title>
+  <para>
+    The maximum size of a datagram is specified by the constant MAX_DGRAM_SIZE;
+    by default it is 8192B and the user should not modify this value as some 
+    hosts may not support UDP datagrams larger than 8KB.
+ </para>
+ </sect1>
+
+</chapter>
+<chapter id="tutorial">
+  <title>How to Write a Simple Java Program with ApMon</title>
+   
+  <para>
+    In this section we show how the ApMon API can be used to write a simple
+    program that sends monitoring datagrams. The source code for this short 
+    tutorial (slightly modified)  can be found in the <code>Example_2.java
+    </code>file under the <emphasis>examples/</emphasis> directory.
+    The program generates some double values for a parameter called 
+    "my_cpu_load" and sends them to the MonALISA destinations. The number of
+    iterations is given as a command line argument; in each iteration two 
+    datagrams are sent, one with timestamp and one without timestamp. 
+  </para>
+  <para>
+    With this example program we'll illustrate the steps that should usually 
+    be taken to write a program with ApMon:
+  </para>
+  <para>
+    1. Import the ApMon package (and possibly other necessary packages):
+    <screen>
+      import java.util.Vector;
+      import java.util.logging.Logger;
+      
+      import apmon.*;
+    </screen>
+  </para>
+  <para>
+    2. Initialize  the variables we shall use..
+    <screen>
+      public class Example_2 {
+        private static Logger logger = Logger.getLogger("apmon");
+	
+	public static void main(String args[]) {
+	  Vector destList = new Vector(); 
+	  int nDatagrams = 20;
+	  ApMon apm = null;
+	  double val = 0;
+	  int i, timestamp;
+	  
+	  if (args.length == 1)
+	    nDatagrams = Integer.parseInt(args[0]);
+    </screen>
+  </para>
+
+  <para>
+    3. Construct an ApMon object (in this example we used an intialization 
+    list containing the name of a destination host, ui.rogrid.pub.ro, and a 
+    webpage where other destination hosts and possibly ApMon options can be 
+    specified). The ApMon functions throw exceptions if errors appear, so 
+    it is recommended to place them in a try-catch block: 
+    <screen>
+          destList.add(new String("ui.rogrid.pub.ro:8884 password"));
+	  destList.add(new String("http://lcfg.rogrid.pub.ro/~corina/destinations_2.conf"));
+    
+	  try {
+	    apm = new ApMon(destList);
+	  } catch (Exception e) {
+	    logger.severe("Error initializing ApMon: " + e);
+	  System.exit(-1);
+	  }
+    </screen>
+  </para>
+  <para>
+    4. Adjust the settings for the ApMon object, if necessary (here we set 
+    the time interval for reloading the configuration page to 300 sec, and 
+    we change the logging level to DEBUG). This can also be done from the 
+    configuration file.
+    <screen>
+          // set the time interval for periodically checking the 
+	  // configuration URL
+	  apm.setRecheckInterval(300);
+	  // this way we can change the logging level
+	  apm.setLogLevel("DEBUG");
+    </screen>
+  </para>
+  <para>
+    5. Send datagrams; we used here two functions: one that includes a 
+    timestamp in the datagram and one that doesn't.
+    <screen>
+          for (i = 0; i &lt; nDatagrams - 1; i++) {
+	    val += 0.05;
+	    if (val > 2)
+	      val = 0;
+      
+	    logger.info("Sending " + val + " for cpu_load");
+          
+	    try {
+	      /* use the wrapper function with simplified syntax */
+	      apm.sendParameter("TestCluster2_java", null, "my_cpu_load", 
+	      ApMon.XDR_REAL64, new Double(val));
+		 
+	      /* now send a datagram with timestamp (as if this was 5h ago) */
+	      long crtTime = System.currentTimeMillis();
+	      timestamp = (int)(crtTime / 1000 - (5 * 3600));
+	      apm.sendTimedParameter("TestClusterOld2_java", null, "my_cpu_load", 
+	      ApMon.XDR_REAL64, new Double(val), timestamp);
+	    } catch(Exception e) {
+	      logger.warning("Send operation failed: " + e);
+	    } 
+	    try {
+	      Thread.sleep(1000);
+	    } catch (Exception e) {}
+	  } // for
+    </screen>
+  </para>
+  <para>
+    6. Stop ApMon:
+    <screen>
+          apm.stopIt();      
+        }
+      }
+    </screen>
+  </para>
+</chapter>
+</book>

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#
+# ML Script Version:1.8.10
+#
+
+
+#
+# Please do not modify this file. It's supposed to be the flag for telling ML that is used for EVO.
+#
+# Authors: Ramiro.Voicu@cern.ch
+#
+# 03/02/2009 - First version of the script
+#
+
+JAVA_OPTS="\
+-Dcom.sun.jini.jeri.connectionTimeout=2400000 \
+-Dlia.Monitor.isVRVS=true \
+-DMonaLisa.Location=${EVO_INST} \
+-DMonaLisa.Country=${EVO_COUNTRY} \
+-DMonaLisa.LAT=${EVO_LAT} \
+-DMonaLisa.LONG=${EVO_LON} \
+${JAVA_OPTS}"

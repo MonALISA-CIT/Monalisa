@@ -1,0 +1,453 @@
+#!/bin/bash
+
+#
+# ML Script Version:13.11.042
+#
+
+#
+# Comments and suggestions: support@monalisa.cern.ch
+# 
+# 01/Aug/14 : Option to disable crontab management (set NO_CRONTAB_MANAGEMENT="true" in ml_env)
+# 04/Nov/13 : Fixed awk parsing
+# 07/May/12 : Crontab fixes for RHEL systems
+# 1/Apr/11 : Added condrestart
+# 19/Nov/10: Added crontab 
+# 12/Oct/10: Added -XX:UseMembar for java6 see BugID: 6822370 in Sun's Java Database. There were reports with Java 6u21...
+# 21/Nov/07: Filter ML processes to report only the head process - for 2.4 kernels
+# 24/Oct/07: Starting ML and update using the run() wrapper
+# 12/Jul/07: Added MLSER_SHELL variable. The ML_SER script should first try to use /bin/bash. Problems on Ubuntu with /bin/sh (-> dash)
+# 18/Mar/09: Return different exit codes for status() function. Remove .ml.pid file when ML stops.
+#
+
+PRG=$0
+#set -x
+# Get the original location of this script
+while [ -h "$PRG" ]; do
+	ls=`ls -ld "$PRG"`
+	link=`expr "$ls" : '.*-> \(.*\)$'`
+	if expr "$link" : '.*/.*' > /dev/null; then
+		PRG="$link"
+	else
+		PRG=`dirname "$PRG"`/"$link"
+	fi
+done
+
+# Fetch the special parameters
+if [ "$2" == "from_su" ]; then
+	FROM_SU=$2
+else
+	UPDATE_VERSION=$2
+	FROM_SU=$3
+fi
+
+# Set the shell to use
+MLSER_SHELL=/bin/bash
+if [ ! -x $MLSER_SHELL ]; then
+	MLSER_SHELL=/bin/sh
+	if [ ! -x $MLSER_SHELL ]; then
+		echo "Cannot use /bin/sh nor /bin/bash ??"
+		exit 1
+	fi
+fi
+
+# Load the standard ML environment variables from ml_env and site_env
+PRGDIR=`dirname "$PRG"`
+FULLPRGDIR=`cd "$PRGDIR"; pwd`
+CONFDIR=${CONFDIR:=$PRGDIR}
+COMMON_SH="$PRGDIR/common.sh"
+[ ! -r "$COMMON_SH" ] && echo "The script $COMMON_SH does not exist!" && exit 1
+. "$COMMON_SH"
+
+# Set platform-dependent parameters
+CMD_GREP_ML="grep Dlia.Monitor.Farm.HOME=$FARM_HOME"
+CMD_GREP_UPDATE="grep Dlia.Monitor.ConfigURL= | grep 'destdir $DEST_DIR'"
+case "`uname -s`" in
+	SunOS)
+		export PATH="/usr/xpg4/bin:$PATH"
+		CMD_PS="ps -fl -u $MONALISA_USER -o pid,ppid,args"
+		CMD_GREP_ML="grep 'java -Dlia.Monitor.Farm.HOME='"
+		CMD_GREP_UPDATE="grep 'java -Dlia.Monitor.ConfigURL='"
+		;;
+	Darwin)
+		CMD_PS="ps -ww -U $MONALISA_USER -o pid,ppid,command"
+		;;
+	*)
+		CMD_PS="ps -www -u $MONALISA_USER -o pid,ppid,command"
+		;;
+esac
+
+# Check if the current user is the same as the one defined in ml_env
+CRT_USER=`id | cut -d\( -f2 | cut -d\) -f1`
+if [ -z "$MONALISA_USER" ]; then
+	echo "Please set MONALISA_USER in $ML_ENV_FILE"
+	echo "e.g MONALISA_USER=$CRT_USER"
+	exit 1
+elif [ "$CRT_USER" != "$MONALISA_USER" ]; then
+	if [ -z "$FROM_SU" ]; then
+		echo "The current user ( $CRT_USER ) != MONALISA_USER ( $MONALISA_USER ) (as set in $ML_ENV_FILE ) will try to su in $MONALISA_USER."
+		su - $MONALISA_USER -c "$MLSER_SHELL -c \"$MonaLisa_HOME/Service/CMD/ML_SER $1 $UPDATE_VERSION from_su\""
+		exit $?
+	else
+		echo "Already from called from su and cannot switch user ... will exit!"
+		exit 1
+	fi
+fi
+
+# Check the environment variables (from common.sh)
+check_env
+if [ $? -ne 0 ]; then
+	echo "Errors setting env...Error messages should have been provided"
+	exit 1
+fi
+
+#Check if JVM support and set it -XX:UseMembar
+TEST_MEM_BAR=`echo "$JAVA_OPTS" | grep "UseMembar"`
+if [ -z "$NO_MEM_BAR" ]; then
+    java -XX:+UseMembar -version >/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        JAVA_OPTS="$JAVA_OPTS -XX:+UseMembar"
+    fi
+fi
+
+# Check the starting and maximum JVM memory sizes and limit them for JDK 1.5
+TEST_MX_MEM=`echo "$JAVA_OPTS" | sed -e "s/^.*-Xmx\([^ ]*\).*$/\1/"`
+TEST_MS_MEM=`echo "$JAVA_OPTS" | sed -e "s/^.*-Xms\([^ ]*\).*$/\1/"`
+if [ "$TEST_MX_MEM" != "$JAVA_OPTS" ]; then
+    #-Xmx was defined in ml_env
+    if [ "$TEST_MS_MEM" = "$JAVA_OPTS" ]; then
+       #Xms wasn't defined ... start with Xmx value
+       JAVA_OPTS="$JAVA_OPTS -Xms$TEST_MX_MEM"
+    fi
+    #both Xmx and Xms defined in ml_env
+else
+    #-Xmx wasn't defined in ml_env
+    if [ "$TEST_MS_MEM" != "$JAVA_OPTS" ]; then
+       #Xms was defined ... set also -Xmx at the same value!
+       #Guess that this was the desired expectation
+       JAVA_OPTS="$JAVA_OPTS -Xmx$TEST_MS_MEM"
+    else
+       #None of Xmx nor Xms defined ... set the default
+       JAVA_OPTS="$JAVA_OPTS -Xms64m -Xmx64m"
+    fi
+fi
+
+# Execute a command using MLSER_SHELL
+run(){
+	# $1 - the command to execute
+	$MLSER_SHELL -c "$1"
+}
+
+# Set the command to start ML
+CMD_START_ML="$JAVA_HOME/bin/java \
+	-Dlia.Monitor.Farm.HOME=$FARM_HOME \
+	-DMonaLisa_HOME=$MonaLisa_HOME \
+	-Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+	-Djava.security.policy=$MonaLisa_HOME/policy/policy.all \
+	-Djava.security.egd=file:/dev/urandom \
+	-Dlia.Monitor.SKeyStore=$MonaLisa_HOME/Service/SSecurity/FarmMonitor.ks \
+	-Dlia.Monitor.update=$SHOULD_UPDATE \
+	-Dlia.monitor.updateURLs=$URL_LIST_UPDATE \
+	-Dlia.Monitor.ConfigURL=file:$FARM_HOME/ml.properties \
+	$JAVA_OPTS -jar $MonaLisa_HOME/Service/lib/JFarmMonitor.jar $FARM_NAME $FARM_CONF_FILE"
+
+# Command to determine the PID of a possibly running ML, started with the same FARM_HOME
+CMD_GET_ML_PID="$CMD_PS | $CMD_GREP_ML | grep -v grep | awk '{if(\$2 != \"\"){print \$1}}'"
+
+# Just start ML, don't do any other checks
+fast_start() {
+	echo -n "Trying to start MonaLisa. Please wait ."
+	cd $FARM_HOME; 
+	run "$CMD_START_ML >$FARM_HOME/ML.log 2>&1 &"
+	echo -n "." ; sleep 2 ; echo -n "."
+	local pid=`run "$CMD_GET_ML_PID"`
+	echo -n "."
+	if [ -z "$pid" ]; then
+		echo " FAILED"
+		echo "Please check $FARM_HOME/ML.log"
+		exit 1
+	fi
+	echo " STARTED [ PID == $pid ]"
+	touch "$FARM_HOME/ALIVE"
+	echo "$pid" > "$ML_PID_FILE"
+	
+	
+}
+
+# Stop the ML JVM, by issuing the shutdown signal sequence; don't do any other checks
+stop_ml_jvm() {
+	local pid=`run "$CMD_GET_ML_PID"`
+	echo -n "."
+	kill -1 $pid >/dev/null 2>&1
+	sleep 1 ; echo -n "."
+	kill -1 $pid >/dev/null 2>&1
+	sleep 1 ; echo -n "."
+	kill -15 $pid >/dev/null 2>&1
+	sleep 2
+}
+
+# Set the command to update ML
+CMD_UPDATE_ML="$JAVA_HOME/bin/java \
+	-Dlia.Monitor.ConfigURL=file:$FARM_HOME/ml.properties \
+	-Djava.security.policy=$MonaLisa_HOME/policy/policy.all \
+	$JAVA_OPTS -jar $MonaLisa_HOME/Service/lib/update.jar \
+	-cachedir $CACHE_DIR \
+	-destdir $DEST_DIR \
+	-jnlps $URL_LIST_UPDATE"
+if [ -n "$UPDATE_VERSION" ] ; then
+	CMD_UPDATE_ML="$CMD_UPDATE_ML -useVersion ${UPDATE_VERSION}"
+fi
+
+# Command to determine the PID of a possibly running ML UPDATE, started with the same DEST_DIR
+CMD_GET_UPDATE_PID="$CMD_PS | $CMD_GREP_UPDATE | grep -v grep | awk '{print \$1}'"
+
+# Run ML Update
+ml_update() {
+	echo -n "Starting UPDATE "
+	local update_status="NOT_OK. Please check $FARM_HOME/update.log"
+	run "$CMD_UPDATE_ML 2>>$FARM_HOME/update.log"
+	local exit_status=$?
+	[ $exit_status -eq 0 ] && update_status=" OK"
+	echo "$update_status"
+}
+
+# Stop the ML Update. Optional parameter: signal to use
+stop_update() {
+	local pid=`run "$CMD_GET_UPDATE_PID"`
+	kill $1 $pid >/dev/null 2>&1
+	sleep 1 ; echo -n "."
+}
+
+# Stop the embedded MySQL database
+stop_emysqldb() {
+	if [ -f "$FARM_HOME/emysqldb/bin/stop.sh" ]; then
+		if [ -f "$FARM_HOME/emysqldb/mysql.port" ]; then
+			$FARM_HOME/emysqldb/bin/stop.sh
+		fi
+	fi
+}
+
+# Stop the embedded PGSQL database
+stop_epgsqldb() {
+	if [ -f "$PGSQL_PATH/pgsql/stop.sh" ]; then
+		if [ -f "$PGSQL_PATH/pgsql/pgsql.port" ]; then
+			"$PGSQL_PATH/pgsql/stop.sh"
+		fi
+	elif [ -f "$FARM_HOME/pgsql/stop.sh" ]; then
+		if [ -f "$FARM_HOME/pgsql/pgsql.port" ]; then
+			"$FARM_HOME/pgsql/stop.sh"
+		fi
+	fi
+}
+
+# Stop the embedded database
+stop_eDB() {
+	stop_emysqldb >> "$FARM_HOME"/lastShudownStatus 2>&1
+	stop_epgsqldb >> "$FARM_HOME"/lastShudownStatus 2>&1
+}
+
+# Stop the embedded database if ML is NOT running
+checked_stop_eDB(){
+	local pid=`run "$CMD_GET_ML_PID"`
+	[ -z "$pid" ] && stop_eDB
+}
+
+# install the crontab entries
+cron(){
+    if [ -z "$NO_CRONTAB_MANAGEMENT" ]; then
+	(
+	    crontab -l 2>/dev/null | grep -v "$FULLPRGDIR/"
+	    echo "@reboot $FULLPRGDIR/ML_SER start &>/dev/null"
+	    echo "0,5,10,15,20,25,30,35,40,45,50,55 * * * * $FULLPRGDIR/CHECK_UPDATE &>/dev/null"
+	) | crontab -
+    fi
+}
+
+# clear the MLSensor-related crontab entries
+clearcron(){
+    if [ -z "$NO_CRONTAB_MANAGEMENT" ]; then
+	crontab -l 2>/dev/null | grep -v "$FULLPRGDIR/" | crontab - 2>/dev/null
+    fi
+}
+
+# Do a full stop for a given service
+full_stop(){
+	# $1 - command to get the PID
+	# $2 - command to execute for normal shutdowns
+	local pid=`run "$1"`
+	if [ -n "$pid" ] ; then
+		$2
+	else
+		echo " Already dead?!" && return 0
+	fi
+	pid=`run "$1"`
+	if [ -n "$pid" ] ; then
+		echo " Failed."
+		echo -n "Retrying .."
+		$2
+	else
+		echo " OK!" && return 0
+	fi
+	pid=`run "$1"`
+	if [ -n "$pid" ] ; then
+		echo " FAILED."
+		echo -n "Force KILL ..."
+		kill -9 $pid >/dev/null 2>&1
+		sleep 2
+	else
+		echo " STOPPED" && return 0
+	fi
+	pid=`run "$1"`
+	if [ -n "$pid" ] ; then
+		echo " FAILED!"
+		echo -n "Retrying Force KILL ..."
+		kill -9 $pid >/dev/null 2>&1
+		sleep 3
+	else
+		echo " KILLED." && return 0
+	fi
+	pid=`run "$1"`
+	if [ -n "$pid" ] ; then
+		echo " FAILED kill -9 !!!"
+		local hostname=`hostname -f`
+		mail -s "Cannot $2 @ $hostname with kill -9" "ramiro@cern.ch" >/dev/null 2>&1 &
+		return 1
+	else
+		echo " KILLED!" && return 0
+	fi
+}
+
+# Stop any previously running ML-Update or ML and then start ML; optional param: start|update
+start() {
+	local pid=`run "$CMD_GET_UPDATE_PID"`
+	if [ -n "$pid" ] ; then
+		echo -n "ML-Update Still Running [ PID == $pid ]. Trying to stop it first ."
+		full_stop "$CMD_GET_UPDATE_PID" stop_update
+	fi
+	pid=`run "$CMD_GET_UPDATE_PID"`
+	if [ -n "$pid" ] ; then
+		echo "ML was NOT started because stopping ML-Update failed!"
+		exit 1
+	fi
+	pid=`run "$CMD_GET_ML_PID"`
+	if [ -n "$pid" ] ; then
+		echo -n "ML Still Running [ PID == $pid ]. Trying to stop it first ."
+		full_stop "$CMD_GET_ML_PID" stop_ml_jvm
+	fi
+	pid=`run "$CMD_GET_ML_PID"`
+	if [ -n "$pid" ] ; then
+		echo "ML was NOT started because stopping the service failed!"
+		exit 1
+	fi
+	# put the script's PID in the file until ML starts
+	echo $$ > $ML_PID_FILE
+	if [ "$1" = "update" -o "$SHOULD_UPDATE" = "true" ]; then 
+		ml_update
+	fi
+	fast_start
+	
+	cron
+}
+
+# Stop any ML or ML-Update that is currently running
+stop() {
+	clearcron
+
+	local pid=`run "$CMD_GET_UPDATE_PID"`
+	if [ -n "$pid" ] ; then
+		echo -n "Trying to stop ML-Update [ PID == $pid ] ."
+		full_stop "$CMD_GET_UPDATE_PID" stop_update
+		stop_eDB
+		pid=`run "$CMD_GET_UPDATE_PID"`
+		[ -n "$pid" ] && exit 1
+		return 0
+	fi
+	pid=`run "$CMD_GET_ML_PID"`
+	if [ -n "$pid" ] ; then
+		echo -n "Trying to stop MonaLisa [ PID == $pid ] ."
+		full_stop "$CMD_GET_ML_PID" stop_ml_jvm
+	else
+		echo "MonaLisa not running!?!"
+	fi
+	stop_eDB
+	pid=`run "$CMD_GET_ML_PID"`
+	[ -n "$pid" ] && exit 1
+	rm -f $ML_PID_FILE
+	return 0
+}
+
+# Print ML Version and exit
+version(){
+	$JAVA_HOME/bin/java -Djava.security.policy=$MonaLisa_HOME/policy/policy.all -jar $MonaLisa_HOME/Service/lib/JFarmMonitor.jar -version
+}
+
+# Stop and then start ML again
+restart(){
+	stop
+	if [ $? -eq 0 ]; then 
+		start
+	else
+		echo "ML was NOT started because stopping the service failed!"
+		exit 1
+	fi
+}
+
+# Print a line with the status
+status(){
+	local pid=`run "$CMD_GET_UPDATE_PID"`
+	if [ -n "$pid" ] ; then
+		echo "ML-Update is now running [ PID == $pid ]"
+	fi
+	pid=`run "$CMD_GET_ML_PID"`
+	if [ -n "$pid" ] ; then
+		echo "MonaLisa is now running [ PID == $pid ]. Logs are in $FARM_HOME"
+		exit 0
+	else
+		echo "MonaLisa is NOT running. Logs are in $FARM_HOME"	
+		exit 1
+	fi
+}
+# condresrart 
+condrestart(){
+	local pid=`run "$CMD_GET_ML_PID"`
+	if [ -n "$pid" ] ; then 
+		echo " MonaLisa is running [PID == $pid] ; trying to restart " 
+		restart
+		if [ $? -eq 0 ]; then 
+			exit 0 
+		else 
+			exit 1 
+		fi 
+    fi 
+	echo " MonaLisa is NOT  running " 
+	exit 0
+}
+           
+case $1 in
+	start|update)
+		start $1
+        	;;
+	stop)
+		stop
+        	;;
+	forcedstopedb)
+		stop_eDB
+		;;
+	stopedb)
+		checked_stop_eDB
+		;;
+	restart)
+		restart
+        	;;
+	status)
+		status
+		;;
+	version)
+		version	
+		;;
+        condrestart )
+                condrestart 
+                ;;
+	*)    
+        	echo "Usage: $0 [ start | stop | restart | status | version | update | condrestart ]"
+        	;;
+esac

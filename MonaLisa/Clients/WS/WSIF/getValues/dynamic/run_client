@@ -1,0 +1,26 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+export CLASSPATH=`../../classpath.sh ../../`:.
+
+if [ $# -eq 7 ] 
+  then
+    `cat ../../../../conf/env.JAVA_HOME`/bin/java Client "$1" "$2" "$3" "$4" "$5" "$6" "$7"     
+  else
+    if [ $# -eq 6 ]
+      then
+       `cat ../../../../conf/env.JAVA_HOME`/bin/java Client "$1" "$2" "$3" "$4" "$5" "$6" "`../../../../conf/MWS.sh`?wsdl"           
+      else
+           
+        echo "bad arguments"
+        echo "Arguments: 
+	    - farm name
+	    - cluster name
+	    - node name
+	    - parameter name
+	    - from time
+	    - to time
+    	    - wsdl location - optional"
+    fi	     
+fi

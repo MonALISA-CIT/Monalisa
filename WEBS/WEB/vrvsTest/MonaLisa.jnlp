@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+   spec="1.0+"
+   codebase="http://monalisa.cern.ch/MONALISA/vrvsTest"
+   href="MonaLisa.jnlp">
+   <information> 
+      <title>MonaLisa VRVS</title>  
+      <vendor>Caltech</vendor> 
+      <description>MonaLisa Monitoring System</description> 
+      <description kind="short">Monitoring tool</description> 
+      <icon href="images/flames.gif"/> 
+   </information> 
+  
+   <security> 
+      <all-permissions/> 
+   </security>
+<resources>
+   <j2se version="1.4"/> 
+   <jar href="lib/vrvsJMonitorClient.jar"/>
+   <jar href="lib/jini-core.jar"/>
+   <jar href="lib/jini-ext.jar"/>
+   <jar href="lib/FarmClient.jar"/>
+   <jar href="lib/monarc_plot.jar"/>
+   <jar href="lib/tools.jar"/>
+   <property name="lia.Monitor.LUSs" value="pccit6.cern.ch,monalisa.cern.ch"/>
+   <property name="lia.Monitor.debug" value="true"/>
+   <property name="java.security.policy" value="policy.all"/>
+   <property name="lia.Monitor.useCodeBase" value="http://monalisa.cern.ch/MONALISA/vrvsTest"/>
+   <property name="lia.Monitor.group" value="vrvst1"/>
+</resources>
+ 
+<application-desc main-class="lia.Monitor.vrvsJiniClient.Main" name="MonaLisa" documentBase="http://monalisa.cern.ch/MONALISA">
+</application-desc>
+</jnlp>

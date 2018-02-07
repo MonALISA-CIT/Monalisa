@@ -1,0 +1,26 @@
+#!/bin/sh
+
+#
+# Init file for the MonALISA daemon ( to be placed in your startup scripts )
+#
+# chkconfig: 345 80 86
+# description: MonALISA Daemon
+#
+#This program is called when the following variables are initialized
+
+#MonaLisa_HOME should be the full path to MonALISA installation directory
+MonaLisa_HOME=/home/monalisa/MonaLisa.v1.2
+
+# User used for MonALISA
+MONALISA_USER=monalisa
+
+PRG_NAME="${MonaLisa_HOME}/Service/CMD/ML_SER"
+PATH=/sbin:/usr/sbin:/bin:/usr/bin:.
+export PATH
+
+if [ ! -x $PRG_NAME ]; then
+    echo "No $PRG_NAME found!"
+    exit
+fi
+                                                                                                                            
+su - $MONALISA_USER -c "/bin/sh -c \"$PRG_NAME $1 $2\""

@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">&nbsp; VRVS</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+<table width="100%" border="0" cellspacing="2" cellpadding="2">
+  <tr>
+    <td><font size="+2"><strong class="page_title">Monitoring the VRVS System</strong></font></td>
+    <td><a href="http://www.vrvs.org" target="_blank"><img src="img/logo_vrvs.gif" border="0" width="60" height="50"></a></td>
+  </tr>
+</table>
+ 
+<p>&nbsp;</p>
+<p>For each VRVS reflector, a MonALISA service is running using an embedded Database, for storing the results 
+locally, and runs in a mode that aims to minimize the reflector resources it uses (typically less than 16MB 
+of memory and practically without affecting the system load). </p>
+<p>Dedicated modules to interact with the VRVS reflectors are developed: to collect information about the 
+topology of the system; to monitor and track the traffic among the reflectors and report communication errors 
+with the peers; and to track the number of clients and active virtual rooms. In addition, overall system information 
+is monitored and reported in real time for each reflector: such as the load, CPU usage, and total traffic in and out. </p>
+<p align="center"><img src="vrvs/ML_service_and_refl.gif" border="0"></p>
+A dedicated GUI for the VRVS version of MonALISA client was developed as a java web-start client.  
+This GUI provides real time information dynamically for all the reflectors which are monitored. 
+If a new reflector is started it will automatically appear in the GUI and its connections to its peers will be shown. 
+Filter agents to compute an exponentially mediated quality factor of each connection are dynamically deployed to 
+every MonALISA service, and they report this information to all active clients who are subscribed to receive this information.
+<br><br>
+It provides real-time information about the way the VRVS system is used (number of conferences or clients) 
+the topological connectivity of the reflectors and the quality of it and system related information (IO traffic CPU load).  
+Clients can also get historical data for any of these parameters.
+<br><br>
+The subscription mechanism allows one to monitor in real time any measured parameter in the system as all the updates are 
+dynamically displayed on the open windows. Below are some snapshots of the GUI client.
+
+<p>Details of the system are presented in Catalin Cirstoiu's Diploma Thesis:<br>
+<a href="documentation/VRVS_Monitoring_and_controlling_Catalin_Cirstoiu.pdf">document (PDF)</a>
+<a href="documentation/MLVRVS-Catalin_Cirstoiu.pdf">slides (PDF)</a>
+</p>
+<p>&nbsp; </p>
+</td>
+</tr>
+</table>
+</body>
+</html>

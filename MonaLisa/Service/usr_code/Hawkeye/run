@@ -1,0 +1,9 @@
+java -jar -Djava.security.policy=policy.all \
+  -Dlia.Monitor.CLASSURLs=file:///scratch/ckireyev/condor_src/src_java/hawkeye_monalisa.jar \
+  -Dlia.Monitor.HOME=$MonaLisa_HOME \
+  -Dlia.Monitor.DataReceivers=DataWriter \
+  -Dlia.Monitor.debug=true \
+  -Dlia.Monitor.SKeyStore=$MonaLisa_HOME/SSecurity/FarmMonitor.ks \
+  -Dcondor.MonaLisa.HawkeyeModule.config_file=/u/c/k/ckireyev/work/heml/HawkeyeModuleConfig \
+   -Dcondor.MonaLisa.PoolHawkeyeModuleAdd.config_file=/u/c/k/ckireyev/work/heml/PoolHawkeyeModuleAddConfig \
+  $MonaLisa_HOME/lib/FarmMonitor.jar MyFarmName test.conf

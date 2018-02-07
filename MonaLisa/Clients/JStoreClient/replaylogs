@@ -1,0 +1,17 @@
+(
+    for a in ../LOGGER/old/*.zip ../LOGGER/*.zip; do
+        echo $a;
+        unzip -c $a;
+    done
+    
+    for a in ../LOGGER/*.log; do
+	echo $a;
+	cat $a;
+    done
+    
+) | java -Xmx512m \
+        -classpath ../lib/JStoreClient.jar:../lib/MSRC_WEB.jar \
+        -Djava.security.policy=policy.all \
+        -server -XX:CompileThreshold=50 \
+        -Dlia.Monitor.ConfigURL=file:conf/App.properties.import \
+        lia.Monitor.JiniClient.Store.Replay

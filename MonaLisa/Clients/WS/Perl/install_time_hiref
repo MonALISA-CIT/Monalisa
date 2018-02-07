@@ -1,0 +1,16 @@
+#!/bin/bash
+
+PERL_MODULES=../lib/perl-modules/
+echo "Install Time::HiRef module ..."
+cd $PERL_MODULES
+tar -zxf Time-HiRes-01.20.tar.gz
+cd  Time-HiRes-01.20/
+perl Makefile.PL
+make
+make test
+make install
+rm -rf ../Time-HiRes-01.20
+
+
+
+

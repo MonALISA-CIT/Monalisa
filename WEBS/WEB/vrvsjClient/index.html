@@ -1,0 +1,63 @@
+<!doctype public "-//w3c//dtd html 4.01 transitional//en" 
+		"http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.78 [en] (X11; U; Linux 2.4.7-10 i686) [Netscape]">
+   <title>Web Demos of Iosif's FLAMES Monitoring Tool</title>
+<!--- JavaScript to detect if Java Web Start is installed or not --->
+<script LANGUAGE="Javascript">
+
+   var javawsInstalled = 0;
+   isIE = "false";
+
+   if (navigator.mimeTypes && navigator.mimeTypes.length) {
+      x = navigator.mimeTypes['application/x-java-jnlp-file'];
+      if (x) javawsInstalled = 1;
+    } else { 
+      isIE = "true";
+    }
+
+    function launchLink(imageUrl, jnlpUrl, title, desc) {       
+       var realUrl = "http://java.sun.com/products/javawebstart/needdownload.html";
+       if (javawsInstalled) {
+         realUrl = jnlpUrl;
+       }
+       document.write("<center><div align=center>");
+       document.write("<a href=" + realUrl + "><img src=" + imageUrl + " width=\"60\" height=\"60\" BORDER=\"0\"></a></div>");
+       document.write("<form action=\"" + realUrl + "\" METHOD=\"GET\"><input type=\"submit\" value=\"Launch\"></form>");
+       document.write("</center>");
+    }    
+
+</script>
+<script LANGUAGE="VBScript">
+
+on error resume next
+If isIE = "true" Then
+  If Not(IsObject(CreateObject("JavaWebStart.IsInstalled"))) Then
+     javawsInstalled = 0
+  Else
+    javawsInstalled = 1
+  End If
+End If
+
+</script>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000FF" vlink="#660066" alink="#FF0000">
+&nbsp;
+<center>
+<p><b><font color="#CC0000"><font size=+2>MonaLisa VRVS</font></font></b></center>
+
+<br>&nbsp;
+<br>&nbsp;
+<p><script LANGUAGE="Javascript" TYPE="text/javascript">
+ launchLink("images/flame.gif", "MonaLisa.jnlp", 60, 30);
+</script>
+<p><br>
+<center><font size="+1" color="#000099"> If you are using Netscape/Mozilla &gt; 6.0 please click this
+<a href="http://monalisa.cacr.caltech.edu/vrvsjClient/MonaLisa.jnlp">link</a></font></center>
+<br>&nbsp;
+<br>&nbsp;
+<p>
+</body>
+</html>

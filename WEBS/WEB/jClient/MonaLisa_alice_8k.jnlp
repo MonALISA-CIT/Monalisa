@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+   spec="1.0+"
+   codebase="http://monalisa.cacr.caltech.edu/jClient">
+   <information> 
+      <title>MonALISA</title>  
+      <vendor>Caltech</vendor> 
+      <description>MonaLisa Monitoring System</description> 
+      <description kind="short">Monitoring tool</description> 
+      <icon href="images/flames.gif"/> 
+   </information> 
+  
+   <security> 
+      <all-permissions/> 
+   </security>
+<resources>
+   <!--j2se version="1.4" initial-heap-size="96m" max-heap-size="128m"/--> 
+   <j2se version="1.4*" href="http://java.sun.com/products/autodl/j2se" max-heap-size="1024m"/>
+   <jar href="lib/JMonitorClient.jar"/>
+   <jar href="lib/jini-core.jar"/>
+   <jar href="lib/jini-ext.jar"/>
+   <jar href="lib/FarmClient.jar"/>
+   <jar href="lib/monarc_plot.jar"/>
+   <property name="lia.Monitor.debug" value="false"/>
+   <property name="lia.Monitor.LUSs" value="monalisa.cacr.caltech.edu,monalisa.cern.ch"/>
+   <property name="lia.util.geo.iNetGeoConfig" value="http://monalisa.cacr.caltech.edu/iNetGeoConfig"/>
+   <property name="lia.Monitor.sleepTime" value="5"/>
+   <property name="lia.Monitor.globeTexture.slices" value="16"/>
+   <property name="j3d.debug" value="true"/>
+   <property name="lia.Monitor.globeTexture.scaleFilter" value="nice"/>
+   <property name="lia.Monitor.globeTexture" value="http://monalisa.cacr.caltech.edu/jClient/images/earth_texture8192x4096.jpg"/>
+   <property name="lia.Monitor.group" value="alice"/>
+</resources>
+ 
+<application-desc main-class="lia.Monitor.JiniClient.Farms.Main" name="MonaLisa" documentBase="http://monalisa.cacr.caltech.edu">
+</application-desc>
+</jnlp>

@@ -1,0 +1,24 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+export CLASSPATH=`../classpath.sh ../`:.
+
+if [ $# -eq 4 ]
+    then
+	`cat ../../../conf/env.JAVA_HOME`/bin/java Client "$1" "$2" "$3" "$4" `../../../conf/MWS.sh`
+   else    	
+  if [ $# -eq 5 ]
+    then
+    `cat ../../../conf/env.JAVA_HOME`/bin/java Client "$1" "$2" "$3" "$4" "$5"   		
+    else
+    echo "bad arguments"
+    echo "Arguments: 
+	    - farm name
+	    - cluster name
+	    - node name
+	    - parameter name
+	    - URL service location - optional
+	    " 
+   fi 	    
+fi

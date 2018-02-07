@@ -1,0 +1,1 @@
+java -Dlia.util.telnet.CalientUsername=admin -Dlia.util.telnet.CalientPasswd=cit*** -Dlia.util.telnet.CalientHostname=137.164.19.54 -classpath .:../../lib/FarmMonitor.jar monCalientPXC

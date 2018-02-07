@@ -1,0 +1,111 @@
+.text{
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: normal;
+    text-decoration: none;
+    color: #5D6261;
+}
+
+a.link:link,
+a.link:active,
+a.link:visited{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #475D71;
+	text-decoration: none
+}
+
+a.link:hover{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #475D71;
+	text-decoration: underline
+}  
+
+a.linkb:link,
+a.linkb:active,
+a.linkb:visited{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #475D71;
+	text-decoration: none
+}
+
+a.linkb:hover{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #475D71;
+	text-decoration: underline
+}  
+
+a.menu_link:link,
+a.menu_link:active,
+a.menu_link:visited{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #818887;
+	text-decoration: none
+}
+
+a.menu_link:hover{
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #818887;
+	text-decoration: underline
+} 
+
+input.input_text{
+	    font-family: Arial, Verdana, Helvetica, sans-serif;
+	    font-size: 11px;
+	    font-weight: normal;
+	    text-decoration: none;
+	    text-align: left;
+	    border: solid 1px #CCCC99;
+	    background-color: #F6F6F6;
+}
+
+input.input_submit{
+	    font-family: Arial, Verdana, Helvetica, sans-serif;
+	    font-size: 11px;
+	    color: #4F4F3B;
+	    font-weight: normal;
+	    text-decoration: none;
+	    border: solid 1px #CCCC99;
+	    background-color: #F6F6F6;
+}
+
+input.input_checkbox{
+	    border: solid 1px #CCCC99;
+	    background-color: #F6F6F6;
+	    width: 13px;
+	    height: 13px;
+	    color: #9BA1A0;
+}
+
+select.input_select{
+	    font-family: Arial, Verdana, Helvetica, sans-serif;
+	    font-size: 11px;
+	    color: #4F4F3B;
+	    font-weight: normal;
+	    text-decoration: none;
+	    border: solid 1px #CCCC99;
+	    background-color: #F6F6F6;
+}
+
+td.menu{
+	padding: 3px; 
+	border-bottom: 3px solid #FFFFFF;
+	border-right: solid 2px #FFFFFF;
+	background-color: #F0F0F0;
+	text-align: center;
+}
+
+td.bottom{
+    border-bottom: solid 2px #FFFFFF;
+}

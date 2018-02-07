@@ -1,0 +1,4 @@
+Main-Class: lia.Monitor.JiniClient.VRVS3D.Main
+Class-Path: jini-core.jar jini-ext.jar plot.jar jogl.jar tools.jar backport-util-concurrent.jar cryptix.jar puretls.jar jgsi.jar jce-jdk13.jar cog-jglobus.jar
+Application-Name: MonALISA GUI Client for EVO
+Permissions: all-permissions

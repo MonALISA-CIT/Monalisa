@@ -1,0 +1,1 @@
+mv /home/developer/Dev/Java/current/Obfuscated/MainClient.jar /home/developer/Dev/Java/current/Obfuscated/MainClient-jar.bak; cd /home/developer/Dev/Java/KVM ; /usr/local/VRVS/j2sdk1.4.1_02/bin/java -jar ZKM.jar -v -l obfuscation-log-for-MainClient.txt normal_obfuscation_MainClient.txt

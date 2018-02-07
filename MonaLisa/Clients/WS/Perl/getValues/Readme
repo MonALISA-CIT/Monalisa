@@ -1,0 +1,50 @@
+
+Client developed using perl module Soap::Lite for the "MLWebService".
+Invoking the "getValues" function of the MLWebService.
+
+Soap::Lite for Perl is a collection of Perl modules which provides a 
+simple and lightweight interface to the Simple Object Access Protocol 
+(SOAP) both on client and server sides.   
+
+Command line arguments:
+    - farm name - string;
+    - cluster name - string;
+    - node name - string ;
+    - parameter name - string ;
+    - from time - long;
+    - to time - long;   
+    - URL location of the MLWebService wsdl file
+       For example:
+       "http://monalisa-starlight.cern.ch/axis/services/MLWebService?wsdl";
+
+
+The "getValues" operation interrogates the database for getting 
+parameter results. It takes as input farm name - the name of the farm 
+interested in, cluster name - the name of the cluster intrested in, node 
+name - the name of the node interested in, parameter name - the parameter 
+name interested in, from time and to time - the return results will be 
+those that were received in the database between these moments of time 
+( given in milliseconds). The return value is complex schema type, an array
+of results.
+
+This client is called from the command line with the following command:
+
+./Client.pl  "*" "*" "*" "*" -999900000 0 "http://monalisa-starlight.cern.ch/axis/services/MLWebService?wsdl"
+
+and will return the results from all the farms ("*") - the first argument,
+all the clusters ("*") - the second argument, all the nodes ("*") - the
+third argument, all the parameters ("*") - the forth argument, that were 
+registered in the database between the fifth argument and the sixth argument.
+The location of the service is specified as the last parameter.
+
+Another example 
+
+./Client.pl   "*" "*" "*" "DataTag0_OUT" -999900000 0 
+
+and will return the results from all the farms ("*") - the first argument,
+all the clusters ("*") - the second argument, all the nodes ("*") - the
+third argument, the "DataTag0_OUT" parameter  - the forth argument, that were 
+registered in the database between the fifth argument and the sixth argument.
+The location of the service wsdl file will be taken from the environment variable 
+MONALISA_WS.
+

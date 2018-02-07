@@ -1,0 +1,20 @@
+echo_usage() {
+	echo
+	echo Usage: $0 path_to_yourKeystoreFile aliasName_for_cert path_to_fileCertToExport
+	echo
+}
+
+if [ $# -ne 3 ]; then
+
+	echo_usage
+	exit 1
+fi
+
+echo "#############################################################"
+echo
+echo "Exporting certificate FROM $1 using alias $2 TO $3." 
+echo "Be ready to give the PASSWORD for your keystore in $1."
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+keytool -export -keystore $1 -alias $2 -file $3

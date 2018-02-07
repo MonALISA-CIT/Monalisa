@@ -1,0 +1,328 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">&nbsp; ReflRouter</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+<font size="+1"><strong class="page_subtitle">VRVS controlling agent - ReflRouter </strong></font>
+<p><strong>Design issues</strong></p>
+The ReflRouter client is able to provide an optimized dynamic routing of the videoconferencing 
+data streams. This client requires information about the quality of the alternative connections in 
+the system and it solves, in real-time, a minimum spanning tree problem to optimize the data flow at the global level. 
+<br><br>
+To evaluate the connection quality with possible peer reflectors we developed monitoring agents 
+performing ping like measurements using UDP packages, which are deployed on all the MonALISA services. 
+These agents perform continuously (every 4s) such measurements and with a selected set of possible peers, 
+which can be dynamically reconfigured, for each reflector.  We are using small UDP packages to evaluate the 
+Round Trip Time (RTT), its jitter and the percentage of lost packages. 
+<br><br>
+The best routing path for reapplication of the multimedia streams is defined as a Minimum Spanning Tree (MST). 
+This means that we need to find the tree that contains all the reflectors (vertices in a graph G) for which 
+the total connection "cost" is minimized:
+<center><img src="vrvs/MST_formula.gif"></center>
+The "cost" of the connection between two reflectors (w) is evaluated using the UDP measurements from both sides. 
+This cost function is build with an exponentially mediated RTT and if lost packages are detected or the jitter of 
+the RTT is high the cost function will increase rapidly.   Based on these values provided by the deployed agents, 
+the MST is calculated nearly in real - time. We implemented the Baruvka's Algorithm, as it is well suited for a 
+parallel/distributed implementation.  Once a link is part of the MST a momentum factor is attached to that link. 
+This is to avoid triggering reconnections for small fluctuations in the system. Such cases may occur when two possible 
+peers have very similar parameters (or they may be at the same location).
+<br>
+<center><img src="vrvs/RR_state_diagram.gif"></center>
+<br>
+In order to be able to perform the rerouting of the multimedia packets, we have to know anytime the status of 
+the Reflectors, their peer links and the quality of their links with a set of "neighboring" reflectors. 
+<br><br>
+Currently, we do not monitor all Reflectors in the VRVS system, and therefore, Results containing peer links 
+that are not found can be received. These links are ignored and no routing is performed with them. The condition 
+to perform routing with just a part of the reflectors and not affect the functioning of all system (i.e. not 
+make cycles) is that the <i>monitored reflectors be the backbone of the VRVS</i>. Cycles could be produced if, for 
+example, we would monitor two reflectors that are leaves in the VRVS tree (the system would issue commands to 
+connect these two reflectors, being unaware that they are already connected through other reflectors).
+<br><br>
+<p><strong>Implementation issues</strong></p>
+The peer links are in fact tunnels over the Internet. They are kept in a hashtable "tunnels" in each ReflNode, 
+the key being the name of the peer Reflector. The available links with the other reflectors are also considered tunnels 
+and are kept in the same class (IPTunnel). IPTunnels have a set of attributes. They have <tt>peerQual</tt> 
+(if it is an active tunnel) and <tt>inetRTTime</tt> - the result from ABPing (if the peer is in the list of 
+the nodes for the current reflector). These values have an associated time - the time when last information about 
+that peer was received. This way, we can get an expiring time for each type of link and issue critical rerouting commands.
+<br><br>
+Each tunnel has two attributes referring to its state: <tt>crtState</tt> and <tt>nextState</tt>. The current state of 
+a tunnel can be either <tt>ACTIVE</tt> or <tt>INACTIVE</tt>, if it currently is in the tree of selected tunnels or not. 
+This attribute depends on the age of the <tt>peerQual</tt> attribute, and is checked (and possibly modified) each 
+time the status of this tunnel is requested by the MST algorithm. The <tt>nextState</tt> attribute is set by the MST 
+algorithm and can have multiple values: <tt>ACTIVE</tt>, <tt>INACTIVE</tt>, <tt>MUST_DEACTIVATE</tt> or <tt>MUST_ACTIVATE</tt>.  
+The MUST_* states can be set before running the MST algorithm to select the tunnels that either must or must 
+not be active anymore, as we will se later. The first two states are set by the MST algorithm and they usually mean 
+states that are recommended for optimizing the overall cost of the tree.
+<br><br>
+The <tt>ReflRouter</tt> is a class that extends <tt>TimerTask</tt> in order to be invoked from time to time to 
+optimize the tree. But usually it is necessary to react to certain events, like a reflector becomes active or inactive. 
+Each 20 seconds (by default, but this value can be changed editing the <i>ml.properties</i> file) all reflectors 
+are checked. This includes checking all tunnels. If a reflector or tunnel isn't active anymore, a rerouting is 
+triggered.  This happens also when a reflector becomes active and it must be included into the MST.
+<br><br>
+<p><strong>Setting the Restrictions for the MST algorithm</strong></p>
+There are some critical cases that must be analyzed before running the MST algorithm. For this, each 
+ReflNode is checked. If a node isn't active then it must not appear in the MST. Further, the tunnels that 
+start from the inactive node must also not be present in the computed tree. Therefore, the next state 
+will be set to <tt>MUST_DEACTIVATE</tt>. If the node is active, then each link to the other 
+reflectors (either active peers or neighbor reflectors) is checked. If the peer reflector isn't 
+active the respective tunnel must not be active. 
+<br><br>
+Another problem arises when between two reflectors there is no ABPing information, or there is only 
+one ABPing link. In this case, the state of the both peer links depends on the current status 
+of the peer link. If there is at least one peer link, then both must be activated. If none is 
+active, then no peer link must be active.
+<br><br>
+For the other cases the next state of a tunnel is initialized as <tt>INACTIVE</tt>, 
+and the MST algorithm will set it as needed.
+<br><br>
+<p><strong>The MST algorithm</strong></p>
+The minimum spanning tree (MST) of a graph defines the cheapest subset of edges that keeps 
+the graph in one connected component. The input is a graph G = (V,E) with weighted edges. 
+The problem is to find the subset E' of  E of minimum weight forming a tree on V.
+<center><img src="vrvs/MST_trees.gif"></center>
+For implementation, we used the Boruvka's algorithm, as it is also appropiate for a parallel implementation. 
+<br><br>
+The original Borvuka algorithm is:
+<pre>
+       Given G = (V,E)
+       T = graph consisting of V with no edges
+       while T has < n-1 edges do
+          for each connected component C of T do
+             e = min cost edge (v,u) s.t. v in C and u not in C
+             T := T union {e}
+</pre>
+<br><br>
+But there can be a problem if the graph isn't connex. In this case, there is no way to connect n-1 edges, 
+so that condition is modified such that the while cycle repeats as long as there is at least one union made into the for cycle.
+<br><br>
+In our case, while joining subtrees, we also mark the next state of each tunnel that is used to perform the respective joint as <tt>ACTIVE</tt>. 
+<br><br>
+Another modification that must be done to this algorithm is that the process is going to be running interative, i.e. 
+we compute the MST, issue commands to change the tree, then we compute the MST and change the tree again and so on. 
+A problem that could appear is that of  active links oscillation.
+<br><br>
+<center><img src="vrvs/MST_oscillations.gif"></center>
+<br>
+For example, as in the above figures: at moment t1, the link between B and C is worse and therefore, is inactive; 
+at the next moment, the link between A and C is worse and the algorithm would issue the commands to deactivate 
+link A-C and activate instead the B-C link; but at the third moment, link between A and C is better once more 
+than B-C, ant the algorithm would send new commands. This would be very bad for a system where there are live 
+conferences ongoing. Therefore, we must take care and issue the commands for changing the route only when 
+the new route is much better than the current route. 
+<br><br>
+This problem can be solved by setting an inertial factor for the links belonging to the MST. Links that are currently 
+in the MST have an artificial cost lowered by, for example 20%. It is important to give this value relative, 
+not absolute as the cost of the links can vary very much - for example links between the reflectors in the same LAN 
+have very low cost, compared to those separated by oceans. Using this inertial factor we are sure that the 
+oscillations cannot happen very often, and that when a new link is chosen, it will bring an semnificative improvement in quality.
+<br><br>
+It's worth saying that this algorithm runs in O(m log n), where m is the number of edges and n the number of vertexes.
+<br><br>
+<p><strong>Generating commands sent to the Reflectors</strong></p>
+Having the MST algorithm complete, we have to send the needed commands to the reflectors in order to change the 
+current network topology to be as the one calculated. There are two types of commands: <i>critical</i> and <i>optional</i> 
+commands. A command is considered critical when it must be sent to the reflectors; its next state is 
+either <tt>MUST_ACTIVATE</tt> or <tt>MUST_DEACTIVATE</tt>. There is one more situation when the commands must 
+be sent: the number of links to be deactivated differs from the number of links to be activated. In this case, 
+it means that there are reflectors with only one peer link between them - the other must be activated, 
+or the one that is active must be deactivated and one of the reflectors must be connected by some other 
+path to the others. The optional type of commands refers to modifications that can be made in order to optimize 
+the overall cost of the tree. It is only recommended to send these commands to the reflectors.
+<br><br>
+For each activation command, there is a tunnel that must be activated. Similarly, for each deactivation 
+command, there is a tunnel to be deactivated. There is always a list of tunnels that are currently in 
+the tree; the MST computes another list of tunnels to be in the next tree. Selecting the links that are in 
+the current list of tunnels but not in the next, gives the list of tunnels to be deactivated; selecting 
+tunnels that are in the next tree, but not in the current tree, gives the tunnels to be deactivated. 
+<br><br>
+<p><strong>Output from ReflRouter</strong></p>
+The ReflRouter client was tested simulating that the commands were sent to the reflectors. 
+For this, the previous tree was saved and when the algorithm was rerun, the current tree was 
+initialized to that. The same algorithm (and classes) was used in the GUI client to perform the MST. 
+Using the graphical interface and seeing the costs of the links the correctness of MST could be easily 
+checked. More tests were performed running more instance of the ReflRouter on different machines, 
+in different places. The algorithm issued the same commands no matter where it was run. We encountered 
+problems with the links oscillations, but that were solved as explained above.
+<br><br>
+Here is the output generated at some rerouting event:
+<pre>
+ReflRouter: [ Thu Jun 19 13:43:43 EEST 2003 ] --> ReRouting process started ...
+MST: Old tree's tunnels:
+  OPTN -> IPTun:sinica->starlight pQ=100.0 iRTT=90.29397335557525 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:sinica->nsysu pQ=100.0 iRTT=3.4801962266528097 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-us->vrvs-eu pQ=100.0 iRTT=0.6944444444444444 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-us->starlight pQ=100.0 iRTT=61.8476418502426 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs5->starlight pQ=100.0 iRTT=16.0 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs3->starlight pQ=100.0 iRTT=12.5 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:funet->vrvs-eu pQ=100.0 iRTT=29.0 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:heanet->vrvs-eu pQ=100.0 iRTT=14.629910974457912 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:kek->starlight pQ=100.0 iRTT=200.9085221112097 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:internet2->starlight pQ=100.0 iRTT=8.060880435574516 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-pub-ro->vrvs-eu pQ=100.0 iRTT=18.21325696235161 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:usp->starlight pQ=100.0 iRTT=81.57752835412776 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:nsysu->sinica pQ=100.0 iRTT=3.6423412559484465 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-eu->heanet pQ=100.0 iRTT=14.632851599403494 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-eu->cracow pQ=100.0 iRTT=26.020228840845647 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-eu->funet pQ=100.0 iRTT=29.0605041625444 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-eu->vrvs-us pQ=100.0 iRTT=0.4722222222222222 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-eu->vrvs-pub-ro pQ=100.0 iRTT=18.427141416629805 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->vrvs5 pQ=100.0 iRTT=16.01794905015217 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->triumf pQ=100.0 iRTT=25.0 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->vrvs3 pQ=100.0 iRTT=12.5 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->kek pQ=100.0 iRTT=200.73285280509853 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->vrvs-caltech pQ=100.0 iRTT=29.445246023552514 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->internet2 pQ=100.0 iRTT=8.187792829736889 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->usp pQ=100.0 iRTT=81.60572974990667 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->sinica pQ=100.0 iRTT=90.11838618546737 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->cornell pQ=100.0 iRTT=11.75526231525018 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->vrvs-us pQ=100.0 iRTT=61.53383926983188 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->usf pQ=100.0 iRTT=14.026621149720478 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:usf->starlight pQ=100.0 iRTT=17.325413035681372 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:cornell->starlight pQ=100.0 iRTT=12.008050493965698 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-caltech->starlight pQ=100.0 iRTT=29.49230711577669 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:cracow->vrvs-eu pQ=100.0 iRTT=26.04976673982483 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:triumf->starlight pQ=100.0 iRTT=24.870547402033 crtState=active nextState=INACTIVE
+Total cost = 1290.1314083782288</pre>
+Next, the MST is built. Here can be seen what (groups of) reflectors are connected at each Borvuka step:
+<pre>
+Joining: vrvs-us + vrvs-eu  :: vrvs-us <-> vrvs-eu = 0.6944444444444444
+Joining: sinica + nsysu  :: sinica <-> nsysu = 3.4801962266528097
+Joining: internet2 + starlight  :: internet2 <-> starlight = 8.060880435574516
+Joining: internet2 starlight + cornell  :: starlight <-> cornell = 11.75526231525018
+Joining: vrvs3 + internet2 starlight cornell  :: vrvs3 <-> starlight = 12.5
+Joining: vrvs-us vrvs-eu + heanet  :: vrvs-eu <-> heanet = 14.632851599403494
+Joining: vrvs3 internet2 starlight cornell + usf  :: starlight <-> usf = 14.026621149720478
+Joining: vrvs5 + vrvs3 internet2 starlight cornell usf  :: vrvs5 <-> starlight = 16.0
+Joining: vrvs-us vrvs-eu heanet + vrvs-pub-ro  :: vrvs-eu <-> vrvs-pub-ro = 18.427141416629805
+Joining: vrvs5 vrvs3 internet2 starlight cornell usf + triumf  :: vrvs3 <-> triumf = 17.244935562862537
+Joining: vrvs5 vrvs3 internet2 starlight cornell usf triumf + vrvs-caltech  :: vrvs3 <-> vrvs-caltech = 17.980756931886063
+Joining: vrvs-us vrvs-eu heanet vrvs-pub-ro + cracow  :: vrvs-eu <-> cracow = 26.020228840845647
+Joining: vrvs-us vrvs-eu heanet vrvs-pub-ro cracow + funet  :: vrvs-eu <-> funet = 29.0605041625444
+Joining: sinica nsysu + kek  :: sinica <-> kek = 35.626157892000315
+Joining: vrvs-us vrvs-eu heanet vrvs-pub-ro cracow funet + vrvs5 vrvs3 internet2 starlight cornell usf triumf vrvs-caltech  
+			:: vrvs-us <-> starlight = 61.8476418502426
+Joining: vrvs-us vrvs-eu heanet vrvs-pub-ro cracow funet vrvs5 vrvs3 internet2 starlight cornell usf triumf vrvs-caltech + usp  
+            :: starlight <-> usp = 81.60572974990667
+Joining: sinica nsysu kek + vrvs-us vrvs-eu heanet vrvs-pub-ro cracow funet vrvs5 vrvs3 internet2 starlight cornell usf 
+            triumf vrvs-caltech usp  :: sinica <-> starlight = 90.29397335557525</pre>
+The output continues with the list of tunnels that should be in the MST:
+<pre>
+MST: Computed tree's tunnels:
+  OPTN -> IPTun:vrvs-us->vrvs-eu pQ=100.0 iRTT=0.6944444444444444 crtState=active nextState=active
+  OPTN -> IPTun:vrvs-eu->vrvs-us pQ=100.0 iRTT=0.4722222222222222 crtState=active nextState=active
+  OPTN -> IPTun:sinica->nsysu pQ=100.0 iRTT=3.4801962266528097 crtState=active nextState=active
+  OPTN -> IPTun:nsysu->sinica pQ=100.0 iRTT=3.6423412559484465 crtState=active nextState=active
+  OPTN -> IPTun:internet2->starlight pQ=100.0 iRTT=8.060880435574516 crtState=active nextState=active
+  OPTN -> IPTun:starlight->internet2 pQ=100.0 iRTT=8.187792829736889 crtState=active nextState=active
+  OPTN -> IPTun:starlight->cornell pQ=100.0 iRTT=11.75526231525018 crtState=active nextState=active
+  OPTN -> IPTun:cornell->starlight pQ=100.0 iRTT=12.008050493965698 crtState=active nextState=active
+  OPTN -> IPTun:vrvs3->starlight pQ=100.0 iRTT=12.5 crtState=active nextState=active
+  OPTN -> IPTun:starlight->vrvs3 pQ=100.0 iRTT=12.5 crtState=active nextState=active
+  OPTN -> IPTun:vrvs-eu->heanet pQ=100.0 iRTT=14.632851599403494 crtState=active nextState=active
+  OPTN -> IPTun:heanet->vrvs-eu pQ=100.0 iRTT=14.629910974457912 crtState=active nextState=active
+  OPTN -> IPTun:starlight->usf pQ=100.0 iRTT=14.026621149720478 crtState=active nextState=active
+  OPTN -> IPTun:usf->starlight pQ=100.0 iRTT=17.325413035681372 crtState=active nextState=active
+  OPTN -> IPTun:vrvs5->starlight pQ=100.0 iRTT=16.0 crtState=active nextState=active
+  OPTN -> IPTun:starlight->vrvs5 pQ=100.0 iRTT=16.01794905015217 crtState=active nextState=active
+  OPTN -> IPTun:vrvs-eu->vrvs-pub-ro pQ=100.0 iRTT=18.427141416629805 crtState=active nextState=active
+  OPTN -> IPTun:vrvs-pub-ro->vrvs-eu pQ=100.0 iRTT=18.21325696235161 crtState=active nextState=active
+  OPTN -> IPTun:vrvs3->triumf pQ=-1.0E50 iRTT=17.244935562862537 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:triumf->vrvs3 pQ=-1.0E50 iRTT=17.5 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs3->vrvs-caltech pQ=-1.0E50 iRTT=17.980756931886063 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs-caltech->vrvs3 pQ=-1.0E50 iRTT=18.232797964901536 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs-eu->cracow pQ=100.0 iRTT=26.020228840845647 crtState=active nextState=active
+  OPTN -> IPTun:cracow->vrvs-eu pQ=100.0 iRTT=26.04976673982483 crtState=active nextState=active
+  OPTN -> IPTun:vrvs-eu->funet pQ=100.0 iRTT=29.0605041625444 crtState=active nextState=active
+  OPTN -> IPTun:funet->vrvs-eu pQ=100.0 iRTT=29.0 crtState=active nextState=active
+  OPTN -> IPTun:sinica->kek pQ=-1.0E50 iRTT=35.626157892000315 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:kek->sinica pQ=-1.0E50 iRTT=35.687456817654265 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs-us->starlight pQ=100.0 iRTT=61.8476418502426 crtState=active nextState=active
+  OPTN -> IPTun:starlight->vrvs-us pQ=100.0 iRTT=61.53383926983188 crtState=active nextState=active
+  OPTN -> IPTun:starlight->usp pQ=100.0 iRTT=81.60572974990667 crtState=active nextState=active
+  OPTN -> IPTun:usp->starlight pQ=100.0 iRTT=81.57752835412776 crtState=active nextState=active
+  OPTN -> IPTun:sinica->starlight pQ=100.0 iRTT=90.29397335557525 crtState=active nextState=active
+  OPTN -> IPTun:starlight->sinica pQ=100.0 iRTT=90.11838618546737 crtState=active nextState=active
+Total cost = 921.954038089863</pre>
+Then, it is computed the list of tunnels to activate and to deactivate, as a difference between the
+two previous list of tunnels:
+<pre>
+Tunnels to deactivate:
+  OPTN -> IPTun:kek->starlight pQ=100.0 iRTT=200.9085221112097 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->triumf pQ=100.0 iRTT=25.0 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->kek pQ=100.0 iRTT=200.73285280509853 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:starlight->vrvs-caltech pQ=100.0 iRTT=29.445246023552514 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:vrvs-caltech->starlight pQ=100.0 iRTT=29.49230711577669 crtState=active nextState=INACTIVE
+  OPTN -> IPTun:triumf->starlight pQ=100.0 iRTT=24.870547402033 crtState=active nextState=INACTIVE
+Total cost = 510.4494754576704
+Tunnels to activate:
+  OPTN -> IPTun:vrvs3->triumf pQ=-1.0E50 iRTT=17.244935562862537 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:triumf->vrvs3 pQ=-1.0E50 iRTT=17.5 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs3->vrvs-caltech pQ=-1.0E50 iRTT=17.980756931886063 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:vrvs-caltech->vrvs3 pQ=-1.0E50 iRTT=18.232797964901536 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:sinica->kek pQ=-1.0E50 iRTT=35.626157892000315 crtState=INACTIVE nextState=active
+  OPTN -> IPTun:kek->sinica pQ=-1.0E50 iRTT=35.687456817654265 crtState=INACTIVE nextState=active
+Total cost = 142.27210516930472</pre>
+Then, based on the status of the previous two list of tunnels (MUST/OPTN) it is decided whether they should
+be sent to the reflectors:
+<pre>
+Commands MAY BE SENT! (MST optimization commands)
+Disconnect IPTun:kek->starlight pQ=100.0 iRTT=200.9085221112097 crtState=active nextState=INACTIVE
+Disconnect IPTun:starlight->triumf pQ=100.0 iRTT=25.0 crtState=active nextState=INACTIVE
+Disconnect IPTun:starlight->kek pQ=100.0 iRTT=200.73285280509853 crtState=active nextState=INACTIVE
+Disconnect IPTun:starlight->vrvs-caltech pQ=100.0 iRTT=29.445246023552514 crtState=active nextState=INACTIVE
+Disconnect IPTun:vrvs-caltech->starlight pQ=100.0 iRTT=29.49230711577669 crtState=active nextState=INACTIVE
+Disconnect IPTun:triumf->starlight pQ=100.0 iRTT=24.870547402033 crtState=active nextState=INACTIVE
+Connect IPTun:vrvs3->triumf pQ=-1.0E50 iRTT=17.244935562862537 crtState=INACTIVE nextState=active
+Connect IPTun:triumf->vrvs3 pQ=-1.0E50 iRTT=17.5 crtState=INACTIVE nextState=active
+Connect IPTun:vrvs3->vrvs-caltech pQ=-1.0E50 iRTT=17.980756931886063 crtState=INACTIVE nextState=active
+Connect IPTun:vrvs-caltech->vrvs3 pQ=-1.0E50 iRTT=18.232797964901536 crtState=INACTIVE nextState=active
+Connect IPTun:sinica->kek pQ=-1.0E50 iRTT=35.626157892000315 crtState=INACTIVE nextState=active
+Connect IPTun:kek->sinica pQ=-1.0E50 iRTT=35.687456817654265 crtState=INACTIVE nextState=active
+ReflRouter: [ Thu Jun 19 13:43:43 EEST 2003 ] --> ReRouting process finished ...</pre>
+
+<br>
+<p><strong>Starting ReflRouter</strong></p>
+The ReflRouter client is started with the following command:
+<pre>
+	$ cd MSRC/MonaLisa/Clients/JReflRouter
+	$ ./jGlobal
+</pre>	 
+<p>
+</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

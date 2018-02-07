@@ -1,0 +1,64 @@
+/*--------------------------------------------------|
+| dTree 2.05 | www.destroydrop.com/javascript/tree/ |
+|---------------------------------------------------|
+| Copyright (c) 2002-2003 Geir Landrö               |
+|--------------------------------------------------*/
+
+.dtree {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;	
+	color: #666;
+	font-size: 90%;
+	white-space: nowrap;
+}
+
+.dtree nodeSel {
+	font-size: 90%;
+}
+
+.dtree img {
+	border: 0px;
+	vertical-align: middle;
+}
+.dtree a {
+	font-size : 90%;
+	color: #333;
+	text-decoration: none;
+	padding: 0px 1px 0px 1px;
+}
+.dtree a.node, .dtree a.nodeSel {
+	white-space: nowrap;
+	padding: 0px 1px 0px 1px;
+}
+.dtree a.node:hover, .dtree a.nodeSel:hover {
+	color: #333;
+	text-decoration: underline;
+}
+.dtree a.nodeSel {
+	background-color: #c0d2ec;
+	border:gray;
+	border-style: dotted;
+	border-width:1px;
+	font-size : 90%;	
+}
+.dtree .clip {
+	overflow: hidden;
+}
+
+.nodeBig, .nodeSelBig, .nodeBig:hover, .nodeSelBig:hover {
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    color: #666000;
+    white-space: nowrap;
+    padding: 0px 1px 0px 1px;
+}
+
+.nodeBig:hover, .nodeSelBig:hover {
+    text-decoration: underline;
+    color: #333000;
+}
+
+.nodeSelBig {
+    background-color: #c0d2ec;
+    border:gray;
+    border-style: dotted;
+    border-width:1px;
+}

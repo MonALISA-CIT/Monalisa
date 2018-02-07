@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+<bookinfo>
+  <title>ApMon User Guide</title>
+  <!--
+      <authorgroup>
+      <author>
+      <firstname>Iosif</firstname>
+      <surname>Legrand</surname>
+	<affiliation>
+	<address>
+	<email>Iosif.Legrand@cern.ch</email>
+	</address>
+	</affiliation>
+	</author>
+	</authorgroup>
+  -->	 
+  <copyright>
+    <year>2005</year>
+    <holder>California Institute of Technology</holder>
+  </copyright>
+</bookinfo>
+
+<chapter id="general-guide" xreflabel="ApMon - General User Guide">
+  <title>ApMon - General User Guide</title>
+  <sect1 id="initialization">
+    <title>ApMon Initialization</title>
+    
+    <para>
+      There are several ways to initialize ApMon:
+    </para>
+
+    <para>
+      A first method to initialize ApMon is from a configuration file, which
+      contains the IP addresses or DNS names of the hosts running MonALISA, to 
+      which the data will be sent; the ports on which the MonALISA services listen 
+      on the destination hosts should also be specified in the file. The 
+      configuration file also contains lines that specify lines for configuring 
+      xApMon (see <xref linkend="xApMon"/>). The lines that specify the destination hosts have 
+      the following syntax: 
+      <programlisting>IP_address|DNS_name[:port] [password]</programlisting>
+    </para>
+    <para>
+      Examples:
+      <programlisting>
+	rb.rogrid.pub.ro:8884 mypassword
+	rb.rogrid.pub.ro:8884
+	ui.rogrid.pub.ro mypassword
+	ui.rogrid.pub.ro
+      </programlisting>
+    </para>
+
+    <para>
+      If the port is not specified, the default value 8884 will be assumed.
+      If the password is not specified, an empty string will be sent as password
+      to the MonALISA host (and the host will accept the datagram either if it
+      does not require a password for the ApMon packets or if the machine from 
+      which the packet was sent is in the host's "accept" list).
+      The configuration file may contain blank lines and comment lines (starting 
+      with "#"); these lines are ignored, and so are the leading and the trailing
+      white spaces from the other lines. 
+    </para>
+
+    <para>
+      Another method to initialize ApMon is to provide a list which contains 
+      hostnames and ports as explained above, and/or URLs; the URLs
+      point to plain text configuration files which have the format 
+      described above. The URLs may also represent requests to a servlet or a 
+      CGI script which can automatically provide the best configuration, 
+      taking into account the geographical zone in which the machine which runs
+      ApMon is situated, and the application for which ApMon is used. 
+      The geographical zone is determined from the
+      machine's IP and the application name is given by the user as the value 
+      of the "appName" parameter included in the URL.
+    </para>
+  </sect1>
+  <sect1 id="send-datagrams">
+    <title>Sending Datagrams with User Parameters</title>  
+
+    <para>
+      A datagram sent to the MonaLisa module has the following structure:
+      <itemizedlist>
+	<listitem>a header which has the following syntax: 
+	<programlisting>
+	v:&lt;ApMon_version&gt;p:&lt;password&gt;       
+	</programlisting>
+	  (the password is sent in plaintext; if the MonALISA host does not 
+	  require a password, a 0-length string should be sent instead of the 
+	  password).
+	</listitem>
+	<listitem>cluster name (string) - the name of the monitored cluster 
+	</listitem>
+	<listitem>node name (string) - the name of the monitored nodes
+	</listitem>
+	<listitem>number of parameters (int) </listitem>
+	<listitem>for each parameter: name (string), value type (int), 
+      value (can be double, int or string)
+	</listitem>
+	<listitem>
+	  optionally a timestamp (int) if the user wants to specify the time
+	  associated with the data; if the timestamp is not given, the current 
+	  time on the destination host which runs MonALISA will be used. The
+	  option to include a timestamp is possible since version 2.0.
+	</listitem>
+      </itemizedlist>
+    </para>
+
+    <para>
+      The configuration file and/or URLs can be periodically checked for 
+      changes, in a background thread or process, but this option is disabled 
+      by default. It can be enabled from the configuration file as follows:
+      <itemizedlist>
+	<listitem> 
+	  to enable/disable the periodical checking of the configuration file
+	  or URLs:
+	  <programlisting>xApMon_conf_recheck = on/off</programlisting>
+	</listitem>
+	<listitem>
+	  to set the time interval at which the file/URLs are checked for 
+	  changes:
+	  <programlisting>xApMon_recheck_interval = number_of_seconds</programlisting>
+	</listitem>
+      </itemizedlist>
+    </para>
+  </sect1>
+
+  <sect1 id="xApMon">
+    <title>xApMon - Automatically Sending Monitoring Information</title>
+    <para>
+      ApMon can be configured to send automatically, in a background thread, 
+      monitoring information regarding the application or the system. The 
+      system information is obtained from the <emphasis>proc/</emphasis> 
+      filesystem and the job 
+      information is obtained by parsing the output of the ps command. If job 
+      monitoring for a process is requested, all its sub-processes will be 
+      taken into consideration (i.e., the resources consumed by the process 
+      and all the subprocesses will be summed).
+    </para>
+    <para>
+      There are three categories of monitoring datagrams that ApMon can send:
+    </para>
+    <para>
+      a) job monitoring information - contains the following parameters:
+      <itemizedlist>
+	<listitem><emphasis>run_time</emphasis>: 
+	elapsed time from the start of this job</listitem>
+	<listitem><emphasis>cpu_time</emphasis>:
+	processor time spent running this job</listitem>
+	<listitem><emphasis>cpu_usage</emphasis>: 
+	percent of the processor used for this job, as reported by 
+	<emphasis>ps</emphasis></listitem> 
+	<listitem><emphasis>virtualmem</emphasis>: 
+	virtual memory occupied by the job (in KB)</listitem>
+	<listitem><emphasis>rss</emphasis>: 
+	resident image size of the job (in KB)</listitem>
+	<listitem><emphasis>mem_usage</emphasis>:
+	percent of the memory occupied by the job, as 
+	reported by <emphasis>ps</emphasis></listitem>
+	<listitem><emphasis>workdir_size</emphasis>: 
+	size in MB of the working directory of the job
+	</listitem>
+	<listitem><emphasis>disk_total</emphasis>: 
+	size in MB of the disk partition containing the 
+	working directory</listitem>
+	<listitem><emphasis>disk_used</emphasis>:
+	size in MB of the used disk space on the partition 
+	containing the working directory</listitem>
+	<listitem><emphasis>disk_free</emphasis>: 
+	size in MB of the free disk space on the partition 
+	containing the working directory</listitem>
+	<listitem><emphasis>disk_usage</emphasis>:
+	percent of the used disk partition containing the 
+	working directory</listitem>
+      </itemizedlist>
+
+      b) system monitoring information - contains the following parameters:
+      <itemizedlist>
+	<listitem><emphasis>cpu_usr</emphasis>: 
+	percent of the time spent by the CPU in user mode 
+	</listitem>
+	<listitem><emphasis>cpu_sys</emphasis>:
+	percent of the time spent by the CPU in system mode
+	</listitem>
+	<listitem><emphasis>cpu_nice</emphasis>:
+	percent of the time spent by the CPU in nice mode
+	</listitem>
+	<listitem><emphasis>cpu_idle</emphasis>:
+	percent of the time spent by the CPU in idle mode
+	</listitem>
+	<listitem><emphasis>cpu_usage</emphasis>:
+	CPU usage percent</listitem>
+	<listitem><emphasis>pages_in</emphasis>:
+	the number of pages paged in per second 
+	(average for the last time interval)</listitem>
+	<listitem><emphasis>pages_out</emphasis>:
+	the number of pages paged out per second 
+	(average for the last time interval)</listitem> 
+	<listitem><emphasis>swap_in</emphasis>:
+	the number of swap pages brought in per second 
+	(average for the last time interval)</listitem>
+	<listitem><emphasis>swap_out</emphasis>:
+	the number of swap pages brought out per second 
+	(average for the last time interval) </listitem>
+	<listitem><emphasis>load1</emphasis>:
+	average system load over the last minute</listitem>
+	<listitem><emphasis>load5</emphasis>:
+	average system load over the last 5 min</listitem>
+	<listitem><emphasis>load15</emphasis>:
+	average system load over the last 15 min</listitem>
+	<listitem><emphasis>mem_used</emphasis>:
+	amount of currently used memory, in MB</listitem>
+	<listitem><emphasis>mem_free</emphasis>:
+	amount of free memory, in MB</listitem>
+	<listitem><emphasis>mem_usage</emphasis>:
+	used system memory in percent</listitem>
+	<listitem><emphasis>swap_used</emphasis>:
+	amount of currently used swap, in MB</listitem> 
+	<listitem><emphasis>swap_free</emphasis>:
+	amount of free swap, in MB</listitem>
+	<listitem><emphasis>swap_usage</emphasis>:
+	swap usage in percent</listitem>
+	<listitem><emphasis>net_in</emphasis>:
+	network (input)  transfer in kBps</listitem>
+	<listitem><emphasis>net_out</emphasis>:
+	network (input)  transfer in kBps </listitem>
+	<listitem><emphasis>net_errs</emphasis>: number of network errors
+	(these will produce params called sys_ethX_in, sys_ethX_out, 
+	sys_ethX_errs, corresponding to each network interface)
+	</listitem>
+	<listitem><emphasis>processes</emphasis>:
+	curent number of processes</listitem>
+	<listitem><emphasis>uptime</emphasis>:
+	system uptime in days</listitem>
+      </itemizedlist>
+
+      c) general system information - contains the following parameters:
+      <itemizedlist>
+	<listitem><emphasis>hostname</emphasis>:
+	the machine's hostname</listitem>
+	<listitem><emphasis>ip</emphasis>:
+	will produce ethX_ip params for each interface</listitem>
+	<listitem><emphasis>cpu_MHz</emphasis>: CPU frequency</listitem>
+	<listitem><emphasis>no_CPUs</emphasis>: number of CPUs</listitem>
+	<listitem><emphasis>total_mem</emphasis>:
+	total amount of memory, in MB</listitem>
+	<listitem><emphasis>total_swap</emphasis>:
+	total amount of swap, in MB</listitem>
+      </itemizedlist>
+    </para>
+    <para> 
+      The parameters can be enabled/disabled from the configuration file (if
+      they are disabled, they will not be included in the datagrams). In order
+      to enable/disable a parameter, the user should write in the configuration
+      file lines of the following form:
+
+      <programlisting>xApMon_job_parametername = on/off</programlisting>
+      (for job parameters)
+      or:
+      <programlisting>xApMon_sys_parametername = on/off</programlisting>
+      (for job parameters)
+      or:
+      <programlisting>xApMon_parametername = on/off</programlisting>
+      (for general system parameters)
+
+      Example:
+      <programlisting>
+	xApMon_job_run_time = on
+	xApMon_sys_load1 = off
+	xApMon_no_CPUs = on
+      </programlisting>
+      By default, all the parameters are enabled.
+    </para>
+    <para>
+      The job/system monitoring can be enabled/disabled by including the 
+      following lines in the configuration file:
+      <programlisting>
+	xApMon_job_monitoring = on/off
+	xApMon_sys_monitoring = on/off
+      </programlisting>
+      The datagrams with general system information are only sent if system 
+      monitoring is enabled, at greater time intervals than the system 
+      monitoring datagrams. To enable/disable the sending of general system 
+      information datagrams, the following line should be written in the 
+      configuration file:
+
+      <programlisting>xApMon_general_info = on/off</programlisting>
+
+      The time interval at which job/system monitoring datagrams are sent can 
+      be set with:
+      <programlisting>
+	xApMon_job_interval = number_of_seconds
+	xApMon_sys_interval = number_of_seconds
+      </programlisting>
+    </para>
+  </sect1>
+</chapter>
+
+<chapter id="version-guides" xreflabel="Version Specific User Guides">
+  <title>Version Specific User Guides</title>
+  <para> 
+    In the following pages you can find specific information for each ApMon
+    version:
+    <itemizedlist>
+      <listitem> 
+	<ulink url="apmon_ug_cpp.html">ApMon C++ User Guide</ulink>
+      </listitem>
+      <listitem> 
+	<ulink url="apmon_ug_c.html">ApMon C User Guide</ulink>
+      </listitem>
+      <listitem> 
+	<ulink url="apmon_ug_java.html">ApMon Java User Guide</ulink>
+      </listitem>
+      <listitem> 
+	<ulink url="apmon_ug_perl.html">ApMon Perl User Guide</ulink>
+      </listitem>
+      <listitem> 
+	<ulink url="apmon_ug_py.html">ApMon Python User Guide</ulink>
+      </listitem>
+    </itemizedlist>
+  </para>
+</chapter>  
+</book>

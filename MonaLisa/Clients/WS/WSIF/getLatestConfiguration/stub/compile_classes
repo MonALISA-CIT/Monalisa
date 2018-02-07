@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+export CLASSPATH=`../../classpath.sh ../../`:.
+
+`cat ../../../../conf/env.JAVA_HOME`/bin/javac Client.java

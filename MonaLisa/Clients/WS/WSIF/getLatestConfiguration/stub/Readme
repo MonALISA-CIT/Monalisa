@@ -1,0 +1,28 @@
+
+Client example using WSIF for accessing "MLWebService" web service.
+Invoking the "getLatestConfiguration" function of the "MLWebService" through a 
+ high level stub interface.
+ 
+ WSIF (Web Service Invocation Framework) is a simple Java API
+  for invoking Web services, no matter how or where the services
+  are provided. WSIF is closely based upon WSDL, so it can invoke
+  any service that can be described in WSDL.
+  
+ Find documentation about Apache WSIF from its site:
+          "http://ws.apache.org/wsif/
+
+
+The "getLatestConfiguration" operation interrogates the database 
+for getting the latest configuration for a given farm. It takes as input 
+one parameter, the farm name. The return value is complex schema type.
+
+For executing the examples run the following scripts:
+ - ./generate_classes -  generate classes from service wsdl file;
+                         The tool used for generating the needed classes
+			 is "WSDL2Java" which generates Bean classes for
+			 return and parameter complex types  starting
+			 from the wsdl service description file.
+- ./compile_classes  - compile the client classes;
+- ./run_client <farm name> <wsdl location - optional> - executes the client;
+			 if the location of the wsdl file is not specified, it will
+			 be taken from the environment variable MONALISA_WS

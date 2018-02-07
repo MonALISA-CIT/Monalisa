@@ -1,0 +1,40 @@
+
+Client example using the Apache WSIF for accessing "MLWebService" web service.
+Invoking the "getConfiguration" function of the "MLWebService" using the WSIF's
+ dynamic invocation interface.
+ 
+  WSIF (Web Service Invocation Framework) is a simple Java API
+  for invoking Web services, no matter how or where the services
+  are provided. WSIF is closely based upon WSDL, so it can invoke
+  any service that can be described in WSDL.
+ 
+ Because the "DynamicInvoker" can invoke only services with primitive
+ schema types, this WSIF tool was not used in this case.
+  
+ Find documentation about Apache WSIF from its site:
+          "http://ws.apache.org/wsif/
+
+The "getConfiguration" operation interrogates the database 
+for getting farms configurations. It takes as input two moments of 
+time ( "fromTime" and "toTime" ) in milliseconds and returns all 
+the configurations from the database that were registered between 
+the given moments of time. The return value is complex schema type,
+an array of configurations.
+
+This client return the configurations registered in the database
+in the last week.
+
+For executing the examples run the following scripts:
+ - ./generate_classes -  generate classes from service wsdl file;
+                         The tool used for generating the needed classes
+			 is "WSDL2Java" which generates Bean classes for
+			 return and parameter complex types  starting
+			 from the wsdl service description file.
+			 
+ - ./compile_classes  - compile the client classes;
+ - ./run_client <location of the wsdl file - optional> 
+       - executes the client; if the location of the wsdl file is not specified,
+         it will be taken from the environment variable MONALISA_WS.
+	 
+
+ 

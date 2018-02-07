@@ -1,0 +1,12 @@
+import net.jini.jeri.BasicILFactory;
+import net.jini.jeri.BasicJeriExporter;
+import net.jini.jeri.tcp.TcpServerEndpoint;
+import net.jini.jrmp.*;
+
+lia.Monitor.ClientsFarmProxy.ProxyService {
+//    exporter = new BasicJeriExporter(TcpServerEndpoint.getInstance(6666),
+//                                         new BasicILFactory(),
+//					 true,
+//					 true); 
+    exporter = new JrmpExporter();
+}

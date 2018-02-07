@@ -1,0 +1,6 @@
+<AuthorizationPolicy>
+    <group name="OS_Users" credentials_type="X509">
+        <subject name="/C=RO/ST=Romania/L=Bucharest/O=ML/OU=ML/CN=Griddie"> </subject>        
+	<subject name="C=US/ST=US/O=Caltech/OU=MonaLisa/CN=Adrian Muraru OS"></subject>        	
+    </group>      
+</AuthorizationPolicy>

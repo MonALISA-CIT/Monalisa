@@ -1,0 +1,3 @@
+#!/bin/sh
+
+java -jar KVM/ZKM.jar -v -l ML_OB.log ML_SER_OB.txt

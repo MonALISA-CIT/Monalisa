@@ -1,0 +1,277 @@
+****************************************
+VO Accounting Modules
+****************************************
+
+Contents
+--------
+1. General Description
+2. Compiling and Running the Modules
+3. Results Provided by the Modules
+
+----------------------------------------
+ 1. General Description
+----------------------------------------
+=== LcgVO_IO:
+The LcgVO_IO module holds statistical information about the GridFTP trafic.
+The input and output and the rates represent the value for the last time 
+interval (this interval is set before you run the ML service). These values 
+are displayed in the ML client and in the OSG repository (integrated values).
+
+
+=== LcgVoJobs:
+The LcgVoJobs module collects information from different queue managers 
+in order to obtain accounting statistics for VOs. The current version is
+able to work with Condor, PBS, LSF and SGE; if there are several queue
+managers on a cluster, the values obtained from them are summed. The module
+parses the output of some specific commands that give information about
+the current jobs (like condor_q from Condor, qstat from PBS etc.) and 
+produces results for each job (CPU time consumed, run time, the amount of
+memory etc.). These results are then added to the statistics made per VO; the
+association between the Unix account from which a job is run and the VO to 
+which the job belongs is made on the base of a map file which specifies the
+corresponding VO for each account.
+
+
+----------------------------------------
+ 2. Compiling and Running the Modules
+----------------------------------------
+In order to use the VO accounting modules, you should have MonALISA 1.2.38 or 
+newer. If you have the OSG distribution, it is necessary to source two 
+scripts:
+
+	. /OSG/setup.sh
+	. /OSG/MonaLisa/Service/CMD/ml_env
+
+(replace "/OSG" with the path to your OSG directory)
+
+If you have the LCG distribution, it is not necessary to source any script. 
+
+To compile, just run the "comp" script from the modules' directory:
+
+	./comp
+
+
+=== LcgVO_IO
+Initialization of VO_IO and VoStorage modules with node and arguments 
+configuration file entry:
+
+	*lcgVO_IO{LcgVO_IO, localhost, <arguments>}%<TIME>
+	*lcgVoStorage{LcgVoStorage, localhost, <arguments>}%<TIME>	
+where
+<arguments> is a comma separated list. Accepted arguments are:
+	GridDistribution=<value> - value is the name of the installed Grid 
+distribution (e.g., OSG or LCG2.4); the default distribution is OSG.
+	MapFile=</path-to-mapfile> (grid3-user-vo-map.txt in OSG or users.conf
+in LCG)
+	RemoteHost=<host> - host is the IP or hostname of 
+a remote host on which the commands will be issued instead of the local 
+machine, via ssh. A username can also be given here (e.g., lcfg.rogrid.pub.ro
+or monalisa@lcfg.rogrid.pub.ro are valid values for this parameter).
+ATTENTION! If you use this option, you must be able to connect to the remote
+host with ssh without giving a password (e.g., you should use public key
+authentication). 
+	FtpLog=<logfile> - gridftp.log for VO_IO or logfile (storage log file) 
+for VoStorage) 
+	RemoteFile=<filename> - the path of the log file on the remote host,if
+the RemoteHost option was used
+	Debug - argument for displaying debug informations in ML log file 
+(for VO_IO and VoStorage modules). This is an optional argument.
+	Test - test the module (only for VoStorage module). In this mode the 
+Python script (diskUsage.py) is not run.
+	CanSuspend=<true|false> - if this parameter is set to true, the module
+is suspended for a period of time if it produces errors three times 
+consecutively when it is run. By default, the value is false.
+
+TIME represents the interval in seconds between two calls of doProcess method.
+
+The modules need two environment variables to be set:
+- for Globus: if you have Globus, you should set the GLOBUS_LOCATION variable.
+This environment variable should be set by sourcing the setup.sh file form your
+OSG/ folder.
+
+- for VDT: if you have vdt, you should set the VDT_LOCATION variable. This 
+environment variable should be set by sourcing the setup.sh file form your 
+OSG/ folder. For OSG the vdt folder is in OSG folder (OSG/vdt).
+
+For example, in the OSG distribution ftplog and mapfile are:
+	ftplog=/OSG/globus/var/gridftp.log
+	mapfile=/OSG/monitoring/grid3-user-vo-map.txt
+	logfile=/path-to-storage-log-file
+
+In farm's config file you should put the line:
+
+*lcgVO_IO{LcgVO_IO, localhost, ftplog=/OSG/globus/var/gridftp.log, mapfile=/OSG/monitoring/grid3-user-vo-map.txt, debug}%60
+*lcgVoStorage{LcgVoStorage, localhost, logfile=~/storage/storage.log, mapfile=/OSG/monitoring/grid3-user-vo-map.txt, debug}%180
+
+It is not necessary to initialize the first two arguments if the environment 
+variables exist and are set. In this case you can initialize the module in 
+this way:
+
+*lcgVO_IO{LcgVO_IO, localhost, }%60
+
+If you want to use a remote host, the LcgVO_IO module should be configured 
+like this:
+
+*lcgVO_IO{LcgVO_IO, localhost, RemoteHost=ce.rogrid.pub.ro, RemoteFile=/var/log/globus-gridftp.log}%60
+
+
+=== LcgVoJobs:
+When the LcgVojobs module is run, it has to determine the locations of the
+different job managers. There are three ways to do this:
+
+1) by providing to the module arguments that specify the path where the job
+managers are installed (instructions for how to run the module with arguments
+are given in the next paragraph):
+
+- for PBS: the PBS_LOCATION argument should have a value such that the path to 
+the qstat command is PBS_LOCATION/bin/qstat.
+
+- for Condor: the CONDOR_LOCATION argument should have a value such that the 
+path to the condor_q command is CONDOR_LOCATION/bin/condor_q. Also, you can
+provide a CondorHistoryFile argument to specify the path of the Condor history
+file (if it is not in CONDOR_LOCATION/local.<machine_name>
+
+- for LSF: the LSF_LOCATION argument should have a value such that the path to 
+the bjobs command is PBS_LOCATION/bin/bjobs.
+
+- for SGE: the SGE_LOCATION argument should have a value such that the path to 
+the qstat command is PBS_LOCATION/bin/glinux/qstat.
+
+2) if there is no argument that specifies the path to a job manager, the
+module checks the existence of an environment variable with the same name
+as the argument (e.g., PBS_LOCATION, CONDOR_LOCATION etc.). If the commands
+will be run on a remote host, the values of the envitonment variables are
+taken from the remote hosts.
+If the CondorHistoryFile argument was not provided, the module checks the
+CONDOR_LOCAL_DIR variable, which should indicate the location of the Condor 
+local directory (i.e., the directory that contains log/, spool/ etc.). The 
+Condor history should be ${CONDOR_LOCAL_DIR}/spool/history.
+
+3) if there is no parameter to the module and no environment variable, the
+module will consider some default locations:
+- for Condor: /usr/local/condor
+- for PBS: /usr
+- for LSF: /usr
+
+If you have the OSG distribuition and you sourced the OSG/setup.sh script,
+all the needed variables are already set and it is not necessary to set any
+other environment variables or to provide arguments that specify the locations
+of the job managers.
+
+To enable the module you should add to the farm configuration file a line of 
+the following form:
+
+*<cluster_name>{LcgVoJobs, localhost [,arguments]}%<time_interval> 
+
+where:
+cluster_name - the cluster name for the results that this module produces
+
+arguments - comma separated list in which the following arguments can appear:
+	GridDistribution=<value> - value is the name of the installed Grid 
+distribution (e.g., OSG or LCG2.4); the default distribution is OSG.
+	MapFile=</path-to-mapfile> - path to the mapfile that contains the 
+associations between user accounts and VOs. By default it is considered to be 
+in ${MONALISA_HOME}/../monitoring/grid3-user-vo-map.txt, in OSG or in 
+${LCG_LOCATION}/yaim/examples/users.conf in LCG
+	SiteInfoFile=</path_to_site_info_file> - path to the site info file
+(the LCG site-info.def file). This parameter is only used for the LCG 
+distribution. If the path to the site info file is not specified here, the
+default path is ${LCG_LOCATION}/yaim/examples/site-info.def.
+	RemoteHost=<host> - host is the IP or hostname of a remote host on 
+which the commands will be issued instead of the local machine, via ssh. See
+the RemoteHost parameter for the LcgVO_IO module.
+	Test - to use this module in test mode (some test files will be parsed 
+instead of the output of the commands)
+	doNotPublishJobInfo - the module will not produce results for each 
+running job, but only VO statistics
+	CondorQuickMode - only the "condor_q -l" command will be used to 
+obtain information on the running jobs. By default, "plain" condor_q is also 
+used to obtain a more accurate value of the run time.
+	CondorHistoryCheck - the module will parse the Condor history log, 
+computing the additional parameter CPUTimeCondorHist.
+	NoCondorHistoryCheck - the module will not parse the Condor history 
+log and the parameter CPUTimeCondorHist will not be computed. This is the 
+default behavior.
+	CondorUseGlobal - if Condor is available, the information will be 
+collected from all the job queues in the pool (i.e., from all the hosts that
+run schedd daemons)
+	Server=<hostname> - if Condor is available, the information will be 
+collected from the specified schedd daemon. This argument may appear more than 
+once to specify multiple schedd daemons. 
+	JobManager=<job_manager_name> - this argument is used to specify a job
+manager that will be queried by the module (PBS, CONDOR, LSF, SGE). It may
+appear more than once to specify multiple managers. If you provide a
+<JOB_MANAGER>_LOCATION argument, the manager will be automatically "enabled"
+and there is no need to enable it with a JobManager argument.
+	CanSuspend=<true|false> - if this parameter is set to true, the module
+is suspended for a period of time if it produces errors three times 
+consecutively when it is run. By default, the value is false.
+
+Examples:
+*lcgVO_JOBS{LcgVoJobs, localhost, mapfile=/mymapfile.txt}%120
+*lcgVO_JOBS{LcgVoJobs, localhost, mapfile=/mymapfile.txt, CondorUseGlobal}%180
+*lcgVO_JOBS{LcgVoJobs, localhost, Server=lcfg.rogrid.pub.ro}%100
+*lcgVO_JOBS{LcgVoJobs, localhost, Server=lcfg.rogrid.pub.ro, Server=wn1.rogrid.pub.ro}%60
+*lcgVO_JOBS{LcgVoJobs, localhost, CondorHistoryCheck, Server=lcfg.rogrid.pub.ro}%120
+*lcgVO_JOBS{LcgVoJobs, localhost, GridDistribution=LCG2.4, RemoteHost=lcfg.rogrid.pub.ro, JobManager=PBS, JobManager=PBS}%120
+ *LcgVO_JOBS_CE{monLcgVoJobs, localhost, RemoteHost = lcfg.rogrid.pub.ro,  CONDOR_LOCATION=/usr/local/condor, CondorHistoryFile=/home/condor/spool/history, PBS_LOCATION=/usr}%30
+
+----------------------------------------
+ 3. Results Provided by the Modules
+----------------------------------------
+=== LcgVO_IO:
+The parameters that represent the values obtained in the last time interval are:
+	- ftpInput and ftpOutput (in MB) represents the total ftp transter in the last time interval ()
+	- ftpRateIn and ftpRateOut (in MB/s) the rates for ftp trafic.
+	- ftpInput_SITENAME and ftpOutput_SITENAME
+	- ftpRateIn_SITENAME and ftpRateOut_SITENAME the same semnification. The values represent the ftp transfet for a domain (SITENAME)
+	(for example ftpInput_caltech.edu)
+  
+
+=== LcgVoJobs:
+The module provides two categories of parameters: parameters specific to a
+single job and parameters for a VO.
+
+Job Parameters:
+Not all the parameters are available in all the queue managers; if a parameter
+is not available, the value 0 is reported. The job parameters provided by this
+module are:
+
+	- CPUTime - the CPU time consumed so far by the job, in seconds 
+(available in Condor, PBS, LSF, SGE)
+	- RunTime - wall clock time, in seconds (available in Condor, LSF)
+	- Size - the size of the job, in MB (available in Condor, LSF, SGE)
+	- DiskUsage - the disk usage of the job, in MB (available in Condor) 
+
+VO Parameters:
+There are two categories of VO parameters: parameters that represent values
+obtained in the last time interval (between the previous run of the module
+and the current one) and parameters that represent rates (calculated as the
+difference between the current value of a parameter and the value obtained at
+the previous run, divided by the length of the time interval between runs).
+
+The parameters that represent values obtained in the last time interval are:
+	- RunningJobs - the number of running jobs owned by the VO
+	- IdleJobs
+	- HeldJobs
+	- UnknownJobs
+	- TotalJobs
+	- SubmittedJobs - the number of jobs submitted in the last time interval
+	- FinishedJobs
+	- CPUTime - CPU time in seconds (sum for all the VO's jobs)
+	- CPUTimeCondorHist - the CPU time for Condor jobs, obtained from the
+history file
+	- RunTime - wall clock time in minutes
+	- JobsSize - the size of the jobs in MB
+	- DiskUsage - disk usage for the VO, in MB
+
+
+The parameters that represent rates are:
+	- SubmittedJobs_R - rate for the SubmittedJobs parameter
+	- FinishedJobs_R
+	- RunTime_R
+	- CPUTime_R
+
+There are also some "total" parameters , which represent the sum of the 
+parameters above for all the VOs.
+ 

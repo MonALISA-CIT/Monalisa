@@ -1,0 +1,49 @@
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ml:32774
+reggie-dl.jar requested from ml:32775
+shutdown request from ml:32778
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ml:32784
+reggie-dl.jar requested from ml:32785
+shutdown request from ml:32794
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ui:33251
+reggie-dl.jar requested from ui:33252
+shutdown request from ui:33328
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ui:33334
+reggie-dl.jar requested from ui:33335
+reggie-dl.jar requested from ui:33350
+reggie-dl.jar requested from ui:33414
+shutdown request from ui:33466
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ui:36251
+reggie-dl.jar requested from ui:36252
+shutdown request from ui:36259
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+reggie-dl.jar probed from ui:36267
+reggie-dl.jar requested from ui:36268
+reggie-dl.jar requested from ui:36281
+reggie-dl.jar requested from ui:36344
+reggie-dl.jar requested from ui:36434
+reggie-dl.jar requested from ui:37094
+reggie-dl.jar requested from ui:39745
+reggie-dl.jar requested from ui:40618
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/mahalo-dl.jar
+/usr/local/ramiro/MSRC.NEW/JINI_SER2/lib/ser_dl/reggie-dl.jar
+Jun 7, 2003 3:13:10 PM com.sun.jini.tool.ClassServer run
+INFO: ClassServer started [./../lib/ser_dl/, port 8288]
+reggie-dl.jar probed from ui:34748
+reggie-dl.jar requested from ui:34749
+reggie-dl.jar requested from alice04.rogrid.pub.ro:3205
+shutdown request from ui:34758
+Jun 7, 2003 3:13:38 PM com.sun.jini.tool.ClassServer terminate
+INFO: ClassServer terminated [port 8288]
+Jun 7, 2003 3:13:38 PM com.sun.jini.tool.ClassServer terminate
+INFO: ClassServer terminated [port 8288]

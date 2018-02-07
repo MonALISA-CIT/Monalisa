@@ -1,0 +1,29 @@
+For installation instructions please see INSTALL.
+
+Description
+===========
+
+The current distribution is Mysql Max 3.23 (current stable release from
+www.mysql.com) with support for InnoDB.
+
+If you intend to use another version with InnoDB support, please use the same
+layout as provided. Download your version to mysql_store directory, and make a
+symbolic link to your version.
+
+Upgrade
+=======
+
+The current version is 3.23.55 (Linux (Intel libc6 systems)). For an upgrade 
+simply download any binary distribution from mysql.com and unpack it in 
+mysql_store directory. You should simply make a simbolic link to the directory
+where you unpack your distribution.
+
+Ex (the current distro):
+
+ $cd mysql_store
+ $ln -sf v4.0.13 current
+
+Defaul this versions bind only to lo interface ( 127.0.0.1 ).
+
+
+Suggestion: ramiro@roedu.net

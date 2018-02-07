@@ -1,0 +1,58 @@
+#!/bin/sh
+
+##
+## MONALISA_USER should be the username who runs MonALISA
+##
+## We strongly suggest to create an account from which you 
+## will run MonALISA service. 
+## 
+##
+#MONALISA_USER="monalisa"
+
+
+##########System specific settings
+
+## JAVA_HOME should point to JDK installation path.
+## Please use the latest stable version from Sun
+## JAVA_HOME="${HOME}/JAVA/j2sdk1.4.2"
+JAVA_HOME="/usr/local/java"
+
+##SHOULD_UPDATE="true" will chec for the latest versions for ML service
+##The updates will be dowloaded from URL_LIST_UPDATE defined below in this file
+#
+#SHOULD_UPDATE="false" will not check for updates
+SHOULD_UPDATE="true"
+
+## MonaLisa_HOME must be the path to your current MonaLisa 
+MonaLisa_HOME="${HOME}/MonaLisa.v1.2"
+
+## This settings are specific for your farm
+#FARM_HOME="${MonaLisa_HOME}/Service/TEST"
+FARM_HOME="${MonaLisa_HOME}/Service/myFarm"
+
+## FARM_CONF_FILE is the path to the configuration file for your farm
+FARM_CONF_FILE="${FARM_HOME}/myFarm.conf"
+
+## Name for your farm
+##
+## Please set a short name that reflects the site from which you are
+## running MonALISA.
+##
+#FARM_NAME=""
+
+## Other params to java 
+## If you have problems with JVM please use -Xint opt below
+## 
+## You can use this parameters if you have a firewall that does not allow
+## http connections, only if a proxy is used. MonALISA uses http requests to check
+## for new versions and to get the updates!
+##
+#JAVA_OPTS="-Dhttp.proxyHost=x.x.x.x -Dhttp.proxyPort=3128"
+
+#Please DO NOT bellow this line EDIT THIS! 
+# **** Next parameters should be left as they are!!! ********
+export MonaLisa_HOME FARM_HOME FARM_CONF_FILE JAVA_HOME
+URL_LIST_UPDATE="http://monalisa.cacr.caltech.edu/FARM_ML,http://monalisa.cern.ch/MONALISA/FARM_ML"
+PATH=.:${JAVA_HOME}/bin:/sbin:/usr/sbin:/usr/bin:/bin
+CACHE_DIR="${MonaLisa_HOME}/Service/TMP_UPDATE"
+DEST_DIR="${MonaLisa_HOME}"

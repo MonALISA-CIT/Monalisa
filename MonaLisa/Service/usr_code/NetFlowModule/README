@@ -1,0 +1,53 @@
+
+MonaLisa module. Interprets NetFlow V5 datagrams and reports traffic in and out between 
+specified networks.
+
+Configuration file format:
+=========================
+The NetFlow configuration file has the entries of the following format:
+  
+   -------------------
+    Name
+	type: M
+        ipClass: 137.138.0.0/16	
+   -------------------
+
+"Name" is tha name you wish to give to this network.
+Type is the entry type, Master (M) or Node (N). The traffic in and out parameters will
+be calculated between the Master network and all the other Node networks specified. There 
+also are raported a total traffic in and out parameters, as all traffic in and out for the
+Master network.
+
+Configuration file example:
+   -------------------------
+    Cern
+	type: M
+        ipClass: 137.138.0.0/16
+	ipClass: 192.91.0.0/16
+	
+    Caltech 
+    	type: N
+	ipClass: 131.215.0.0/16
+	
+    FNAL 
+	type: N
+	ipClass: 131.225.0.0/16
+	
+    Total_IN: Cern
+    Total_OUT: Starlight
+    -------------------------
+    
+  This configuration file will raport traffic in and out between Cern(Master node) and Caltech and
+  between Cern and FNAL. These parameters will be raported in cluster Netflow, node Cern_Caltech and 
+  Cern_FNAL. Total traffic in and out parameters will be in cluster NetFlow, node Cern_Starlight, 
+  as specified in the configuration file by entries Total_IN and Total_OUT. 
+  
+ Module Arguments:
+ ================
+  - port - port on the local machine where NetFlow datagrams are received from a router;
+  - confFile - path to the NetFlow module configuration file;
+  - samplerate - sample netflow rate of the router ;
+  
+  Example configuration line from myFarm.conf file:
+    
+   *NetFlow{NetFlowModule, localhost, port=2055,confFile=NetFlow.config,sampleRate=100}%30 

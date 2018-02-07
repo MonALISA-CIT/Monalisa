@@ -1,0 +1,15 @@
+Ramiro - Changed on 12Oct2012
+
+
+Compile:
+
+ CLASSPATH must include jogl.jar in this directory 
+
+Run:
+ 
+ Specify the java.library.path (LD_LIBRARY_PATH)
+
+E.g.
+ OS_PATFORM=linux-x64
+
+ -Djava.library.path=${MSRC_ROOT}/lin/jogl/runtime_native_libraries/${OS_PLATFORM}

@@ -1,0 +1,23 @@
+Client developed using Apache Axis for the "MLWebService".
+Invoking the "getLastValues" function of the MLWebService.
+
+Apache Axis is an implementation of the SOAP (Simple Object Access
+Protocol).  
+
+The "getLastValues" operation returns the latest data received by
+the client, one value for each parameter that is received. This function
+has no parameters and returns an array of results.
+
+This client is called from the command line running the following scripts:
+     - ./generate_classes - generate classes from service wsdl file;
+                            The tool used for generating the needed classes
+			    is "WSDL2Java" which generates Bean classes for
+			    return and parameter complex types  starting
+			    from the wsdl service description file.
+			     
+     - ./compile_classes - compile client classes
+     - ./run_client 
+       or
+       ./run_client "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService"
+
+If you don't specify the URL of the WebService then the default localhost address is used.

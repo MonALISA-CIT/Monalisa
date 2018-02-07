@@ -1,0 +1,5 @@
+ java  \
+ -jar -Djava.security.policy=policy.all \
+ -Dlia.Monitor.ConfigURL=file:app.properties \
+ ../lib/JReflRouterClient.jar > log.out 2>err.out &
+	   

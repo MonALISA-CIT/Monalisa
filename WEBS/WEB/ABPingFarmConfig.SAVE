@@ -1,0 +1,37 @@
+# host and it's peers, separated by spaces
+
+se.rogrid.pub.ro pccil.cern.ch pccit6.cern.ch testulix.phys.ufl.edu
+pccil.cern.ch se.rogrid.pub.ro tier2.cacr.caltech.edu
+pccit6.cern.ch se.rogrid.pub.ro nomura.fnal.gov t2cms0.sdsc.edu testulix.phys.ufl.edu
+nomura.fnal.gov pccit6.cern.ch
+testulix.phys.ufl.edu se.rogrid.pub.ro tier2.cacr.caltech.edu pccit6.cern.ch
+tier2.cacr.caltech.edu pccil.cern.ch t2cms0.sdsc.edu testulix.phys.ufl.edu
+t2cms0.sdsc.edu tier2.cacr.caltech.edu pccit6.cern.ch
+citgrid3.cacr.caltech.edu vdt01.caltech.edu
+phys.ufl.edu spider.usatlas.bnl.gov nest.phys.uwm.edu grid02.uchicago.edu tam01.fnal.gov iuatlas.physics.indiana.edu a197107.n1.vanderbilt.edu 
+vdt01.caltech.edu citgrid3.cacr.caltech.edu
+
+
+# RTime, the link performance indicator is computed like this:
+# RTime = OVERALL_COEF + RTT_COEF * rtt + PKT_LOSS_COEF * loss% + JITTER_COEF * jitter%
+# lower is better
+
+# double values
+OVERALL_COEF 0
+RTT_COEF 0.5
+PKT_LOSS_COEF 500
+JITTER_COEF 10
+
+# We keep last RTT_SAMPLES rtts (integer value)
+RTT_SAMPLES 6
+
+# The history of Lost Packages is PKT_LOSS_MEM long (integer value)
+PKT_LOSS_MEM 10
+
+# The size of the packet sent over the net (must be bigger than 3 bytes)
+PACKET_SIZE 450
+
+# Time between pings (milliseconds). Should be big enough to alow reasonable time for
+# packets to return to sender and not consider them lost
+PING_INTERVAL 4000
+

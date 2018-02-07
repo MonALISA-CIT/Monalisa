@@ -1,0 +1,1 @@
+java -DMonaLisa_HOME=../../.. -classpath .:../../lib/FarmMonitor.jar Bwctl monalisa2.cern.ch

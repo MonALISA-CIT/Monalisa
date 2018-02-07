@@ -1,0 +1,35 @@
+
+This directory includes a simple example of a Filter
+which can write all the (e)Result-s based on a set of
+predicates defined in a configuration file, into a 
+Unix pipe. The "filtered" (e)Result-s are kept in a 
+circular buffer.
+
+The configuration file is monitored for modification time
+and any changes in this file are reloaded by the filter, 
+without the need to restart the service.
+
+1) compile the code using the ./comp script ( in the same directory )
+  
+2) enable the filter. edit the ml.properties file and add the
+following entries:
+    
+    a) add the directory to the class loader
+	lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/FilterExamples/PipeResultWriter/
+	 
+    b) enable the filter
+        lia.Monitor.ExternalFilters=PipeResultWriter
+	     
+    c) set the configuration file for the filter
+	PipeResultWriter.ConfigFile=${MonaLisa_HOME}/Service/usr_code/FilterExamples/PipeResultWriter/conf.properties
+
+3) Define the path to the named pipe used by the filter (PIPE_NAME 
+parameter) in the configuration file defined at step 2. 
+ 
+ *Note* This must be the full path to the named pipe. ( It does not recognize
+ env variables like $MonaLisa_HOME
+		   
+		   
+All the configuration parameters are explained in conf.properties file
+
+For suggestions and bug reports please contact: support@monalisa.cern.ch

@@ -1,0 +1,56 @@
+#!/bin/sh
+
+#Use this script to import CAs certificates in your trustore
+#Any certificates signed by one of this CAs certificates are trusted in this way
+#For safety, "chmod 600" the trustore file [lus.truststore]
+
+
+PRG="$0"
+
+while [ -h "${PRG}" ]; do
+  ls=`ls -ld "${PRG}"`
+  link=`expr "${ls}" : '.*-> \(.*\)$'`
+  if expr "${link}" : '.*/.*' > /dev/null; then
+    PRG="${link}"
+  else
+    PRG="`dirname ${PRG}`/${link}"
+  fi
+done
+
+# Get standard environment variables
+PRGDIR="`dirname ${PRG}`"
+. "${PRGDIR}"/../conf/set_env
+CERTS_PATH="$PRGDIR/../Services/LU_reggie/persistent/certs"
+
+echo_usage() {
+	echo
+	echo "Usage: $PRG <aliasName_for_cert> <path_to_fileCertToImport>"
+	echo 
+	echo "Use this script to import CAs certificates in your trustore"
+	echo "Any certificates signed by one of this CAs certificates are trusted in this way"
+	echo "For safety, ""chmod 600"" the trustore file [lus.truststore]"
+
+}
+
+if [ $# -ne 2 ]; then
+	echo_usage
+	exit 1
+fi
+echo "########################Trustore Admin################################"
+echo
+echo -e "Importing certificate FROM $2 TO $CERTS_PATH/lus.truststore. \n$1 will be used as alias"
+echo "ATTENTION! If the trustore file doesn't exists it will be created!!!"
+echo "Be ready to give the PASSWORD for your trust-store !!"
+
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+${JAVA_HOME}/bin/keytool -import -keystore $CERTS_PATH/lus.truststore -alias $1 -file $2
+if [ $? -ne 0 ]; then
+    echo "Fail to import certificate"
+    exit 1
+fi
+
+
+
+

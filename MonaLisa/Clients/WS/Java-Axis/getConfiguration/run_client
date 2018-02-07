@@ -1,0 +1,12 @@
+#!/bin/bash
+
+cd `dirname $0`
+
+export CLASSPATH=`../classpath.sh ../`:.
+
+if [ $# != 1 ] 
+    then
+	`cat ../../../conf/env.JAVA_HOME`/bin/java Client `../../../conf/MWS.sh`
+    else	
+	`cat ../../../conf/env.JAVA_HOME`/bin/java Client $1
+fi

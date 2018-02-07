@@ -1,0 +1,10 @@
+#!/bin/sh
+
+#
+# Please export here all global variables.
+#
+# E.g:
+#
+# PATH_TO_MY_LOCATION=/some/location
+# 
+# export PATH_TO_MY_LOCATION

@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+<bookinfo>
+  <title>ApMon Perl User Guide</title>
+  <!--
+      <authorgroup>
+      <author>
+      <firstname>Iosif</firstname>
+      <surname>Legrand</surname>
+	<affiliation>
+	<address>
+	<email>Iosif.Legrand@cern.ch</email>
+	</address>
+	</affiliation>
+	</author>
+	</authorgroup>
+  -->	 
+  <copyright>
+    <year>2005</year>
+    <holder>California Institute of Technology</holder>
+  </copyright>
+</bookinfo>
+
+<chapter id="installation" xreflabel="Installation">
+  <title>Installation</title>
+  
+  <para>
+    The ApMon archive contains the following files in the ApMon module:
+    <itemizedlist>
+      <listitem><emphasis>ApMon.pm</emphasis> - 
+      main ApMon module. It can be instantiated by users to send data.
+      </listitem>
+      <listitem><emphasis>ApMon/Common.pm</emphasis> - 
+      contains common functions for all other modules.
+      </listitem>
+      <listitem><emphasis>ApMon/XDRUtils.pm</emphasis> -
+      contains functions that encode different values in XDR format
+      </listitem>
+      <listitem><emphasis>ApMon/ProcInfo.pm</emphasis> -
+      procedures to monitor the system and a given application
+      </listitem>
+      <listitem><emphasis>ApMon/ConfigLoader.pm</emphasis> - 
+      manages configuration retrieval from multiple places
+      </listitem>
+      <listitem><emphasis>ApMon/BgMonitor.pm</emphasis> - 
+      handles the background monitoring of system and applications
+      </listitem>
+      <listitem><emphasis>README</emphasis>
+      </listitem>
+      <listitem><emphasis>example/*</emphasis> -
+      a set of examples with the usage of the ApMon module.
+      </listitem>
+      <listitem><emphasis>example/destinations.conf</emphasis> - 
+      a sample destinations file, for url/file configuration
+      </listitem>
+      <listitem><emphasis>MAN</emphasis> -
+      a short description and API functions
+      </listitem>
+    </itemizedlist>
+  </para>
+  <para>
+    To install this module type the following:
+    <screen>
+      perl Makefile.PL
+      make
+      make test
+      make install
+    </screen>
+  </para>
+  <para>
+    DEPENDENCIES:
+  </para>
+  <para>
+    This module requires these other modules and libraries:
+    <screen>
+      Data::Dumper
+      LWP::UserAgent
+      Socket
+      Exporter
+    </screen>
+  </para>
+</chapter>
+<chapter id="using-apmon" xreflabel="Using ApMon">
+  <title>Using ApMon</title>
+
+  <sect1 id="initialization">
+    <title>ApMon Initialization</title>
+    
+    <para>
+      In the Perl version, the ApMon features are available as methods of a 
+      class called <code>ApMon</code>. The <code>ApMon</code> class will start 
+a second process that 
+      will verify periodically the configuration files or webpages for any 
+      changes. The settings are communicated to the main procress through a 
+      local file, stored in temp. This is because there could be long waiting 
+      times for the downloading and the resolving of the destination hosts for
+      the udp datagrams. This way, ApMon <code>sendParam*</code> functions 
+      will not block.
+    </para>
+    <para>
+      An ApMon object can be initialized in one of the following ways
+      (see the manual for details):
+      <itemizedlist>
+	<listitem>
+	  passing as parameters a list of locations from where the 
+	  configuration will be loaded. These are 
+	  strings that represent either a filename, or an URL address (if they 
+	  start with <code>http://</code>).
+	</listitem>
+	<listitem>
+	  passing as parameter a reference to an array, containg directly the 
+	  destinations (<code>host[:port][ pass]</code>). ApMon will send datagrams to all
+	  the valid given destinations (i.e. hosts that can be resolved), with 
+	  default options. In this case, the child process that verifies 
+	  configuration files for changes will be not be started and all 
+	  function calls refering to this part will generate an error message.
+	</listitem>
+	<listitem>
+	  passing as parameter to the constructor a reference to a hash. In 
+	  this case, the keys will be destinations and the corresponding 
+	  values will be references to another hash in which the key is a 
+	  configuration option and the value is the value of that option. Note 
+	  that in this case, the options should not be preceded by <code>
+	  xApMon_</code> and options should be 0/1 instead of on/off as in
+	  the configuration file.
+	  In this case, the child process that verifies configuration files 
+	  for changes will not be started and all function calls refering to 
+	  this part will generate an error message. If system and job 
+	  monitoring and general information are disabled, the child process 
+	  that performs this monitoring will not be starting. Any attempts to 
+	  setMonitorClusterNode or setJobPID will generate errors.
+	</listitem>
+	<listitem>
+	  passing no parameters. In this case, in order to initialize the 
+	  destionations for the packets, you will have to use the <code>
+	  setDestinations()</code> function. This accepts the same parameters 
+	  as the constructor, as described above.
+	</listitem>
+      </itemizedlist>
+    </para>
+  </sect1>
+
+  <sect1 id="sending-datagrams">
+    <title> Sending Datagrams</title>
+
+    <para>
+      To send user parameters to MonALISA, you have the following set of 
+      functions:
+      <screen>
+	sendParameters ( $clusterName, $nodeName, @params);
+      </screen>
+      Use this to send a set of parameters to all given destinations.
+      The default cluster an node names will be updated with the values given
+      here.If afterwards you want to send more parameters, you can use the 
+      shorter version of this function, sendParams. The parameters to be sent 
+      can be eiter a list, or a reference to a list, a hash or a reference to
+      a hash with pairs. This list should have an even length and should 
+      contain pairs like <code>(paramName, paramValue)</code>. <code>
+      paramValue</code> can be a string, an integer or a float. Due to the 
+      way that Perl interprets functions parameters, you can put as many 
+      parameters in the function call as you want, not needing to create a 
+      list for this.
+      <screen>
+	sendParams (@params);
+      </screen>
+      Use this to send a set of parameters without specifying a cluster and a 
+      node name. In this case, the default values for cluster and node name 
+      will be used. See the sendParameters function for more details.
+      <screen>
+	sendTimedParameters ($clusterName, $nodeName, $time, @params);
+      </screen>
+      Use this instead of sendParameters to set the time for each packet that 
+      is sent. The time is in seconds from Epoch. If you use the other 
+      function, the time for these parameters will be sent by the MonALISA 
+      serice that receives them. Note that it is recommended to use the other 
+      version unless you really need to send the parameters with a different 
+      time, since the local time on the machine might not be synchronized to a 
+      time server. The MonALISA service sets the correct real time for the 
+      packets that it receives.
+      <screen>
+	sendTimedParams ($time, @params);
+      </screen>
+      This is the short version of the sendTimedParameters that uses the 
+      default cluster and node name to sent the parameters and allows you to 
+      specify a time (in seconds from Epoch) for each packet.
+    </para>
+    <para>
+      Please see the EXAMPLE file for examples of using these functions.
+    </para>
+  </sect1>
+
+  <sect1 id="configuring-apmon">
+    <title>Configuring ApMon with the aid of the API</title>
+    
+    <para>
+      The behaviour of ApMon can be configured not only from the configuration 
+      files or webpages, but also with the aid of the API.
+      In order to enable the periodical reloading of the configuration files / 
+      webpages, you should call <code>setConfRecheck($bool, [$interval])
+      </code>; if you want, you can specify the time interval at which the 
+      recheck operatins are performed.
+    </para>
+    <para>
+      If you want to disable temporarily sending of background monitoring 
+      information, and to enable it afterwards, you can use:
+      <screen>
+	enableBgMonitoring ($bool)
+      </screen>
+      If you don't want to have the two background processes, you can turn 
+      them off whenever you want using the following function:
+      <screen>
+	stopBgProcesses ();
+      </screen>
+      In this case, configuration changes will not be notified anymore, and no 
+      background monitoring will be performed. To force a configuration check 
+      or send monitoring information about the system and/or jobs, you can use 
+      the following two functions:
+      <screen>
+	refreshConfig ();
+	sendBgMonitoring ();
+      </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="automated-job-monitoring">
+    <title>Automated Job Monitoring</title>
+   
+    <para>
+      To monitor jobs, you have to specify the PID of the parent process for 
+      the tree of processes that you want to monitor, the working directory, 
+      the cluster and the node names. If work directory is "", no information 
+      will be retrieved about disk:
+      <screen>
+	addJobToMonitor ($pid, $workDir, $clusterName, $nodeName);
+      </screen>
+      To stop monitoring a job, just call:
+      <screen>
+	removeJobToMonitor ($pid);
+      </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="logging">
+    <title>Logging</title>
+    
+    <para>
+      To change the log-level of the ApMon module, you can either set it in 
+      the configuration file or use the following function:
+      <screen>
+	setLogLevel(level);
+      </screen>
+      with the following valid log-levels: "DEBUG", "NOTICE", "INFO", 
+      "WARNING", "ERROR", "FATAL"
+    </para>
+    <para>
+      From the configuration file the log-level can be set as follows:
+      <screen>
+       xApMon_loglevel = &lt;level&gt;
+     </screen>
+     e.g.,
+     <screen>
+       xApMon_loglevel = FINE
+     </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="restrictions">
+    <title>Restrictions</title>
+    <para>
+      The maximum size of a datagram is specified by the constant 
+      MAX_DGRAM_SIZE; by default it is 8192B and the user should not modify
+      this value as some hosts may not support UDP datagrams larger than 8KB.
+
+    </para>
+  </sect1>
+  
+</chapter>
+<chapter id="tutorial">
+  <title>How to Write a Simple Perl Program with ApMon</title>
+   
+  <para>
+    In this section we show how the ApMon API can be used to write a simple
+    program that sends monitoring datagrams. The source code for this short 
+    tutorial (slightly modified)  can be found in the simple_send.pl file
+    under the <emphasis>examples/</emphasis> directory.
+  </para>
+  <para>
+    The program generates values for a few parameters and sends them to the 
+    MonALISA destinations; this action is repeated in  20 iterations.
+  </para>
+  <para>
+    With this example program we'll illustrate the steps that should usually 
+    be taken to write a program with ApMon:
+  </para>
+  <para>
+    1. Import the ApMon module (and possibly other necessary modules):
+    <screen>
+      use strict;
+      use warnings;
+
+      use ApMon;
+    </screen>
+  </para>
+  <para>
+    2. Initialize ApMon and possibly set some options (in this example, we 
+    disabled system monitoring). These options could have also been set from a 
+    configuration file, but here we don't have one.
+    <screen>
+      # Initialize ApMon specifying that it should not send information about the system. 
+      # Note that in this case the background monitoring process isn't stopped, in case you may
+      # want later to monitor a job.
+      my $apm = new ApMon({"pcardaab.cern.ch" => {"sys_monitoring" => 0, "general_info" => 0}});
+    </screen>
+  </para>
+  <para>
+    3. Send the datagrams. We used here two functions: sendParameters, which 
+    specifies the cluster name and the node name (which will be cached in the 
+    ApMon object), and sendParams, which uses the names that were memorized at 
+    the call of the first function.
+    <screen>
+      for my $i (1 .. 20) {
+        # you can put as many pairs of parameter_name, parameter_value as you want
+	# but be careful not to create packets longer than 8K.
+	$apm->sendParameters("SimpleCluster", "SimpleNode", "var_i", $i, "var_i^2", $i * $i);
+	my $f = (20.0 / $i);
+	# send in the same cluster and node as last time
+	$apm->sendParams("var_f", $f, "5_times_f", 5 * $f, "i+f", $i + $f);
+	sleep(1);
+      }
+    </screen>
+ </para>
+</chapter>
+</book>

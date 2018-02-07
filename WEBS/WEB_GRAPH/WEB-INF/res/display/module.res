@@ -1,0 +1,1 @@
+<input type="checkbox" name="modules" value="<<:name esc:>>" id="<<:name esc:>>" <<:plot check:>> class="input_checkbox"><a href="JavaScript:reverse('<<:name js:>>');" onMouseOver="return overlib('Show/hide chart <b><<:descr js:>></b>');" onMouseOut="return nd();" class="link"><<:descr esc:>></a>

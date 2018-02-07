@@ -1,0 +1,196 @@
+#!/bin/sh
+
+JAVA_HOME="/usr/java/jdk1.5.0_05"
+export CRT_DIR=`pwd`
+export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${CRT_DIR}/lib
+export CLASSPATH=${CLASSPATH}:${CRT_DIR}/lib/apmon.jar
+
+
+## Uncomment this if you are trying to register this proxy in SECURE LUSs
+#SEC_REGISTRATION="true"
+
+PRG="$0"
+                 
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+                                                                                                                               
+# Get standard environment variables
+PRGDIR=`dirname "$PRG"`
+
+#separate logger config file
+#-Djava.util.logging.config.file=${PRGDIR}/logger.config \
+set_cmd() {
+
+cmd="${JAVA_HOME}/bin/java \
+-Dlia.Monitor.monitor.proxy_home=${PRGDIR} \
+-Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+-Djava.security.policy=${PRGDIR}/policy.all \
+-Dlia.Monitor.ConfigURL=file:${PRGDIR}/ml.properties"
+
+if [ "x${SEC_REGISTRATION}" = "xtrue" ]; then
+    cmd="${cmd} \
+    -Djava.security.manager= \
+    -Djava.security.auth.login.config==${PRGDIR}/security/proxy.login \
+    -Djavax.net.ssl.trustStore= \
+    -Dcom.sun.jini.jeri.connectionTimeout=2400000 "
+fi
+
+cmd="${cmd} -jar ${PRGDIR}/lib/ClientsFarmProxy.jar"
+
+#echo $cmd
+
+return 0
+}
+
+
+set_RE_cmd() {
+
+cmd_RE="${JAVA_HOME}/bin/java .*\
+-Dlia.Monitor.monitor.proxy_home=.* .*"
+
+return 0
+}
+
+
+start(){
+    set_cmd && set_RE_cmd
+    c_uid="`id -u -r`"
+    
+    pid="`${PRGDIR}/bin/pgrep -u ${c_uid} -f \"${cmd_RE}\"`"
+    if [ ! -z "${pid}" ]; then
+        echo "Proxy still running? [ PID == ${pid} ]"
+        return 1
+    fi
+
+    echo -n "Trying to start Proxy Service...."
+
+    cd ${PRGDIR}; ${cmd} > "${PRGDIR}"/"MLProxy.log" 2>&1 &
+    sleep 5
+    
+    pid=`"${PRGDIR}"/bin/pgrep -f -P $$ "${cmd_RE}"`
+    if [ -z "${pid}" ]; then
+        echo "FAILED"
+        echo "Please check ${PRGDIR}/Proxy.log"
+    else
+    	echo "STARTED [ PID == ${pid} ]"
+    fi
+}
+
+stop(){
+	set_cmd && set_RE_cmd
+
+    c_uid="`id -u -r`"
+	
+	ppid_cmd="${PRGDIR}/bin/pgrep -u ${c_uid} -f -P 1 \"${cmd_RE}\""
+	pid_cmd="${PRGDIR}/bin/pgrep -u ${c_uid} -f \"${cmd_RE}\""
+	ppid=`/bin/sh -c "${ppid_cmd}"`
+	pid=`/bin/sh -c "${pid_cmd}"`
+	
+	if [ -z "${pid}" ]; then
+		echo "Proxy service not running!?!"
+		return 0
+	fi
+	echo -n "Trying to stop Proxy Service...."
+
+	kill ${ppid} >/dev/null 2>&1
+	sleep 5
+	more=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${more}" ]; then
+		echo "STOPPED"
+		return 0
+	fi
+	echo "FAILED"
+	echo -n "Retrying...Please wait..."
+
+	pid=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${pid}" ]; then
+		echo "STOPPED"
+		return 0
+	fi
+
+	kill ${pid} >/dev/null 2>&1
+	sleep 10
+
+	more=`/bin/sh -c "${pid_cmd}"`
+	if [ -z ${more} ]; then
+		echo "OK!"
+		return 0
+	fi
+
+	echo "FAILED!!!"
+	echo -n "Force kill..."
+	pid=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${pid}" ]; then
+		echo "Killed!"
+		return 0
+	fi
+
+	kill -9 ${pid} >/dev/null 2>&1
+	sleep 5
+
+	more=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${more}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+	
+	echo "FAILED!!!!"
+	echo -n "Retrying to kill..."
+
+	pid=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${pid}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+
+	kill -9 ${pid} >/dev/null 2>&1
+	sleep 10
+
+	more=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${more}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+
+	hostname=`hostname -f`
+	mail -s "Cannot stop Proxy @ ${hostname} with kill -9!" "Iosif.Legrand@cern.ch,ramiro@roedu.net" 2>&1 >/dev/null &
+	echo "FAILED!!!"
+	return 1
+
+}
+
+restart(){
+	stop
+	if [ $? -eq 0 ]; then 
+		start
+	else
+		echo " ML was NOT started because stopping the service failed! "
+		exit 1
+	fi
+}
+
+
+case $1 in
+'start')
+		start
+        ;;
+'stop')
+		stop
+        ;;
+'restart')
+		restart
+        ;;
+*)    
+        echo "Usage: $0 [ start | stop | restart ]"
+        ;;
+esac

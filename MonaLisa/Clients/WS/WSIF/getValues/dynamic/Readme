@@ -1,0 +1,41 @@
+
+Client example using the WSIF for accessing "MLWebService" web service.
+Invoking the "getValues" function of the "MLWebService" using the WSIF's
+ dynamic invocation interface.
+ 
+ WSIF (Web Service Invocation Framework) is a simple Java API
+  for invoking Web services, no matter how or where the services
+  are provided. WSIF is closely based upon WSDL, so it can invoke
+  any service that can be described in WSDL.
+
+ Find documentation about Apache WSIF from its site:
+       "http://ws.apache.org/wsif/
+
+    The "getValues" operation interrogates the database for getting 
+parameter results. It takes as input farm name - the name of the farm 
+interested in, cluster name - the name of the cluster intrested in, node 
+name - the name of the node interested in, parameter name - the parameter 
+name interested in, from time and to time - the return results will be 
+those that were received in the database between these times ( given in 
+milliseconds). The return value is complex schema type, an array of results.
+
+
+For executing the examples run the following scripts:
+ - ./generate_classes -  generate classes from service wsdl file;
+                         The tool used for generating the needed classes
+			 is "WSDL2Java" which generates Bean classes for
+			 return and parameter complex types  starting
+			 from the wsdl service description file.
+ - ./compile_classes  - compile the client classes
+ - ./run_client <farm_name> <cluster_name> <node_name> <param_name> <fromTime> 
+	        <toTime> <wsdl_location - optional>
+        - executes the client; if the location of the wsdl file is not specified, 
+	it will be taken from the environment variable MONALISA_WS.
+		       
+For example: ./run_client "*" "*" "*" "*" -99990000 0
+       
+   will return all results from all farms ("*"), all clusters ("*"),
+   all nodes ("*"), all parameters registered in the database between 
+   from time (-99990000) and to time (0 - present).
+		   
+ 

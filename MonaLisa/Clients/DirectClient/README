@@ -1,0 +1,5 @@
+  To use this interface you have to add the following options to your 
+JStoreClient's App.properties configuration file:
+
+lia.Monitor.SimpleExporter.enabled=true
+lia.Monitor.SimpleExporter.port=9100

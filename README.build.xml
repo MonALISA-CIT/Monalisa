@@ -1,0 +1,41 @@
+Tasks defined in build.xml
+
+dist
+====
+
+Makes distro in $LIA_HOME/JARS. It's the default task!
+
+	depends on:
+	
+	compile
+	=======
+			depends on:
+			compile_java:
+			============
+			Compiles (all) .java source files under lia directory.
+
+			rmic:
+			====
+			RMI compiler for Remote Interfaces.
+
+clean:
+=====
+Deletes all .class files under build directory.
+
+Ex:
+
+1)Compile .java files.
+ant compile_java
+
+2)Compile .java and rmic for remote interfaces
+ant compile
+
+It is the same as:
+ant compile_java
+ant rmic
+
+3)Make distro:
+ant
+
+or
+ant dist

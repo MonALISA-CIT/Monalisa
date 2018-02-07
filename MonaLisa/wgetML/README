@@ -1,0 +1,26 @@
+
+This directory contains a simple script to 
+update MonALISA in case there are http proxy
+issues at your site, or you want to download ML
+binaries.
+
+All you have to do is:
+
+$cd MonaLisa/wgetML
+$./getML.sh
+
+The entire operation will be logged in wgetML.log
+
+It also includes a script which "tests" if the .jar files
+are ok.
+
+
+Requirements
+============
+
+You should have installed zip and wget.
+
+
+
+
+Please email any suggestions or bugs to developers@monalisa.cern.ch

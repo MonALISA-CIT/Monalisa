@@ -1,0 +1,37 @@
+
+Quick Launch:
+
+1) Set MYSQL_HOME in Start_Mysql.sh and InitMonaLisa.sh to the directory were you unpack this
+distro.
+
+2) cd $MYSQL_HOME.
+
+3) cp -r Conf/.MyCC/ ~/.MyCC
+
+4) ./Start_Mysql.sh
+
+5) if OK ./InitMonaLisa.sh
+
+You must have about 120MBytes (for the current settings) free on the partition
+where you intend to install Mysql. InnoDB alocates it's tables at the very first
+start of Mysql.
+
+You have an very intuitive client GUI for configuring your users/passwords. It's
+called mycc(see http://www.mysql.com/products/mycc/index.html). You should find
+it in mysql_store/mycc.
+
+To create default tables layout please use mycc:
+$MYSQL_HOME/mycc/mycc
+(In step 3 you have copied the default configuration params for mycc)
+
+The script is in Conf/MonaLisa/crebas_InnoDB.sql
+
+Default user&pass:
+mon_user
+mon_pass
+
+If you already have a mysql daemon running in the system and you want to bind
+this one on a new TCP port, other than standard 3306, you should change the
+value MYSQL_TCP_PORT to whatever value you want.
+
+For more config options please read the Start_Mysql.sh

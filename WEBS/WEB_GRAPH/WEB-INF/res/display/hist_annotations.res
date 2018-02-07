@@ -1,0 +1,1 @@
+&nbsp;<a href="#" onMouseOver="return overlib('<<:continut js:>>');" onMouseOut="return nd();" onClick="return openAnnotations();"><img src="/img/alert_small.png" border=0 width=16 height=16></a>

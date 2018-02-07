@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+  <bookinfo>
+    <title>MonALISA Web Services User Guide</title>
+    <copyright>
+      <year>2004</year>
+      <holder>California Institute of Technology</holder>
+    </copyright>
+  </bookinfo>
+  <chapter id="ws-for-ml">
+    <title>Web Services for MonALISA</title>
+    <para>
+      A simple Web Service is integrated with the MonALISA service,
+      as well with the MonALISA Repository. The Web service,
+      "MLWebService", provides an interface for publishing the
+      monitoring data using a WSDL/SOAP technology. In this way, any
+      client can connect and receive selected monitoring data.
+    </para>
+    <sect1 id="ws-description">
+      <title>Service description</title>
+	<para>
+	  The service offers a single port type with three operations:
+	  <function>getValues</function>, <function>getConfiguration</function> and
+	  <function>getLatestConfiguration</function>.
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		the <function>getValues</function> operation
+		interrogates the database and gets all the parameter
+		values for the farm, the cluster, the node and the
+		parameter name specified as arguments. The time when
+		the parameter(s) was registered in the database must
+		be between two moments of time (fromTime and toTime)
+		also specified as operation input. The return type is
+		a complex schema type, an array of results containing
+		all the values taken from the database.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		the <function>getConfiguration</function> operation
+		interrogates the database and gets all configurations
+		of all farms that were registered in the database
+		between two limits of time (from time and to time)
+		given as input. The return type is a complex schema
+		type, an array of configurations that were found in
+		the database that matched the constraints .
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		the <function>getLatestConfiguration</function>
+		operation interrogates the database and returns the
+		last configuration received in the database for a
+		given farm. It receives as input a string, the farm
+		name. It returns a complex schema type that represents
+		the configuration.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+      </sect1>
+      <sect1 id="ws-implementation">
+	<title>Service implementation</title>
+	<para>
+	  The web service application was developed using Apache Axis
+	  (See <ulink url="http://ws.apache.org/axis">http://ws.apache.org/axis</ulink>).
+	</para>
+	<para>
+	  The interface of the service contains the following
+	  functions:
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<function>Result[] getValues (String farmName, String clusterName, String nodeName, String parameterName, long fromTime, long toTime);</function>
+	      </term>
+	      <listitem>
+		<para>
+		  This function can be called in two ways:
+		  <itemizedlist>
+		    <listitem>
+		      <para>
+			specifying negative values for times. For
+			example, if the call is
+			<programlisting>getValues( "*", "*", "*", "*",-3600000,0)</programlisting> 
+			the service will return all the values registered in the
+			database in the last hour.
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			specifying absolute values for time. For
+			example, if the call is 
+			<programlisting>getValues ("*", "*", "*", "*", 1060400000000, 1065000000000)</programlisting> 
+			the service will return all the values registered
+			in the database with the registration time
+			between the two values specified in milliseconds.
+		      </para>
+		    </listitem>
+		  </itemizedlist>
+		</para>
+		<para>
+		  The Result class is a Bean class and has the following description:
+		  <programlisting>
+public class Result {
+    private String farmName;      // the farm name that contains the parameters 
+    private String clusterName;   // the cluster name that contains the parameters 
+    private String  nodeName ;    // the node name that contains the parameters 
+    private String[] param_name ; // the parameters names
+    private double[] param;       // the parameters values
+    private long time;            // the absolute time in milliseconds when this value was   
+                                  // registered in the database
+    ............                  // get/set functions
+}</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>WSConf[] getConfiguration (long fromTime, long toTime);</function>
+	      </term>
+	      <listitem>
+		<para>
+		  The times specified for this function are absolute
+		  moments of time in milliseconds.
+		</para>
+		<para>
+		  The WSConf is a Bean class and has the following description:
+		  <programlisting>
+public class WSConf {
+    private WSFarm wsFarm; // the farm that had this configuration
+    private long confTime; // the time when this configuration was registered in 
+                           // the database
+    .............          // get/set functions
+} 
+		  </programlisting>
+		  the java class that describes a farm:<programlisting>
+public class WSFarm {
+    private String farmName;         // the name of the farm
+    private WSCluster[] clusterList; // the clusters of this farm
+    ..........                       // get/set functions
+}</programlisting>
+                  the java class that describes a cluster:<programlisting>
+public class WSCluster {
+    private String clusterName; // the name of the cluster
+    private WSNode[] nodeList ; // the nodes contained in this cluster
+    ..........                  // get/set functions
+}</programlisting>
+                  the java class that describes a node:<programlisting>
+public class WSNode {
+    private nodeName ;        // the node name
+    private String paramList; // the list of parameters for this node
+    .........                 // get/set functions
+}</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>WSConf[] getLatestConfiguration (String farm)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  returns the latest configurations received in the
+		  database for all farms (farm="*") or returns the
+		  latest configuration for a specified farm.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</para>
+      </sect1>
+    </chapter>
+    <chapter id="ws-client-examples">
+	<title>Clients Examples for MLWebService</title>
+	<para>
+	  An archive with Java and Perl examples of simple
+	  MLWebService clients example can be downloaded from
+	  <ulink url="http://monalisa.cacr.caltech.edu/">http://monalisa.cacr.caltech.edu/</ulink>. 
+	  These examples shows you
+	  how to interrogate the web service from MonALISA and get
+	  monitoring data using the SOAP protocol.
+	</para>
+	<sect1>
+	  <title>MLWebService clients examples presentation</title>
+	  <para>
+	    The client examples presented here can interrogate both
+	    the MLWebService from the Repository and the MLWebService
+	    from the MonALISA service. There are examples for
+	    <emphasis role="bold">Java-Axis</emphasis>, <emphasis
+	    role="bold">WSIF</emphasis> and <emphasis
+	    role="bold">Perl</emphasis>.
+	  </para>
+	</sect1>
+	<sect1>
+	  <title>Examples archive structure</title>
+	  <para>
+	    The sources of the clients examples are located in the
+	    <filename>WS-Clients</filename> directory. There are
+	    special subdirectories in it
+	    (<filename>Java-Axis</filename>,
+	    <filename>Perl</filename>, <filename>Wsif</filename>),
+	    each containing clients developed using different
+	    libraries (<emphasis role="bold">Apache Axis</emphasis>,
+	    <emphasis role="bold">Soap:Lite</emphasis> and <emphasis
+	    role="bold">Apache Wsif</emphasis>). Every client example
+	    calls a function of the MLWebService and is located in a
+	    directory having the name of the called function of the
+	    service. The source of every example is called <emphasis
+	    role="bold">Client</emphasis>
+	    (<filename>Client.java</filename> or
+	    <filename>Client.pl</filename>). There are special scripts
+	    in each directory for automating the installation of used
+	    libraries, the compilation and execution of each client:
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  for the examples developed in Java (Axis or WSIF)
+		  each example contains the following scripts
+		  <itemizedlist>
+		    <listitem>
+		      <para>
+			the <filename>generate_classes</filename>
+			script uses the WSDL2Java tool for generating
+			the client used classes;
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			the <filename>compile_classes</filename>
+			script compiles the client classes;
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			the <filename>run_client</filename> script
+			executes the example.
+		      </para>
+		    </listitem>
+		  </itemizedlist>
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		  for the example developed in Perl, there were used
+		  special modules (<emphasis
+		  role="bold">Soap::Lite</emphasis> and <emphasis
+		  role="bold">Time:HiRes</emphasis>). This modules are
+		  automatically installed using the
+		  <filename>install_soap_lite</filename> and
+		  <filename>install_time_hires</filename> scripts
+		  located in the Perl directory.
+		</para>
+	      </listitem>
+	    </itemizedlist>
+	    For details see the <filename>Readme</filename> files from
+	    every example directory.
+	  </para>
+	</sect1>
+	<sect1>
+	  <title>Examples developed using Apache Axis, Perl SOAP::Lite modules and Apache WSIF</title>
+	  <para>
+	    Apache Axis is an implementation of the SOAP (Simple Object Access Protocol).
+	  </para>
+	  <para>
+	    SOAP::Lite for Perl is a collection of Perl modules which
+	    provide a simple and lightweight interface to the Simple
+	    Object Access Protocol, both on client and server side.
+	  </para>
+	  <para>
+	    WSIF (Web Service Invocation Framework) is a simple Java
+	    API for invoking Web services no matter or how and where
+	    the services are provided. WSIF is closely based upon WSDL
+	    (Web Service Description Language - See <ulink
+	    url="http://www.w3.org/TR/wsdl">http://www.w3.org/TR/wsdl</ulink>),
+	    so it can invoke any service that can be described in
+	    WSDL.
+	  </para>
+	  <para>
+	    There are three types of clients, one that interrogates
+	    the <function>getConfiguration</function> function of the
+	    service and returns the configuration registered in the
+	    database in the last week, one that interrogates the
+	    <function>getValues</function> function and returns all
+	    the parameters and parameter values respecting specified
+	    constraints and another one that interrogates the
+	    <function>getLatestConfiguration</function> service
+	    function and returns the latest configuration received in
+	    the database for a given farm (See <xref
+	    linkend="ws-implementation"/> for the
+	    definition of these functions).
+	  </para>
+	</sect1>
+    </chapter>
+</book>

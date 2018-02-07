@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">&nbsp; Design</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+<font size="+1"><strong class="page_subtitle">Data Collection</strong></font>
+<p>
+The data collection part is based on a multithread engine that performs the procedures 
+to get the requested values. A monitoring module performs a certain task (a SNMP request, 
+runs a script or a performance program) and it can be dynamically loaded into the system 
+and applied to a (set of) system(s)  with a defined frequency. Dedicated modules to use 
+parameters collected with other monitoring tools (e.g. Ganglia, MRTG) are controlled  
+by the same multithread engine. 
+</p>
+<p align="center">
+<img src="img/ml_design_snmp.jpg" align="absmiddle" border="0">
+</p>
+
+<p> A <strong>Monitoring Module</strong> is a dynamic loadable unit which 
+executes a procedure (runs a scrip / program or performs SNMP request) 
+to collect a set of parameters (monitored values) by properly parsing 
+the output of the procedure. In general a monitoring unit is a simple 
+class, which is using a certain procedure to obtain a set of parameters 
+and report them in a simple, standard format. Each monitoring module must 
+implement a method that provides the names (identifiers) for the parameters 
+is able to collect. </p>
+
+<p>Monitoring Modules can be used for pulling data and in this case it 
+is necessary to execute them   with a predefined frequency or to "install" 
+(has to run only once) pushing scripts (programs) which are sending the monitoring 
+results (via SNMP, UDP or TCP/IP) periodically back to the Farm Monitoring module.  
+The execution for these modules is done using a dynamic  pool of threads and it 
+controlled by the farm monitoring unit.  Allowing to dynamically load these modules 
+from a (few) centralized sites when they ate needed makes much easier to keep 
+large monitoring systems updated and provide new functionalities dynamically. 
+</p>
+
+<p>The <strong>Farm Monitoring</strong> unit is responsible for the configuration 
+and the monitoring of one or several farms.  It can dynamically load any monitoring 
+modules from a (set of) http servers or a distributed files system and use them 
+to perform monitoring tasks on each node based on the configuration it receives from 
+a RC Monitor unit. </p>
+
+<p>The dynamic pool of threads is used to run the specified monitoring modules on 
+each node.  This allows to run concurrently any number of modules and to efficiently 
+use the resources. If performing a monitoring task fails or hangs due to I/O errors, 
+the other tasks are not delayed or disrupted if such a multi-thread scheme is used. 
+A dedicated control thread is used to stop the threads in case of I/O errors and to 
+reschedule these tasks that have not been successfully done. A priority queue is 
+used for the jobs that need to be executed  periodically. 
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">The Service System</strong></font>
+
+<p>Each farm unit may register as a JINI service and / or WSDL service. Clients or 
+other services can get the system configuration and are notified when a change is done. 
+Access to monitor parameters is done using a predicate mechanism. Clients can subscribe 
+with a predicate  which may  return  historical data  and / or perform a subscription 
+for the matching values in the future.   The monitoring predicates are based on regular 
+expressions for string selection, including configuration parameters (e.g. system 
+names.parameters), conditions for numerical values and time limits.   In addition 
+predicates may perform elementary functions like MIN, MAX, average, integral. 
+The predicate matching and the client notification is done in independent threads 
+(one per client IP) under the  control of the DataCache unit.  Measured values are 
+currently stored into a relational DB using JDBC (InstantDB,  MySQL, Postgres , 
+Oralcle ...). The query procedures are adapted to the predicate mechanism for 
+selecting historical data and at the same time to provide active listeners. 
+</p>
+
+<p>More complex data processing can be done using  Filter Agents.  They are "active 
+objects" which  may be deployed by a client or an other service to perform a dedicated 
+task using the data collected from a farm unit. It use a predicate to receive the 
+data it needs and may send the computed values back a set of  registered units.  
+As an example, a maximum flow path algorithm can be done by such an agent. Agents may 
+perform such tasks without  being deployed to a certain service but in this case the 
+Data Cache unit needs to send all the requested values to a remote site. 
+</p>
+
+<p align="center"><img src="img/ml_design_service.jpg"></p>
+
+<ul>
+	<li>The system allows to add dynamically additional data writers and provide the 
+	collected values to other programs or tools.</li>
+	<li>The Monitor Farm unit is design as a service system able to accept values, 
+	predicate based requests from clients and Agent Filters and to manage all of them asynchronously.</li>
+	<li>The service is than  "published" as a JINI service and a WSDL service at the same time.</li>
+</ul>
+<p>&nbsp;</p>
+<p><strong><a href="http://www.jini.org" title="JINI" target="_blank">JINI</a></strong> extends the Java Platform 
+providing support for Distributed Applications. JINI is a set of Java classes (APIs) and services 
+within a distributed computing framework. The purpose of the JINI architecture is to federate 
+groups of software components into a single, dynamic distributed system. The major features 
+which make JINI technology attractive  are: 
+</p>
+<ul>
+	<li><strong>Lookup Discovery Service</strong>: Services are found and resolved by a lookup 
+	service. The lookup service is the central bootstrapping mechanism for the system and 
+	provides the major point of contact between the system and users of the system. 
+	</li>
+	<li><strong>Leasing Mechanism</strong>: Access to many of the services in the JINI system 
+	environment is lease based. A lease is a grant of guaranteed access over a time period. 
+	Each lease is negotiated between the user of the service and the provider of the service 
+	as part of the service protocol. 
+	</li>
+	<li><strong>Transactions Manager</strong>: Reliable distributed object models require 
+	transaction support to aid in protecting the integrity of the resource layer. The specified 
+	transactions are inherited from the Jini programming model and focus on supporting large 
+	numbers of heterogeneous resources, rather than a single large resource (database). This 
+	service provides a series of operations, either within a single service or spanning multiple 
+	services that can be seen as distributed atomic procedures having a two-phase commit. 
+	</li>
+	<li><strong>The JavaSpaces Service</strong>: This communication mechanism was heavily 
+	influenced by the concept of a Tuple space that was first described in 1982 in a 
+	programming language called Linda. Distributed programs, unaware of each other's existence, 
+	can communicate by releasing data (a tuple) into a persistent space. Programs read, 
+	write, and take such entries from the Tuple space that are of interest to them. The  
+	distributed JavaSpace implementation  developed by  Gigaspaces will be used for the data 
+	management system using the real-time monitoring  services. 
+	</li>
+</ul>
+
+<p>&nbsp;</p>
+<p><strong>Web services</strong> are software components that can be invoked across a network 
+using XML. They are building blocks for building distributed applications in language, platform 
+and location independent way.  A service-oriented architecture implements each part of the a 
+systems as a web service. Simple web services provide low-level features such as access to 
+particular kind of data or to perform a data processing task. Higher-level web services 
+orchestrate lower-level services to provide more complex behaviors, resulting in a pyramid 
+or increasingly specialized processing. </p>
+<p>Three standards support the implementation of web services: </p>
+<ul>
+	<li><strong>WSDL</strong> (web services description language) is the XML equivalent of 
+	a resume. WSDL describes what a web service can do, where it resides, and how to invoke it.</li>
+	<li><strong>SOAP</strong> (service-oriented access protocol) is a general-purpose protocol 
+	for sending XML messages between endpoints, and may be used for remote procedure calls 
+	(RPC) or plain document transfer. SOAP messages can be send over any transport layer; 
+	HTTP is the most common layer, with implementations also available for Simple Mail 
+	Transport Protocol (SMTP) and Java Messaging Service (JMS). </li>
+	<li><strong>UDDI</strong> (universal description, discovery and integration) is a registry 
+	for connecting producers and consumers of web services. A producer can use the UDDI 
+	publish API to register information about a web service, and a consumer can use the UDDI 
+	inquire API to locate one or more web services that satisfies a particular criteria. </li>
+</ul>
+<p>&nbsp;</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

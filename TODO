@@ -1,0 +1,56 @@
+TODO file
+contains all enhancements/bugs that are to be done and their estimated completion time
+codificare:
+FLAG		POSTAT DE		DESCRIERE
+exemplu:
+Urgent		mine			de terminat articol!!!
+
+MonALISA 1
+
+- serviciu
+
+- client
+Cat_mai_repede	catac	panel topologie, dupa ce sunt gata serviile topo
+
+- site
+Cat_mai_curand		costing		indexare pagini web + continut site
+la http://monalisa.caltech.edu/awstats/ sunt acum niste statistici pentru 
+site-ul de web. Pentru mai multe detalii vezi mail-ul 8 iunie 2006 13:11:42 GMT+03:00
+
+- repository
+
+- proxy
+
+- servicii topologie
+Cat_mai_repede	catac	de refacut
+
+- diverse
+Cat_mai_curand		ioji		articol ML
+de urmarit: Text cat mai profesionist si daca este necesar sa avem
+figuri si diagrame bine facute care sa ajute la intalegere
+1) Proxy   - Mihalea
+2) Securitate pt servicii si proxy - Adi
+3) Monitorizare pt retele  SNMP, pathload , ABping , tracepath , netFlow ....( Adi, Alex H, Catalin )
+4) Monitorizare GRID ) resurse si joburi ) ( Corina + Florin ) 5) "High Level Services" pt VRVS (EVO )  Reroutare , repornire servicii  ( Catalin + Ramiro + Lucian)
+6) Optical Path   ( Ramiro + Ciprian )
+7) GMPLS monitorizare ( Ciprian )
+8) Repository ( Agrgare de date, sitexe  / Alarme .... )  ( Costin , Alex , Lucian)
+9) GUI .... ( Ciprian + Lucian )
+10) Stocare date ( Costin )
+11) Sistemul de agenti  ( Mihaela )
+12) ApMon ( Corina )
+13) LISA ( Ciprian + Lucian )
+
+MonALISA 2
+
+- serviciu
+
+- client
+
+- lisa 2 daemon
+Cat_mai_curand		ioji		distributie lisa2 pentru SO
+Urgent				cip			client xdr in c care sa poata fi folosit de catre o aplicatie scris in c (precum bbcp) - task Lucian
+Urgent				cip			modul de networking (intr-o prima etapa de terminat monitorizarea parametrilor critici ai interfetelor - segmente retrimise, errors, etc, monitorizarea si actualizarea dinamica a tabelei de rutare, monitorizarea si actualizarea dinamica a bufferelor de retea - bdp -, monitorizarea si poate setarea (inca nu sunt convins ca e ok) stivei tcp folosite)- task Ciprian
+Urgent				cip			de gasit o solutie de apelare din LISA2 a partii de sw optice (xdr, rmi, agentii in ML2 ?)
+
+- lisa 2 client

@@ -1,0 +1,14 @@
+keystore=monalisaWeb.ks
+alias_name=ioji
+
+#if the keystore exist, remove it
+if [ $keystore ]; then
+   rm -f $keystore
+fi
+
+
+#generate a keystore
+
+echo "----------------------------------------"
+echo "Now generate the keystore"
+keytool -genkey -keystore $keystore -alias $alias_name

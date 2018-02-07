@@ -1,0 +1,7 @@
+#!/bin/sh
+
+dir=`pwd`
+java -Dlia.Monitor.monitor.proxy_home="${dir}" \
+     -Djava.security.policy="policy.all" \
+     -classpath "lib/jini-core.jar:lib/jini-ext.jar:lib/tools.jar:ClientsFarmProxy.jar" \
+     lia.Monitor.ClientsFarmProxy.Service

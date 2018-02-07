@@ -1,0 +1,31 @@
+Runtime Options Example:
+
+1)PostgreSQL
+    -Dlia.Monitor.jdbcDriverString=org.postgresql.Driver
+    -Dlia.Monitor.jdbcURLString=jdbc:postgresql://p16.pub.ro/flames
+    -Dlia.Monitor.StoreClass=lia.Monitor.Store.Sql.SimpleSqlStore
+    -Dlia.Monitor.CLASSURLs=http://141.85.3.11/MSRC/lib/store.jar,http://141.85.3.11/MSRC/lib/pgjdbc2.jar
+
+2)MySql
+    -Dlia.Monitor.jdbcDriverString=org.gjt.mm.mysql.Driver
+    -Dlia.Monitor.jdbcURLString=jdbc:mysql://mysql/flames
+    -Dlia.Monitor.StoreClass=lia.Monitor.Store.Sql.SimpleSqlStore
+    -Dlia.Monitor.CLASSURLs=http://141.85.3.11/MSRC/lib/store.jar,http://141.85.3.11/MSRC/lib/mm.mysql-2.0.14-bin.jar
+
+
+Both examples are functional.
+
+User:flames
+Pass:flames45FLAMES
+
+For postgres the user/pass are sent using crypt(), I don't know yet if for MySql are sent in blank ??
+
+If any exception appears instantDB is used...
+In the former example the first all the given parameters are the default values
+in lia.Monitor.Store.PersistentStoreFactory and lia.Monitor.Store.Sql.SimpleSqlStore
+
+For user and password a simple dialog box is provided. After five failures the
+instantDB store is choosed.
+
+ramiro@flames.roedu.net
+

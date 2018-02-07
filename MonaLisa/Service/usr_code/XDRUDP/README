@@ -1,0 +1,28 @@
+
+Use ./comp to compile and ./test_run to run XDRUDP module
+standalone
+
+In order to add it to ML:
+
+1) add the following URL at the list of lia.Monitor.CLASSURLs
+in ml.properties file
+
+lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/XDRUDP/
+
+ if you have more than one URLs please separate them by commas
+
+lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/PBS/,file:${MonaLisa_HOME}/Service/usr_code/XDRUDP/
+
+3) add the following line in myFarm.conf
+
+^XDRUDP{ListenPort=8884}%10
+
+4) You can add timeout on parameters/clusters/nodes to dissapear from the conf, if there is no data for them for
+a specified ammount of time. You can also set a simple AccesConfFile in order to accept UDPs only for a specified
+list of hosts, or set a simple password authentication scheme, or you can use both of them. If you want to append
+to the node name the IP from where that data is sent, you can also use the flag AppendIPToNodeName.
+
+The timeouts are in seconds!
+
+^XDRUDP{AccessConfFile=/home/monalisa/MonaLisa/Service/usr_code/XDRUDP/XDRUDP.conf,ParamTimeout=200,NodeTimeout=300,ClusterTimeout=400,ListenPort=8884,AppendIPToNodeName=true}%10
+

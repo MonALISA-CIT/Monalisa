@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+   spec="1.0+"
+   codebase="http://monalisa.cacr.caltech.edu/vrvsClient"
+   href="MonaLisa.jnlp">
+   <information> 
+      <title>MonaLisa</title>  
+      <vendor>Caltech</vendor> 
+      <description>MonaLisa Monitoring System</description> 
+      <description kind="short">Monitoring tool</description> 
+      <icon href="images/flames.gif"/> 
+   </information> 
+  
+   <security> 
+      <all-permissions/> 
+   </security>
+<resources>
+   <!--j2se version="1.4" initial-heap-size="96m" max-heap-size="128m"/--> 
+   <j2se version="1.4*" href="http://java.sun.com/products/autodl/j2se"/>
+   <jar href="lib/vrvs3dJMonitorClient.jar"/>
+   <jar href="lib/jini-core.jar"/>
+   <jar href="lib/jini-ext.jar"/>
+   <jar href="lib/FarmClient.jar"/>
+   <jar href="lib/monarc_plot.jar"/>
+   <property name="lia.Monitor.debug" value="false"/>
+   <property name="lia.Monitor.sleepTime" value="30"/>
+   <property name="lia.Monitor.LUSs" value="monalisa-starlight.cern.ch,vrvs-us.cern.ch"/>
+   <property name="lia.Monitor.group" value="vrvst1,vrvs-test"/>
+</resources>
+ 
+<application-desc main-class="lia.Monitor.JiniClient.VRVS3D.Main" name="MonaLisa" />
+</jnlp>

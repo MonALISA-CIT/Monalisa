@@ -1,0 +1,16 @@
+In class lia.Monitor.monitor.JarFinder
+    in method private boolean isImplementingInterface(java.lang.Object) 
+        java.lang.Class.getName()
+    in method private java.lang.String check(java.lang.String) 
+        java.lang.Class.forName(java.lang.String)
+In class lia.Monitor.Store.Fast.DB$DBConnection
+    in method public boolean connectMySQL() 
+        java.lang.Class.forName(java.lang.String)
+    in method public boolean connectMcKoi() 
+        java.lang.Class.forName(java.lang.String)
+In class lia.Monitor.Store.PersistentStoreFactory
+    in method public static lia.Monitor.Store.AbstractPersistentStore getPersistentStore(java.lang.String, java.net.URL[]) 
+        java.net.URLClassLoader.loadClass(java.lang.String)
+In class lia.ws.MLWebServiceServiceLocator
+    in method public java.rmi.Remote getPort(java.lang.Class) 
+        java.lang.Class.getName()

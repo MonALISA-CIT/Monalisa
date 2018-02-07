@@ -1,0 +1,2 @@
+Main-Class: lia.util.logging.service.MLLoggerService
+Class-Path: backport-util-concurrent.jar jini-core.jar jini-ext.jar

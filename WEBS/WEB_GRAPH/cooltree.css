@@ -1,0 +1,463 @@
+.clsNode, .clsNode:visited{
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+	color: black;
+	font-weight : bold;;
+	font-size : 12px;
+	text-decoration : none;
+}
+.clsNodeL1, .clsNodeL1:visited{
+	color: black;
+	font-size : 12px;
+	text-decoration : none;
+}
+.clsNodeL1:hover{
+	color: blue;
+	font-size : 12px;
+	text-decoration : underline;
+}
+
+.clsNodeL2, .clsNodeL2:visited{
+	color: black;
+	font-size : 12px;
+	text-decoration : none;
+}
+.clsNodeL2:hover{
+	color: blue;
+	font-size : 12px;
+	text-decoration : underline;
+}
+
+.clsNodeL3, .clsNodeL3:visited{
+	color: black;
+	font-size : 10px;
+	text-decoration : none;
+}
+.clsNodeL3:hover{
+	color: blue;
+	font-size : 10px;
+	text-decoration : underline;
+}
+
+body {
+	background-color: #FFFFFF;
+	text-align: center;
+}
+
+.footer{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FF9900;
+	background-color: #CFD7DA;
+	text-align: center;
+	font-weight: bold;
+	}
+	
+.header1{
+	height: 12px;
+	font-size: 9px;
+}
+
+.header2{
+	height: 12px;
+	font-size: 9px;
+}
+
+.header3{
+	height: 12px;
+	font-size: 9px;
+}
+
+.menutab{
+	background-color: #FFFFFF;
+	border-right-color: #5890C3;
+	border-right-style: solid;
+	border-right-width: 2px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #046598;
+	text-align: center;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.selectedmenutab{
+	background-color: #FF9C00;
+	border-right-color: #18506F;
+	border-right-style: solid;
+	border-right-width: 2px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+	text-align: center;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.selectedmenutab1{
+	background-color: #FF9900;
+	border-right-color: #5890C3;
+	border-right-style: solid;
+	border-right-width: 2px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+	text-align: center;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.selectedmenutab2{
+	border-right-color: #5890C3;
+	border-right-style: solid;
+	border-right-width: 2px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+	text-align: center;
+	font-weight: bold;
+	vertical-align: middle;
+}
+
+.bannerleft{
+	border-right-color: #046598;
+	border-right-style: solid;
+	border-right-width: 3px;
+}
+
+.bannerleft1{
+	border-right-color: #DDDBC7;
+	border-right-style: solid;
+	border-right-width: 3px;
+}
+
+#header{
+	height: 49px;
+	width: 1000px;
+	margin-top: 0px;
+	position: relative;
+	visibility: visible;
+	z-index: 1;	
+}
+
+#banner{
+	height: 178px;
+	width: 800px;
+	position: relative;
+	visibility: visible;
+	z-index: 1;
+	background-color: #FFFFFF;
+
+}
+
+.banner1{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #FFFFFF;
+	text-align: center;
+}
+
+.banner2{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #5890C3;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #FFFFFF;	
+}
+
+.banner3{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	text-align: left;
+	padding-left: 10px;
+}
+
+.banner3:link {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	text-align: left;
+	padding-left: 10px;
+}
+
+.banner3:visited{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	text-align: left;
+	padding-left: 10px;
+}
+
+
+.banner3:hover{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	text-align: left;
+	padding-left: 10px;
+}
+
+.banner3:active{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;
+	text-align: left;
+	padding-left: 10px;
+}
+
+.banner4{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #5890C3;
+	text-align: left;
+	padding-left: 10px;
+	border-bottom-width: 2px;
+	border-bottom-style: solid;
+	border-bottom-color: #FFFFFF;
+}
+
+
+.search{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF9900;
+	background-color: #DBE8F0;
+	vertical-align: middle;
+	text-align: right;
+	
+}
+
+.footerderived{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF9900;
+	background-color: #5890C3;
+	vertical-align: middle;
+	text-align: right;
+	border-top-width: 2px;
+	border-top-style: solid;
+	border-top-color: #FFFFFF;
+	
+}
+
+.footerderived2{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	color: #FFFFFF;
+	background-color: #5890C3;
+	vertical-align: middle;
+	text-align: right;
+	border-top-width: 2px;
+
+	border-top-style: solid;
+
+	border-top-color: #FFFFFF;
+	
+	
+}
+
+.go{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF9900;
+	background-color: #FFFFFF;
+	vertical-align: middle;
+	text-align: center;
+	
+}
+
+.searchbox{
+	height: 17px;
+	width: 120px;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 10px;
+	font-weight: normal;
+	
+}
+
+#strips{
+	height: 178px;
+	width: 75px;
+	position: absolute;
+	visibility: visible;
+	z-index: 1;
+	background-image: url(left-strip.jpg);
+	background-repeat: repeat-y;
+}
+
+.news{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #046598;
+	background-image: url(news_background.jpg);
+	text-align: center;
+	padding-top: 10px;
+	
+}
+
+.news1{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 8px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-decoration: none;
+	background-color: #046598;	
+}
+
+.newsletter{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #FF9900;
+	text-align: left;
+	padding-left: 15px;
+	padding-top: 5px;
+}
+
+.email{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FF9900;
+	text-align: left;
+	padding-left: 15px;
+}
+
+.emailbox{
+	height: 13px;
+	width: 100px;
+	
+}
+
+#maintable{
+}
+
+.title{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #006699;
+	padding-top: 5px;
+	padding-left: 15px;
+
+}
+
+.title1{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 14px;
+	font-weight: bold;
+	color: #006699;
+	padding-top: 10px;
+	padding-left: 15px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #006699;
+	border-top-width: 1px;
+	border-top-style: solid;
+	border-top-color: #006699;
+}
+
+.content{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+	padding-top: 3px;
+	padding-left: 15px;
+
+}
+
+.content1{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: normal;
+	color: #000000;
+	padding-top: 3px;
+	padding-left: 5px;
+
+}
+
+.map{
+	border: 3px solid #006699;
+}
+
+.gri{
+	border-bottom-width: 3px;
+	border-bottom-style: solid;
+	border-bottom-color: #EDEBEC;
+}
+
+.repositorieslist{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+	color: #006699;
+	padding-top: 5px;
+	padding-left: 15px;
+	text-decoration: underline;
+}
+
+.clientbutton{
+	background-color: #053887;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #FFFFFF;
+	border: 3px outset #053887;
+	
+}
+
+.pagetitleeffect{
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	color: #FFFFFF;
+	text-align: center;
+	font-weight: bold;
+	vertical-align: middle;
+	background-color: #FF9900;
+	border-top-color: #FF9900;
+	border-top-style: none;
+	border-top-width: 0px;
+	border-bottom-color: #FF9900;
+	border-bottom-style: none;
+	border-bottom-width: 0px;
+	border-left-color: #FF9900;
+	border-left-style: none;
+	border-left-width: 0px;
+	border-right-color: #FF9900;
+	border-right-style: none;
+	border-right-width: 0px;
+	height: 20px;
+}

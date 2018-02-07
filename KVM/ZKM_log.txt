@@ -1,0 +1,4 @@
+[2003.10.06 20:23:12] Zelix KlassMaster 4.0.4a - License #10775
+                      Two Standard Licences
+                      California Institute of Technology
+[2003.10.06 20:23:12] Preprocessing ZKM Script file "/?"

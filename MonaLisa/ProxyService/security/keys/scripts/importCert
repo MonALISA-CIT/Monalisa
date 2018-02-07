@@ -1,0 +1,36 @@
+#!/bin/sh
+
+echo_usage() {
+	echo
+	echo Usage: $0 aliasName_for_cert password_for_keystore path_to_fileCertToImport
+	echo
+}
+
+if [ $# -ne 3 ]; then
+
+	echo_usage
+	exit 1
+fi
+
+PRG="$0"
+
+while [ -h "${PRG}" ]; do
+  ls=`ls -ld "${PRG}"`
+  link=`expr "${ls}" : '.*-> \(.*\)$'`
+  if expr "${link}" : '.*/.*' > /dev/null; then
+    PRG="${link}"
+  else
+    PRG="`dirname ${PRG}`/${link}"
+  fi
+done
+PRGDIR="`dirname ${PRG}`"
+#. "${PRGDIR}"/../../../conf/set_env
+
+
+echo "#############################################################"
+echo
+echo "Importing certificate FROM $3 TO MLProxy.ks. $1 will be used as alias"
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+${JAVA_HOME}/bin/keytool -import -keystore $PRGDIR/../Service/MLProxy.ks -storepass $2 -alias $1 -file $3

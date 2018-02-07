@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+	<!-- General description of the web application -->
+	<display-name>MonAlisa Pathload Configuration</display-name>
+    <description>
+      	This is version 1.0 of the MonAlisa Pathload Configuration
+      	and debugging application.
+    </description>
+
+	<!--  Initialize Context Listeners -->
+	<listener>
+		<listener-class>lia.util.Pathload.server.servlet.PathloadContextListener</listener-class>
+	</listener>
+
+	 <!-- Servlet definitions -->
+	<servlet>
+		<servlet-name>PathloadStatus</servlet-name>
+		<description>
+    		This Servlet displays the internal status Pathload 
+	    	Configuration App
+    	</description>
+		<servlet-class>lia.util.Pathload.server.servlet.PathloadStatus</servlet-class>
+		<load-on-startup>0</load-on-startup>
+	</servlet>
+
+	<servlet>
+		<servlet-name>PathloadSetup</servlet-name>
+		<description>
+			This Servlet lets you change global App variables and 
+			conditions
+		</description>
+		<servlet-class>lia.util.Pathload.server.servlet.PathloadSetup</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+  
+  	<servlet>
+		<servlet-name>PathloadHistory</servlet-name>
+		<description>
+			This Servlet displays a number of last status rounds
+			of the Application
+		</description>
+		<servlet-class>lia.util.Pathload.server.servlet.PathloadHistory</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>  
+
+  	<servlet>
+		<servlet-name>PathloadConnector</servlet-name>
+		<description>
+			This Servlet is the Connector of the monPathload module to 
+			the servlet.
+		</description>
+		<servlet-class>lia.util.Pathload.server.servlet.PathloadConnector</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- Define mappings that are used by the servlet container -->
+	<servlet-mapping>
+		<servlet-name>PathloadStatus</servlet-name>
+		<url-pattern>/PathloadStatus</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>PathloadSetup</servlet-name>
+		<url-pattern>/PathloadSetup</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>PathloadHistory</servlet-name>
+		<url-pattern>/PathloadHistory</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>PathloadConnector</servlet-name>
+		<url-pattern>/PathloadConnector</url-pattern>
+	</servlet-mapping>
+
+	<!--  Security Settings -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>MonAlisa PathloadConfig Administration</web-resource-name>
+			<description>MonAlisa Administration pages for Pathload Module</description>
+			<url-pattern>/PathloadStatus</url-pattern>			
+			<url-pattern>/PathloadHistory</url-pattern>
+			<url-pattern>/PathloadSetup</url-pattern>
+			<url-pattern>/doc*</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+		</web-resource-collection>		
+		<auth-constraint>
+			<description>Only pathloadsadmins are allowed to view Pathload Statistics</description>
+			<role-name>pathloadadmins</role-name>
+		</auth-constraint>
+		<user-data-constraint>
+			<description>We have no interest to encrypt traffic</description>
+			<transport-guarantee>NONE</transport-guarantee>
+		</user-data-constraint>
+	</security-constraint>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+	
+	<security-role>
+		<description>Pathload Admins group</description>
+		<role-name>pathloadadmins</role-name>
+	</security-role>
+
+	<!-- Start Page -->
+	<welcome-file-list>
+		<welcome-file>PathloadStatus</welcome-file>
+		<welcome-file>index.html</welcome-file>		
+	</welcome-file-list>
+	
+</web-app>

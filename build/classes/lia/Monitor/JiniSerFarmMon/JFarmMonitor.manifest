@@ -1,0 +1,2 @@
+Main-Class: lia.Monitor.JiniSerFarmMon.RegFarmMonitor
+Class-Path: FarmMonitor.jar jini-core.jar jini-ext.jar sun-util.jar tools.jar  serviceui-1.1beta4.jar cryptix.jar cog-jglobus.jar puretls.jar jgsi.jar jce-jdk13.jar log4j-1.2.7.jar lazyj.jar

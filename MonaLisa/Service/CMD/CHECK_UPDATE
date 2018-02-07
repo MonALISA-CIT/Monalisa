@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# ML Script Version:1.8.0
+#
+
+PRG="$0"
+
+# Get the original location of this script                             
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+                                                                                                                               
+# Get standard environment variables
+PRGDIR=`dirname "$PRG"`
+CONFDIR=${CONFDIR:=$PRGDIR}
+COMMON_SH="${PRGDIR}"/"common.sh"
+[ ! -r "$COMMON_SH" ] && echo "The script $COMMON_SH does not exist!" && exit 1
+. "$COMMON_SH"
+
+# Check the environment variables (from common.sh)
+check_env
+if [ $? -ne 0 ]; then
+	echo "Errors setting env...Error messages should have been provided"
+	exit 1
+fi
+
+# Check if ML is dead, and restart it
+if [ -r "$ML_PID_FILE" ]; then
+    if [ -r "$FARM_HOME/ALIVE" ]; then
+        rm -f "$FARM_HOME/ALIVE" 2>&1 >> /dev/null
+    else
+        echo "`date`: Crontab: ML NOT OK...RESTART!!!!" >> "$FARM_HOME/scripts.log"
+        $PRGDIR/ML_SER restart
+    fi
+fi
+
+# Check if an update is available and restart ML
+if [ -r "$FARM_HOME/UPDATE" ]; then
+	echo "`date`: Crontab: UPDATE(S) AVAILABLE..." >> "$FARM_HOME/scripts.log"
+	rm -f "$FARM_HOME/UPDATE" 2>&1 >>"$FARM_HOME/scripts.log"
+	echo "Running ${PRGDIR}/ML_SER restart" 2>&1 >>"$FARM_HOME/scripts.log"
+	"$PRGDIR/ML_SER" restart
+fi
+

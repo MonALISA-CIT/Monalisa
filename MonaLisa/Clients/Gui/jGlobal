@@ -1,0 +1,12 @@
+java -jar -Djava.security.policy=policy.all \
+	   -Dlia.Monitor.globeTexture=lia/images/earth_texture1024x512.jpg \
+	   -Dlia.Monitor.showPanels=globe,wmap,table,load,wan,vojobs \
+	   -Dlia.Monitor.globeTexture.slices=4 \
+	   -Dlia.Monitor.globeTexture.scaleFilter=nice \
+	   -Dlia.Monitor.ClientsFarmProxy.ProxyGroup=farm_proxy \
+	   -Dlia.Monitor.LUSs=monalisa.cacr.caltech.edu,monalisa.cern.ch \
+  	   -Dlia.util.geo.iNetGeoConfig=http://monalisa.cacr.caltech.edu/iNetGeoConfig \
+	   -Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+           -Dlia.Monitor.group=test \
+	   -Dlia.Monitor.groupUnselected=grid3,grid3-serv,atlas,ml,alice1,cms-us,vdt,vdt1 \
+            ../lib/JMonitorClient.jar 

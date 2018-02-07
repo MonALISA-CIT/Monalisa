@@ -1,0 +1,1 @@
+<<:com_first_start:>> | <<:com_first_end:>> <a href="display?page=<<:pagehref enc:>>" onClick="switchToAlternate('<<:page js:>>'); return false;" class=link onMouseOver="return '<<:explain js:>>'.length>0 ? overlib('<<:explain js:>>') : false;" onMouseOut="return nd();"><<:descr esc:>></a>

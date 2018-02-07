@@ -1,0 +1,2 @@
+Main-Class: lia.Monitor.WClient.Client
+Class-Path: monarc_plot.jar

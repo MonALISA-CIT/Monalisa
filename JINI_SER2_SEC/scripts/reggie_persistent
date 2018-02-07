@@ -1,0 +1,140 @@
+#!/bin/sh
+
+PRG="$0"
+                                                                                                                               
+while [ -h "${PRG}" ]; do
+  ls=`ls -ld "${PRG}"`
+  link=`expr "${ls}" : '.*-> \(.*\)$'`
+  if expr "${link}" : '.*/.*' > /dev/null; then
+    PRG="${link}"
+  else
+    PRG="`dirname ${PRG}`/${link}"
+  fi
+done
+                                                                                                                               
+# Get standard environment variables
+PRGDIR="`dirname ${PRG}`"
+. "${PRGDIR}"/../conf/set_env
+JINI_SER_HOME="${PRGDIR}"/".."
+REGGIE_HOME="${JINI_SER_HOME}"/"Services/LU_reggie/persistent"                                                                                   
+
+cmd="${JAVA_HOME}/bin/java -Djava.security.manager= \
+-Djavax.net.ssl.trustStore=${REGGIE_HOME}/certs/lus.truststore \
+-Djava.protocol.handler.pkgs=net.jini.url \
+-Djava.security.auth.login.config=${REGGIE_HOME}/reggie.login \
+-Djava.security.properties=${REGGIE_HOME}/inet.properties \
+-Djini.ser.home=${JINI_SER_HOME} \
+-Djini.ser.hostname=${JINI_SER_HOSTNAME} \
+-Djini.ser.port=${JINI_SER_PORT} \
+-Djini.ser.reggie.home=${REGGIE_HOME} \
+-Djini.ser.reggie.groups=${JINI_GROUPS} \
+-Djava.security.policy=${REGGIE_HOME}/start_service.policy \
+-jar ${JINI_SER_HOME}/lib/start.jar \
+${REGGIE_HOME}/start-persistent-reggie.config"
+
+
+##java -Djava.security.manager=                                           \
+##     -Djava.security.policy=config/ssl-reggie.policy                    \
+##     -Djavax.net.ssl.trustStore=keys/LUS/lus.truststore                 \
+##     -Djava.protocol.handler.pkgs=net.jini.url                          \
+##     -Djava.util.logging.config.file="config/logging.conf"              \
+##     -Djava.security.auth.login.config=config/ssl-reggie.login          \
+##     -Djava.security.debug=failure                                      \
+##     -Djava.security.properties=config/inet.properties                  \
+##     -jar lib/start.jar                                                 \
+##     config/start-ssl-reggie.config  2>&1
+
+
+cmd_RE=".*/bin/java -Djava.security.manager= \
+-Djavax.net.ssl.trustStore=.*/certs/lus.truststore \
+-Djava.protocol.handler.pkgs=net.jini.url \
+-Djava.security.auth.login.config=.*/reggie.login \
+-Djava.security.properties=.*/inet.properties \
+-Djini.ser.home=.* \
+-Djini.ser.hostname=.* \
+-Djini.ser.port=.* \
+-Djini.ser.reggie.home=.* \
+-Djini.ser.reggie.groups=.* \
+-Djava.security.policy=.*/start_service.policy \
+-jar .*/lib/start.jar \
+.*/start-persistent-reggie.config"
+
+
+start() {
+	rmexit_code=0;
+	if [ ! -d "${REGGIE_HOME}/reggie_tmp" ]; then
+	    mkdir "${REGGIE_HOME}/reggie_tmp"
+	fi
+	
+	if [ ! -z "`ls "${REGGIE_HOME}"/reggie_tmp/`" ]; then 
+		rm -r ${REGGIE_HOME}/reggie_tmp/* >/dev/null 2>&1
+		rmexit_code=$?
+	fi
+	
+	if [ $rmexit_code -eq 0 ]; then 
+		if [ -z "${JAVA_HOME}" ]; then
+		    echo "Please set JAVA_HOME in conf/set_env"
+		    return 1
+		fi
+		
+		if [ -x "${JAVA_HOME}/bin/java" ]; then
+    		    echo -n "Starting reggie..."
+    		    ${cmd} >> ${JINI_SER_HOME}/logs/reggie.log 2>&1 &
+		    echo "OK"
+		else
+		    echo "Cannot execute ${JAVA_HOME}/bin/java"
+		    echo "Please check that JAVA_HOME is set in conf/set_env"
+		    return 1
+		fi
+	else
+		echo "Cannot deletel filese from ${REGGIE_HOME}/reggie_tmp"
+		echo "Reggie will not start"
+		return 1
+	fi
+}
+
+stop() {
+    pid=`"${JINI_SER_HOME}"/bin/pgrep -f -P 1 "${cmd_RE}"`
+
+    if [ -z "${pid}" ]; then
+        echo "Reggie is not running running?"
+		return 0
+    fi
+	
+	echo -n "Trying to stop reggie. Please wait..."
+	kill ${pid}
+	sleep 5
+    
+	pid=`"${JINI_SER_HOME}"/bin/pgrep -f "${cmd_RE}"`
+    if [ -z "${pid}" ]; then
+        echo "OK"
+		return 0
+    fi
+
+	echo "...."
+	kill -9 ${pid}
+	sleep 5
+
+	pid=`"${JINI_SER_HOME}"/bin/pgrep -f "${cmd_RE}"`
+    if [ -z "${pid}" ]; then
+        echo "OK"
+		return 0
+    fi
+
+	echo "FAILED"
+	echo "REGGIE Cannot be stopped"
+
+}
+
+case $1 in
+'start')
+	start
+    ;;
+'stop')
+	stop
+    ;;
+*)
+    echo "Usage: $0 [ start | stop ] "
+    ;;
+esac
+

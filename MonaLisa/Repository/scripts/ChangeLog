@@ -1,0 +1,155 @@
+1.2.104: 2010/05/10
+    * Update the official distribution
+    * ALICE templates
+    * Move from Tomcat 5.0.28 to 6.0.26
+
+1.2.92: 2008/10/29
+    * For a long time the changes were not logged, too much has changed to be told :)
+
+1.2.27: 2005/03/14
+    * JFreeChart 1.0.0-pre2
+    * OverLib tooltips
+
+1.2.24: 2005/02/15 (lots of changes&fixes in the meantime, major ones following)
+    * PostgreSQL 8.0.1 as the default database
+    * Java 1.5+ support (external libraries upgrade)
+    * Dynamic buffer size is autoadjusted according to the JVM memory limit
+      parameter
+
+1.2.15
+    * (2004/09/01) Added ApMon statistics reporting to the repository
+
+    * (2004/08/28) Added a dynamic buffer for the data that is stored, this 
+      will make things work faster in both repository and the service.
+
+    * (2004/08/27) Some minor fixes related to DirectInsert methods.
+
+    * (2004/08/24) Added WS function calls statistics on the info.jsp page.
+
+    * (2004/08/20) Stats fixes : green instead of red when there are some values
+      but they are =0. Added "bool2" option that displayes orange when the
+      values are =0.
+
+    * (2004/08/19) Several fixes and optimizations in the storage and averaging 
+      structures.
+    
+    * (2004/08/11) Added PostgreSQL storage to the repository, writemodes 7&8,
+      and changed the default storage to mode 7 and two 1-year tables (1min and
+      100min-averaged values). MySQL storage is still available for the old
+      repositories.
+
+    * (2004/07/15) Made the buffered data flush to disk if it stays too long
+      in memory (especially usefull for rare data that didn't appear on the
+      history charts but until two values of that kind where received)
+
+    * (2004/07/13) Changed the default INNODB buffer size to 32M instead of 8M
+
+1.2.14
+    * (2004/07/12) Fixed the Start and Stop scripts for MySQL and changed the
+      default MySQL port number to 3316.
+    
+    * (2004/07/10) In maps, the nodes that don't have some specific data but that
+      nodes in fact run ML and report some data:
+        default.alternate_data=<predicate>
+	or
+	NODENAME.alternate_data=<predicate>
+	
+	we are using this option like this:
+	default.alternate_data=$NAME/*/*/-1/-1
+	
+    * (2004/07/09) The status pages can now display the row number at the left of the
+      series name:
+        option<set number>.numbers=true
+
+    * (2004/07/08) Added smoothing support for automatic detection of starting value
+	history.smooth_from_table=<table_name>
+    
+    * (2004/07/01) Added URLs support for history charts:
+	url.format=<string>
+	
+      You can use the following special symbols in the string:
+        {T}	- current table
+
+	{SS}	- point time in millis
+	{SD}	- point date as string (yyyy-mm-dd)
+	{ST}	- point time as string (hh:mm:ss)
+	
+	{ES}	- now, time in millis
+	{ED}	- now, date as string
+	{ET}	- now, time as string
+	
+	{V}	- value
+	
+	{ID}	- table id for this series
+	
+	{S}	- series name
+
+    * (2004/06/26) Added shapes support for each series in a history chart
+      The options are:
+	default.shape=[o^v#-|]		(the default is 'o')
+	SERIESNAME.shape=[o^v#-|]
+	
+    * (2004/06/24) "Smoothing" support. There are cases where the data should be incremental
+      but the counters are sometimes reset. This filter ignores the decreases in
+      values and consideres only the increases.
+      To activate this filter just add:
+        history.smooth_sets=true
+      to your configuration file for a history chart.
+      You can also specify a starting value and a starting date, this value will
+      be added to all the data having timestamp > starting date.
+	history.smooth_startdate=<long, time in millis, default 0>
+	history.smooth_addvalue=<double, default 0>
+
+    * (2004/06/20) History series can now have arbitrary combinations of Farm,Cluster,Node and
+      Function. If you need this behaviour just add to your history chart config.
+      file :
+        series.names=Name,Name...
+	series.predicates=Farm[/Cluster[/Node[/-1[/-1[/Function]]]]],...
+      both options need to have the same number of values, separated by ","
+	
+      For example:
+        series.names=Load5,Load10
+	series.predicates=TestFarm/*/*/-1/-1/Load5,TestFarm/Master/*/-1/-1/Load10
+
+      Or, if the farm was given as the http variable named "farm" :
+        series.predicated=${farm}/Master/*/-1/-1/Load5 ...
+
+    * (2004/06/20) Statistics page can now display green/red cells if there is some recent data
+      for a given predicate or not. Also an arbitrary string can be displayed,
+      such as a result from a query...
+      
+      Example:
+        #The Farms
+        pivot0_2=${Farms}
+      
+        # the predicates 
+        pivot0_3=$2/*/*,\
+	         $2/Master/*,\
+		 $2/PN%,\
+		 $2/VO_JOBS,\
+		 $2/VO_IO,\
+		 $2/ABPing,\
+		 $Qselect version from abping_aliases where name='$2' limit 1
+	
+	# column header names
+	descr0=Online,\
+	       Master,\
+	       &nbsp;&nbsp;&nbsp;PN&nbsp;&nbsp;&nbsp;,\
+	       VO_JOBS,\
+	       VO_IO,\
+	       ABPing,\
+	       ML Version
+	
+	# how should the predicates' results be displayed
+	func0=last ns;bool,\
+	      last ns;bool,\
+	      last ns;bool,\
+	      last ns;bool,\
+	      last ns;bool,\
+	      last ns;bool,\
+	      string
+
+1.2.13 - bad luck collision avoided
+
+1.2.12
+    * (2004/06/16) Initial release of ChangeLog file

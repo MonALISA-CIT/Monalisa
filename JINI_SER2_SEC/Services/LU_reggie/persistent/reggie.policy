@@ -1,0 +1,63 @@
+grant {
+    permission java.util.PropertyPermission "jini.ser.*", "read";
+};
+
+grant codebase "file:${jini.ser.home}/lib/jsk-platform.jar" {
+    permission java.security.AllPermission;
+};
+
+grant codebase "file:${jini.ser.home}/lib/reggie.jar" {
+    permission java.security.AllPermission;
+};
+
+
+/* ----Security policy for SSL-enabled reggie -----*/
+
+/* ----Grant the following registrar permissions to authenticated clients--- */
+grant Principal javax.security.auth.x500.X500Principal * {
+
+    permission com.sun.jini.reggie.RegistrarPermission "register";
+        
+    permission com.sun.jini.reggie.RegistrarPermission "addAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "modifyAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "setAttributes";
+    
+    permission com.sun.jini.reggie.RegistrarPermission "cancelEventLease";
+    permission com.sun.jini.reggie.RegistrarPermission "renewEventLease";
+    permission com.sun.jini.reggie.RegistrarPermission "cancelServiceLease";
+    permission com.sun.jini.reggie.RegistrarPermission "renewServiceLease";
+    permission com.sun.jini.reggie.RegistrarPermission "cancelLeases";
+    permission com.sun.jini.reggie.RegistrarPermission "renewLeases";
+						           
+    permission com.sun.jini.reggie.RegistrarPermission "getUnicastPort";
+    
+    /* 	if Administrable.getAdmin() is disabled all the others admin methods 
+        are disabled    	
+  	*/
+    //permission com.sun.jini.reggie.RegistrarPermission "getAdmin";
+    //permission com.sun.jini.reggie.RegistrarPermission "addMemberGroups";	        
+    //permission com.sun.jini.reggie.RegistrarPermission "destroy";   
+	
+};
+
+
+grant { 
+    permission com.sun.jini.reggie.RegistrarPermission "lookup";
+    permission com.sun.jini.reggie.RegistrarPermission "notify";    
+    permission com.sun.jini.reggie.RegistrarPermission "getEntryClasses";
+    permission com.sun.jini.reggie.RegistrarPermission "getFieldValues";
+    permission com.sun.jini.reggie.RegistrarPermission "getMemberGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getLocator";
+    permission com.sun.jini.reggie.RegistrarPermission "getServiceTypes";
+    permission com.sun.jini.reggie.RegistrarPermission "addLookupLocators";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupAttributes";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupGroups";
+    permission com.sun.jini.reggie.RegistrarPermission "getLookupLocators";
+    
+    permission com.sun.jini.reggie.RegistrarPermission "getProxyVerifier";
+    permission com.sun.jini.reggie.RegistrarPermission "getServiceProxy";
+    
+    permission java.util.PropertyPermission "com.sun.jini.reggie.enableImplToStubReplacement", "read";
+};
+
+

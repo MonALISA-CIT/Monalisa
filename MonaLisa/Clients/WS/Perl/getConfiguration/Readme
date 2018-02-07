@@ -1,0 +1,31 @@
+
+Client developed using Perl module Soap::Lite for the "MLWebService" web service.
+Invoking the "getConfiguration" function of this service.
+
+Soap::Lite for Perl is a collection of Perl modules which provides a
+simple and lightweight interface to the Simple Object Access Protocol
+(SOAP), both on client and server sides.
+
+For this example it was also used the Time:HiRes Perl module. 
+The Time::HiRes module implements a Perl interface to the usleep,
+ualarm, and gettimeofday system calls.  This allows for very
+precise timing measurements inside of Perl scripts. 
+
+The "getConfiguration" operation interrogates the database for 
+getting farms configurations. It takes as input two moments of time 
+( "fromTime" and "toTime" ) in milliseconds and returns all the 
+configurations from the database that were registered between the given mo-
+ments of time. The return value is complex schema type, an array of 
+configurations.
+
+This client will return an array of configurations received in the database
+in the last week.
+You can call this client with the following command :
+
+    ./Client.pl  "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService?wsdl"
+    
+    or
+    ./Client.pl - in this case the location of the wsdl file will be taken from the 
+                  environment variable "MONALISA_WS".
+		      
+    

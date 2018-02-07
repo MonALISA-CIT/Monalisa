@@ -1,0 +1,2 @@
+Main-Class: lia.Monitor.control.MonitorControl
+Class-Path: joesnmp-0.2.6.jar jini-core.jar 

@@ -1,0 +1,2 @@
+javac -classpath $CLASSPATH:$JINI_HOME/lib/jini-core.jar:$JINI_HOME/lib/jini-ext.jar:$LIA_HOME/lib/joesnmp-0.2.6.jar *.java
+

@@ -1,0 +1,1 @@
+<th align=center class="table_header_stats" style="background-color:#D8E5FF"><input class="input_text" onFocus="focusText(this, 100);" onBlur="blurText(this);" style="width:100%" name="<<:name esc:>>" value="<<:value esc:>>"></th>

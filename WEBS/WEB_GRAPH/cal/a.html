@@ -1,0 +1,110 @@
+<html>
+<head>
+    <script language="JavaScript" src="calendar1.js"></script>
+    <script language="JavaScript" src="calendar2.js"></script>
+</head>
+<body>
+    <form name="form1" action="a.jsp" method=post>
+	Quick jump:
+	<select name="quick_interval" onChange="javascript:quick_jump();">
+	    <option value="-1">- choose -</option>
+	    <option value="3600000">last hour</option>
+	    <option value="86400000">last day</option>
+	    <option value="604800000">last week</option>
+	    <option value="2678400000">last month</option>
+	    <option value="31536000000">last year</option>
+	</select>
+    
+	Interval selection: 
+	<a href="javascript:cal1.popup();"><img src="img/cal.gif" border=0></a>
+	<input type="text" name="interval_date_low"  size=10 readonly onChange="javascript:recalc();"><select name="interval_hour_low" onChange="javascript:recalc();"></select>
+	&nbsp;&nbsp;-&nbsp;&nbsp;
+	<a href="javascript:cal2.popup();"><img src="img/cal.gif" border=0></a>
+	<input type="text" name="interval_date_high" size=10 readonly onChange="javascript:recalc();"><select name="interval_hour_high" onChange="javascript:recalc();"></select>
+	
+	<input type=hidden name="interval.min" value="7200000">
+	<input type=hidden name="interval.max" value="0">
+
+	<script language="JavaScript">
+	    <!--
+	    var now = new Date("11/18/2005 15:00:00");
+	    
+	    var cal1 = new calendar1(document.forms['form1'].elements['interval_date_low']);
+	    var cal2 = new calendar1(document.forms['form1'].elements['interval_date_high']);
+	    
+	    cal1.year_scroll = false;
+	    cal1.time_comp = false;
+
+	    cal2.year_scroll = false;
+	    cal2.time_comp = false;
+
+	    for (i=0;i<24;i++){
+		document.form1.interval_hour_low.options[i]=new Option((i<10?"0":"")+i+":00",i);;
+		document.form1.interval_hour_high.options[i]=new Option((i<10?"0":"")+i+":00",i);;
+	    }
+	    
+	    init_form();
+
+	    function init_form(){
+	        var dmin = new Date(now.getTime()-document.forms['form1'].elements['interval.min'].value);
+		var dmax = new Date(now.getTime()-document.forms['form1'].elements['interval.max'].value);
+	    
+		document.form1.interval_hour_low.selectedIndex = dmin.getHours();
+	        document.form1.interval_hour_high.selectedIndex = dmax.getHours();
+	    
+		document.form1.interval_date_low.value=dmin.getDate()+"-"+(dmin.getMonth()+1)+"-"+dmin.getFullYear();
+		document.form1.interval_date_high.value=dmax.getDate()+"-"+(dmax.getMonth()+1)+"-"+dmax.getFullYear();
+	
+		update_quick_jump();	
+	    }
+	    
+	    function update_quick_jump(){
+		var found = false;
+		
+		if (document.forms['form1'].elements['interval.max'].value==0)
+		    for (i=1; i<document.form1.quick_interval.options.length; i++)
+			if (document.form1.quick_interval.options[i].value==document.forms['form1'].elements['interval.min'].value){
+			    document.form1.quick_interval.selectedIndex=i;
+			    found=true;
+			}
+			
+		if (!found)
+		    document.form1.quick_interval.selectedIndex=0;
+	    }
+	    
+	    function quick_jump(){
+		var val = document.form1.quick_interval.options[document.form1.quick_interval.selectedIndex].value;
+		
+		if (val>0){
+		    document.forms['form1'].elements['interval.min'].value=val;
+		    document.forms['form1'].elements['interval.max'].value=0;
+		
+		    init_form();
+		}
+	    }
+	    
+	    function recalc(){
+		var arr = document.form1.interval_date_low.value.split('-');
+	    
+		var sd1 = 
+		    arr[1]+"/"+arr[0]+"/"+arr[2]+" "+
+		    document.form1.interval_hour_low.options[document.form1.interval_hour_low.selectedIndex].value+":00:00";
+		    
+		var d1 = new Date(sd1);
+		
+		var diff = now.getTime() - d1.getTime();
+		
+		if (diff<0){
+		    init_form();
+		}
+		else{
+		    document.forms['form1'].elements['interval.min'].value=diff;
+		}
+		
+		update_quick_jump();
+	    }
+	    -->
+	</script>
+    </form>
+</body>
+</html>

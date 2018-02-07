@@ -1,0 +1,5 @@
+
+ The "FindMLServices" program searches Monalisa services in the lookup locators
+ given in the "locatos.conf" file and shows found services and their attributes.
+ 
+ For compiling and running the example run the "run.sh" script.

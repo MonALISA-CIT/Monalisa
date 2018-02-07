@@ -1,0 +1,11 @@
+    grant {
+	permission java.util.PropertyPermission "jini.ser.*", "read";
+    };
+
+    grant codebase "file:${jini.ser.home}/lib/jsk-platform.jar" {
+        permission java.security.AllPermission;
+    };
+
+    grant codebase "file:${jini.ser.home}/lib/start.jar" {
+        permission java.security.AllPermission;
+    };

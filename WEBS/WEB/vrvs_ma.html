@@ -1,0 +1,147 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">Monitoring Agents</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+<font size="+1"><strong class="page_subtitle">VRVS Monitoring agents</strong></font>
+<p><strong>Number of clients and virtual rooms</strong></p>
+A reflector always keeps track of the current connected users. This information can be 
+gathered by making a TCP connection to the reflector on a certain port and issuing a 
+command. The reflector will return on the same connection the information requested 
+and then it will close the link. The received text is parsed and we get:
+<ul>
+<li>	number of audio clients;</li>
+<li>	number of video clients;</li>
+<li>	number of virtual rooms.</li>
+</ul>
+<br>
+<p><strong>Peer links for a Reflector</strong></p>
+Peer links represent the current active tunnels for a reflector. The reflector forwards 
+packets to the other reflectors based on users and virtual rooms information (a packet 
+from a user in a certain virtual room must reach all users in the same virtual room 
+wherever they would be in the whole system). For each tunnel, we can query the reflector 
+for the following data, which is forwarded to the listeners:
+<ul>
+<li>	quality of the link, as computed by the reflector software;</li>
+<li>	lost packages.</li>
+</ul>
+<br>
+<p><strong>Links quality evaluation - monABPing</strong></p>
+In order to be able to supply a routing alternative for the current selected tunnels, 
+we have to monitor links' qualities between reflectors. For each reflector a set of 
+possible peers is chosen and the module monitors the quality of each link. The module 
+sends UDP packets to the other reflectors. The other reflectors respond sending back the 
+received packet. This way we can determine simple, but important factors that influence 
+the quality of each link. The quality is computed with the following formula:
+<p>
+&nbsp;&nbsp;	RTimeQuality = OVERALL_COEF + RTT_COEF * rtt + PKT_LOSS_COEF * loss% + JITTER_COEF * jitter
+</p>
+This formula is flexible enough to permit calculating any kind of quality, based on RTT, Packet Loss and Jitter. 
+The values obtained by pinging peers are:
+<ul>
+<li>rtt - the round trip time for packets to travel to the peer and back;</li>
+<li>loss - percent, ranging from 0 to 1 of lost packets sent to the peer;</li>
+<li>jitter - sum of the variations of rtt for a set of samples, divided by the average rtt and number of samples. </li>
+</ul>
+The list of available peers for each reflector and the *_COEF coefficients should be highly 
+configurable to allow easy reconfiguration. To reach this goal, the configuration file is the 
+same for all reflectors, each one knowing to extract only the information that is needed. 
+The coefficients must be the same for all reflectors in order to obtain comparable RTime qualities.
+<br><br>
+The configuration file is loaded at start, and then it is periodically checked, from a URL 
+configured when starting MonALISA service on the reflector. If there is a new peer for a 
+reflector, it is added to the list of peers in the monABPing module. Similarly, if a 
+known peer isn't found anymore in the configuration file, it is deleted from the peer list. 
+If at least one of the coefficients modify, all measurements are reset and the 
+new values are computed using the previous formula.
+<br><br>
+Here is a sample configuration file:
+<pre>vrvs.co.pub.ro vrvs-eu.cern.ch vrvs-us.cern.ch
+vrvs-eu.cern.ch vrvs-us.cern.ch vrvs.co.pub.ro cinxia.tv.funet.fi
+vrvs-us.cern.ch vrvs-eu.cern.ch vrvs.co.pub.ro vrvs-starlight.cern.ch
+…
+OVERALL_COEF 0
+RTT_COEF 0.5
+PKT_LOSS_COEF 100
+JITTER_COEF 20
+
+# We keep last RTT_SAMPLES rtts (integer value)
+RTT_SAMPLES 10
+
+# The history of Lost Packages is PKT_LOSS_MEM long (integer value)
+PKT_LOSS_MEM 20
+
+# The size of the packet sent over the net (must be > 3 bytes)
+PACKET_SIZE 450
+
+# Time between pings (ms). Should be big enough to allow reasonable 
+# time for packets to return to sender and not consider them lost
+PING_INTERVAL 4000
+</pre>
+<br>
+<p><strong>Filter based data analysis</strong></p>
+A filter is, generally speaking, both a client and a data producer for other clients 
+of the MonALISA service. As a client, a filter receives all data from the monitor modules. 
+It analyzes this data and performs an action according to the received data. As a 
+data producer, it generates Results for other clients.
+<br><br>
+For monitoring Reflectors, the MonALISA service must be started using two filters:
+<ul>
+<li>Filtering data - TriggerAgent
+	<ul>
+		<li>Register for receiving the data coming from the modules</li>
+		<li>Compute time mediated values for peer links quality:<br>
+			<i>Qual2h, Qual12h, Qual24h</i>
+		</li>
+		<li>Build a special type of result, "alarm" if there is no data from 
+		    the reflectors for 1 minute
+		</li>
+		<li>Inform all registered clients</li>
+	</ul>
+</li>
+<li>Triggering Actions - vrvsRestartTrigger
+	<ul>
+		<li>Listen for receiving the data from the modules</li>
+		<li>Take action if no interesting data comes ...<br>
+			&nbsp;for 1 minute ==> restart reflector<br>
+			&nbsp;for 2 minutes ==> send e-mail/sms to a list of administrators
+		</li>
+	</ul>
+</li>
+</ul> 
+<p>
+</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

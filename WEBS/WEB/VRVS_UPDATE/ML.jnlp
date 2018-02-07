@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp
+   spec="1.0+"
+   codebase="http://monalisa.cacr.caltech.edu/VRVS_UPDATE"
+   href="ML.jnlp">
+   <information> 
+      <title>MonaLisa</title>  
+      <vendor>Caltech</vendor> 
+      <description>MonaLisa Monitoring System</description> 
+      <description kind="short">Monitoring tool</description> 
+      <icon href="images/flames.gif"/> 
+   </information> 
+  
+   <security> 
+      <all-permissions/> 
+   </security>
+<resources>
+   <j2se version="1.4"/> 
+   <jar href="lib/VRVS.jar"/>
+</resources>
+ 
+<application-desc main-class="lia.Monitor.JiniSerFarmMon.RegFarmMonitor" name="MonaLisa" documentBase="http://monalisa.cacr.caltech.edu/FARM_ML">
+</application-desc>
+</jnlp>

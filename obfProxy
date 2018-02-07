@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#java -jar KVM/ZKM.jar -v -l ML_PROXY_OB.log ML_PROXY_OB.txt
+#find build/current/ProxyService/lib -iname *.BACKUP -exec rm {} \;
+
+java -jar proguard3.9/lib/proguard.jar @proxy_OB.pro

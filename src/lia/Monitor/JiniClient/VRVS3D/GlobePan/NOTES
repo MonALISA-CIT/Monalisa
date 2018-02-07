@@ -1,0 +1,11 @@
+The Earth is given a radius of 1.0. Everything else should be sized accordingly.
+
+If you try to make the Mmap the topmost tab, with the GlobePan underneath,
+the 3D scene will initially be rendered over the Mmap panel. The solution:
+set up the application with the GlobePan on top by default, or manually
+call setSelectedComponent() on the TabbedPane component holding the panels.
+
+The texture for the globe can be changed at the command line by setting the
+"lia.Monitor.JiniClient.VRVS3D.globeTexture" property. The texture must be
+an image of a well-known type (i.e. jpg, gif, etc.) and both its width and
+height must be powers of 2 (this restriction is imposed by Java 3D).

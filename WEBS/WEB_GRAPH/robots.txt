@@ -1,0 +1,8 @@
+User-Agent: Wget
+Allow: /
+
+User-Agent: *
+Allow: /
+Allow: /show
+Allow: /stats
+Disallow: /display

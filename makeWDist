@@ -1,0 +1,30 @@
+#!/bin/sh
+LIA_HOME=/home/ramiro/WORK/MSRC
+ML_DIR=MonaLisa.v1.2
+
+cd ${LIA_HOME}/build && rm -rf ${ML_DIR}/Service/lib/*.BACKUP && \
+/bin/tar -czvf ${LIA_HOME}/WEBS/WEB/download/MonaLisa.tar.gz \
+	--exclude=${ML_DIR}/Repository --exclude=${ML_DIR}/Service/Admin* \
+	--exclude=${ML_DIR}/Service/SSecurity/FamMonitorVRVS.ks \
+	--exclude=${ML_DIR}/VRVS_SCRIPTS \
+	--exclude=${ML_DIR}/Service/REF \
+	--exclude=${ML_DIR}/Service/SSecurity/FarmMonitorVRVS.ks \
+	--exclude=${ML_DIR}/Service/CMD/*.VRVS \
+	--exclude=${ML_DIR}/Clients \
+	--exclude=${ML_DIR}/ProxyService \
+	${ML_DIR}
+
+cd ${LIA_HOME}/build && \
+/bin/tar -czvf ${LIA_HOME}/WEBS/WEB/download/MonaLisaVRVS.tar.gz \
+	--exclude=${ML_DIR}/Service/CMD/ML_SER \
+	--exclude=${ML_DIR}/Service/CMD/common.sh \
+	--exclude=${ML_DIR}/Service/CMD/CHECK_UPDATE \
+	--exclude=${ML_DIR}/Service/CMD/ml_env \
+	--exclude=${ML_DIR}/Service/usr_code/* \
+	--exclude=${ML_DIR}/Clients \
+	--exclude=${ML_DIR}/Repository \
+	--exclude=${ML_DIR}/Service/Admin* \
+	--exclude=${ML_DIR}/Repository \
+	--exclude=${ML_DIR}/Service/usr_code \
+	--exclude=${ML_DIR}/Service/TEST \
+	${ML_DIR}

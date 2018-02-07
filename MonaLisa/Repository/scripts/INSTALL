@@ -1,0 +1,73 @@
+    1. DO NOT TRY TO INSTALL THE SERVICE AS ROOT!
+
+    2. Make sure no running program is listening on the
+ports that postgres and tomcat are (or will be) using. 
+The default ports are 5544 for postgres and 8080 for tomcat.
+You can change the default configuration using the files in
+conf/ dir. Please check these files before trying to install
+the repository.
+
+    3. Run install.sh. Should an error had occured please
+untar the package, correct the error and try again.
+    The install.sh script will look up the java home dir.
+If java cannot be found in current path then the script asks
+for one and tests it.
+    The java home dir and the repository dir are saved
+in conf/ directory in the env.JAVA_HOME and env.REPOSITORY_DIR
+files.
+
+    4. Start the service using start.sh. You can control 
+every service in part using scripts/*.sh
+    
+    5. Test the web service typing http://localhost:8080/ 
+in your browser's address bar. You should start seeing some
+values in the charts in a few minutes.
+
+    6. To stop the service you can use stop.sh. Please add a
+reference to scripts/verify.sh in your crontab, for example:
+
+* * * * * ~/MLrepository/scripts/verify.sh &>/dev/null
+
+This script checks if the repository is running ok, if not
+the repository is restarted.
+
+    7. To change the path to java home dir in the future
+please edit the conf/env.JAVA_HOME. You can move the
+entire repository to another directory but you have to
+edit the conf/env.REPOSITORY_DIR and write the new path
+there.
+
+    8. This repository contains some Web Services Client
+examples. They are default configured to use the localhost
+as the web server to which they connect to. To change this
+behaviour please edit the conf/env.MONALISA_WS file. When
+you edit this file make sure there is no trailing line feed
+character at the end of the line.
+
+    9. After you start the repository please check the
+documentation provided under the "Site config" menu.
+
+    10. You can keep your repository updated by running the
+update.sh script. Before running this script please BACKUP 
+YOUR REPOSITORY. The script should correctly update the
+service and the additional software (database, web server etc)
+and it shouldn't cause any problems at all, but it's better
+to have a backup in case something doesn't work as planned.
+
+Instead of using this script you can download the latest stable
+version from the site and manually update the components. If you
+proceed like this you should keep at least the following folders:
+./pgsql_store/data
+./JStoreClient/conf
+./conf
+./tomcat/webapps
+./tomcat/conf   	(or at least modify the new tomcat config
+                         files to use the same tcp/ip ports)
+
+
+
+
+
+    MonaLisa Team,
+    mailto:developers@monalisa.cern.ch
+    http://monalisa.cacr.caltech.edu

@@ -1,0 +1,27 @@
+/******************************************************************************/
+/* Copyright 2003 Zelix Pty Ltd (ACN 078 740 093)                             */
+/*                                                                            */
+/* Zelix KlassMaster Default trimExclude statement. Leave this file in the    */
+/* directory from which you start Zelix KlassMaster. It determines the        */
+/* default trim exclusions.                                                   */
+/******************************************************************************/
+
+trimExclude *.* <init>() and //No-arg constructors.  Some APIs access them indirectly.  Eg. java.io.Externalizable 
+            interface *.*^ implements java.rmi.Remote *(*) throws java.rmi.RemoteException and //RMI 
+            *.* private readObject(java.io.ObjectInputStream) and   //Serialization 
+            *.* private writeObject(java.io.ObjectOutputStream) and //Serialization 
+            *.* static final long serialVersionUID and              //Serialization 
+            *.* writeReplace() and                                  //Serialization 
+            *.* readResolve() and                                   //Serialization 
+            *.* readObjectNoData() throws java.io.ObjectStreamException and //Serialization 
+            *.* java.io.ObjectStreamField[] serialPersistentFields and  //Serialization 
+            *.* implements javax.servlet.Servlet and  //Servlets 
+            *.*^ implements javax.ejb.EJBObject public *(*) and              //EJB Remote 
+            *.* implements javax.ejb.EJBLocalObject public *(*) and          //EJB Local 
+            *.*^ implements javax.ejb.EJBHome public create(*) and           //EJB Home 
+            *.*^ implements javax.ejb.EJBHome public find*(*) and            //EJB Home 
+            *.* implements javax.ejb.EJBLocalHome public create(*) and       //EJB Local Home 
+            *.* implements javax.ejb.EJBLocalHome public find*(*) and        //EJB Local Home 
+            *.*^ implements javax.ejb.EnterpriseBean public *(*) and         //EJB Bean 
+            *.* static createUI(javax.swing.JComponent) and                  //GUI
+            *.* extends javax.swing.JComponent getUI();                      //Pluggable L&F

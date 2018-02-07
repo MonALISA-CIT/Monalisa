@@ -1,0 +1,1 @@
+<td nowrap align=right bgcolor=#<<:color:>> class="table_row_stats" sorttable_customkey="<<:sorttable_realvalue esc:>>" <<:com_url_start:>>onClick="javascript:window.open('<<:url esc js:>>', '_blank');" style="cursor:pointer;"<<:com_url_end:>>>&nbsp;<<:value:>></td>

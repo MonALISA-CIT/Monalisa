@@ -1,0 +1,71 @@
+#!/bin/sh
+
+PRG="$0"
+
+while [ -h "${PRG}" ]; do
+  ls=`ls -ld "${PRG}"`
+  link=`expr "${ls}" : '.*-> \(.*\)$'`
+  if expr "${link}" : '.*/.*' > /dev/null; then
+    PRG="${link}"
+  else
+    PRG="`dirname ${PRG}`/${link}"
+  fi
+done
+
+# Get standard environment variables
+PRGDIR="`dirname ${PRG}`"
+. ${PRGDIR}/../conf/set_env
+JINI_SER_HOME="${PRGDIR}"/".."
+
+cmd="${JAVA_HOME}/bin/java -jar ${JINI_SER_HOME}/lib/tools.jar -verbose -trees -port ${JINI_SER_PORT} -dir ${JINI_SER_HOME}/lib/ser_dl"
+
+start() {
+	if [ -z "${JAVA_HOME}" ]; then
+	    echo "Please set JAVA_HOME in conf/set_env"
+	    return 1;
+	fi
+	
+	if [ -x "${JAVA_HOME}"/bin/java ]; then
+	    echo -n "Starting $0..."
+	    ${cmd} >> ${JINI_SER_HOME}/logs/http.log 2>&1 &
+	    echo "STARTED"
+	    return 0
+	else
+	    echo "Cannot execute ${JAVA_HOME}/bin/java." 
+	    echo "Please check that JAVA_HOME in set in conf/set_env"
+	fi
+}
+
+stop() {
+	echo -n "Stopping $0..."
+	${cmd} -stop >> ${JINI_SER_HOME}/logs/http.log 2>&1
+	if [ $? -eq 0 ]; then
+		echo "OK"
+		return 0
+	else
+		echo "FAILED"
+		echo "Please see ${JINI_SER_HOME}/logs/http.log for details"
+		return 1
+	fi
+}
+
+restart() {
+	stop
+	start
+}
+
+case $1 in
+'start')
+    start
+    ;;
+'stop')
+    stop
+    ;;
+'restart')
+    restart
+    ;;
+'*')
+    echo "Usage: $0 [start|stop|restart]"
+    ;;
+esac
+

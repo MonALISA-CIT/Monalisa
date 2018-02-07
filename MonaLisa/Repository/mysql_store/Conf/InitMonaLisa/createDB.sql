@@ -1,0 +1,6 @@
+CREATE DATABASE mon_data;
+
+GRANT ALL PRIVILEGES ON mon_data.* TO mon_user@localhost IDENTIFIED BY 'mon_pass' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON mon_data.* TO mon_user@"%" IDENTIFIED BY 'mon_pass' WITH GRANT OPTION;
+
+FLUSH PRIVILEGES;

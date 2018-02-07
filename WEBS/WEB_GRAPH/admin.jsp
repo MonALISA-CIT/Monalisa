@@ -1,0 +1,229 @@
+<%@ page import="alimonitor.*,lia.Monitor.Store.Fast.DB,lia.web.utils.ThreadedPage,lia.Monitor.Store.Cache,lia.Monitor.Store.FarmBan,lia.web.utils.Formatare,lia.Monitor.monitor.monPredicate,java.io.*,java.util.*,java.net.URLEncoder,lia.web.servlets.web.*,auth.*,java.security.cert.*" %><%
+    lia.web.servlets.web.Utils.logRequest("START /admin.jsp", 0, request);
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream(5000);
+            
+    Page pMaster = new Page(baos, "WEB-INF/res/masterpage/masterpage_admin.res");
+
+    pMaster.modify("title", "Site administration");
+    
+    //menu
+    pMaster.modify("class_administration", "_active");
+
+
+    Page pAdmin = new Page("admin.res");                 
+
+    String JSP = "admin.jsp";
+
+    response.setHeader("Pragma", "no-cache");
+    response.setHeader("Expires", "-1");
+    response.setContentType("text/html");
+    response.setHeader("Admin", "Costin Grigoras <costin.grigoras@cern.ch>");
+
+    String sName = request.getParameter("delete");
+    String sIP   = request.getParameter("ip");
+    String sBan  = request.getParameter("ban");
+    
+    String URL="/"+JSP;
+    boolean bQM = false;
+
+    boolean bAuthOK = false;
+    
+    final AlicePrincipal principal = Users.get(request);
+    
+    if (principal!=null)
+	bAuthOK = principal.hasRole("webadmin");
+    
+    Enumeration en = request.getParameterNames();
+    
+    while (en.hasMoreElements()){
+	String sParam = (String) en.nextElement();
+	
+	String[] values = request.getParameterValues(sParam);
+	
+	for (int i=0; values!=null && i<values.length; i++){
+	    URL = URL + (bQM ? "&" : "?") + URLEncoder.encode(sParam)+"="+URLEncoder.encode(values[i]);
+	    bQM = true;
+	}
+    }
+    
+    if (((sName!=null && sName.length()>0) || (sBan!=null && sBan.length()>0)) && sIP!=null && sIP.length()>0){
+	if(!bAuthOK){
+	    response.sendRedirect("/dologin.jsp?page="+URLEncoder.encode(URL));
+	    return;
+	}
+    
+        if (sBan!=null){
+    	    FarmBan.banFarm(sBan);
+	    FarmBan.banIP(sIP);
+	    sName = sBan;
+	}
+	
+	if (sName!=null){
+	    DB db = new DB();
+	    db.syncUpdateQuery("DELETE FROM abping_aliases WHERE name='"+Formatare.mySQLEscape(sName)+"' AND ip='"+Formatare.mySQLEscape(sIP)+"';");
+    	    db.syncUpdateQuery("DELETE FROM abping WHERE mfarmsource='"+Formatare.mySQLEscape(sIP)+"' OR mfarmdest='"+Formatare.mySQLEscape(sIP)+"';");
+	}
+	    
+	response.sendRedirect(JSP);
+	return;
+    }
+    
+    String sClear = request.getParameter("clear_all");
+    if (sClear!=null && sClear.length()>0){
+    	if(!bAuthOK){
+	    response.sendRedirect("/dologin.jsp?page="+URLEncoder.encode(URL));
+	    return;
+	}
+    
+	DB db = new DB();
+	db.syncUpdateQuery("DELETE FROM abping; DELETE FROM abping_aliases;");
+	response.sendRedirect(JSP);
+	return;
+    }
+    
+    String sUnBan = request.getParameter("unban_farm");
+    if (sUnBan!=null && sUnBan.length()>0){
+    	if(!bAuthOK){
+	    response.sendRedirect("/dologin.jsp?page="+URLEncoder.encode(URL));
+	    return;
+	}
+    
+	FarmBan.unbanFarm(sUnBan);
+        response.sendRedirect(JSP);
+        return;
+    }
+    
+    sUnBan = request.getParameter("unban_ip");
+    if (sUnBan!=null && sUnBan.length()>0){
+    	if(!bAuthOK){
+	    response.sendRedirect("/dologin.jsp?page="+URLEncoder.encode(URL));
+	    return;
+	}
+    
+	FarmBan.unbanIP(sUnBan);
+        response.sendRedirect(JSP);
+        return;
+    }
+    
+    String sHide = request.getParameter("hide");
+    
+    if (sHide!=null && sHide.length()>0){
+    	if(!bAuthOK){
+	    response.sendRedirect("/dologin.jsp?page="+URLEncoder.encode(URL));
+	    return;
+	}
+
+    	DB db = new DB();
+    	
+    	db.syncUpdateQuery("DELETE FROM hidden_sites WHERE name='"+sHide+"';");
+	
+	if (db.getUpdateCount()<=0)
+	    db.syncUpdateQuery("INSERT INTO hidden_sites (name) VALUES ('"+sHide+"');");
+    }
+    
+    HashSet hsHiddenNames = new HashSet();
+    
+    DB db = new DB("SELECT name FROM hidden_sites;");
+    
+    while (db.moveNext()){
+	hsHiddenNames.add(db.gets(1));
+    }
+
+    Page pServices = new Page("admin_services.res");
+    Page pServicesEl = new Page("admin_services_el.res");
+
+    db = new DB("SELECT * FROM abping_aliases ORDER BY name ASC;");
+	    
+    int i = 1;
+	    
+    while (db.moveNext()){
+	monPredicate pred = new monPredicate(db.gets("name"), "MonaLisa", "localhost", -1, -1, new String[]{"CurrentParamNo"}, null);
+	
+	if(Cache.getLastValue(pred)!=null){
+	    pServicesEl.modify("on_color", "green");
+	    pServicesEl.modify("on", "ON");
+	}
+	else{
+	    pServicesEl.modify("on_color", "red");
+	    pServicesEl.modify("on", "OFF");
+	}
+	
+	String sServiceName = db.gets("name");
+	
+	pServicesEl.modify("i", i);
+	pServicesEl.modify("name", sServiceName);
+	pServicesEl.modify("ip", db.gets("ip"));
+	pServicesEl.modify("reverseip", ThreadedPage.getHostName(db.gets("ip"), true));
+	pServicesEl.modify("version", db.gets("version"));	
+	pServicesEl.modify("geo_lat", db.gets("geo_lat"));
+	pServicesEl.modify("geo_long", db.gets("geo_long"));	
+	pServicesEl.modify("name_link", Formatare.encode(sServiceName));
+	pServicesEl.modify("ip_link", Formatare.encode(db.gets("ip")));
+
+	pServicesEl.modify("color", (i%2 == 0 ? "#FFFFFF" : "#F0F0F0"));
+	
+	pServicesEl.modify("color_web", hsHiddenNames.contains(sServiceName) ? "#FFEEAA" : "#AAEEAA");
+	pServicesEl.modify("msg_web", hsHiddenNames.contains(sServiceName) ? "unhide" : "hide");
+
+	pServices.append(pServicesEl);
+	
+	i++;
+    }    
+    
+    pAdmin.modify("services", pServices);
+
+    Page pBanned = new Page("admin_banned.res");
+    Page pBannedEl = new Page("admin_banned_el.res");
+
+    db.query("SELECT * FROM ban_farm ORDER BY name ASC;");
+	    
+    i = 0;
+	    
+    while (db.moveNext()){
+	pBannedEl.modify("name", db.gets("name"));
+	pBannedEl.modify("name_link", Formatare.encode(db.gets("name")));
+
+	pBannedEl.modify("color", (i%2 == 0 ? "#FFFFFF" : "#F0F0F0"));	
+	
+	pBannedEl.modify("jps" , JSP);
+	
+    	pBanned.append(pBannedEl);
+    	
+    	i++;
+    }
+
+    pAdmin.modify("banned", pBanned);
+
+    Page pBannedIp = new Page("admin_bannedip.res");
+    Page pBannedIpEl = new Page("admin_bannedip_el.res");
+
+    db.query("SELECT * FROM ban_ip ORDER BY ip ASC;");
+
+    i=0;
+    while (db.moveNext()){
+	pBannedIpEl.modify("ip", db.gets("ip"));
+	pBannedIpEl.modify("ip_link", Formatare.encode(db.gets("ip")));
+	
+	pBannedIpEl.modify("name", ThreadedPage.getHostName(db.gets("ip"), true));
+
+	pBannedIpEl.modify("color", (i%2 == 0 ? "#FFFFFF" : "#F0F0F0"));	
+
+	pBannedIpEl.modify("jps" , JSP);
+
+	pBannedIp.append(pBannedIpEl);
+	
+	i++;
+    }
+    
+    pAdmin.modify("bannedip", pBannedIp);
+
+    pMaster.append(pAdmin);
+    
+    pMaster.write();
+        
+    String s = new String(baos.toByteArray());
+    out.println(s);
+    
+    lia.web.servlets.web.Utils.logRequest("/admin.jsp", baos.size(), request);
+%>

@@ -1,0 +1,27 @@
+body {
+	scrollbar-track-color: "#DADADA";
+	scrollbar-base-color: "#D6D6C0";
+	color : black;
+	font-size : 12px;
+	font-family : Comic Sans MS, Tahoma, Verdana, Arial, Helvetica;
+	background-color : #D6D6C0;
+} 
+table, td, tr {
+	color : black;
+	font-size : 12px;
+	font-family : Comic Sans MS, Tahoma, Verdana, Arial, Helvetica;
+}
+A {
+	color : black;
+	font-size : 12px;
+	font-family : Comic Sans MS, Tahoma, Verdana, Arial, Helvetica;
+}
+
+TD.clsNewsTitle{
+	font-weight : bold;
+	background-color: #D6D6C0;
+}
+
+TD.clsNewsText{
+	background-color: #DADADA;
+}

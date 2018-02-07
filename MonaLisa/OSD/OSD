@@ -1,0 +1,176 @@
+#!/bin/sh
+
+JAVA_HOME="/opt/JAVA/jdk1.5.0"
+LUS_HOSTS="monalisa-starlight.cern.ch,vrvs-us.cern.ch"
+
+PRG="$0"
+                 
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '.*/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+                                                                                                                               
+# Get standard environment variables
+PRGDIR=`dirname "$PRG"`
+
+set_cmd() {
+
+cmd="${JAVA_HOME}/bin/java \
+-Dlia.Monitor.monitor.osd_home=${PRGDIR} \
+-Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+-Djava.security.policy=${PRGDIR}/policy.all \
+-Dlia.Monitor.ConfigURL=file:${PRGDIR}/conf/OSDaemonConf.properties \
+-Dlia.osdaemon.OSDaemonConfigFile=${PRGDIR}/conf/OSDaemonConf.properties \
+-jar ${PRGDIR}/lib/OSD.jar"
+
+return 0
+}
+
+set_RE_cmd() {
+
+cmd_RE=".*/java .*\
+-Dlia.Monitor.monitor.osd_home=.* .*"
+
+return 0
+}
+
+start(){
+    set_cmd && set_RE_cmd
+    c_uid="`id -u -r`"
+    
+    pid="`${PRGDIR}/bin/pgrep -u ${c_uid} -f \"${cmd_RE}\"`"
+    if [ ! -z "${pid}" ]; then
+        echo "Optical Switch Daemon still running? [ PID == ${pid} ]"
+        return 1
+    fi
+
+    echo -n "Trying to start Optical Switch Daemon...."
+
+    cd ${PRGDIR}; ${cmd} > "${PRGDIR}"/"OSD.log" 2>&1 &
+    sleep 5
+    
+    pid=`"${PRGDIR}"/bin/pgrep -f -P $$ "${cmd_RE}"`
+    if [ -z "${pid}" ]; then
+        echo "FAILED"
+        echo "Please check ${PRGDIR}/OSD.log"
+    else
+    	echo "STARTED [ PID == ${pid} ]"
+    fi
+}
+
+stop(){
+	set_cmd && set_RE_cmd
+
+    c_uid="`id -u -r`"
+	
+	ppid_cmd="${PRGDIR}/bin/pgrep -u ${c_uid} -f -P 1 \"${cmd_RE}\""
+	pid_cmd="${PRGDIR}/bin/pgrep -u ${c_uid} -f \"${cmd_RE}\""
+	ppid=`/bin/sh -c "${ppid_cmd}"`
+	pid=`/bin/sh -c "${pid_cmd}"`
+	
+	if [ -z "${pid}" ]; then
+		echo "Optical Switch Daemon not running!?!"
+		return 0
+	fi
+	echo -n "Trying to stop Optical Switch Daemon...."
+
+	kill ${ppid} >/dev/null 2>&1
+	sleep 5
+	more=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${more}" ]; then
+		echo "STOPPED"
+		return 0
+	fi
+	echo "FAILED"
+	echo -n "Retrying...Please wait..."
+
+	pid=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${pid}" ]; then
+		echo "STOPPED"
+		return 0
+	fi
+
+	kill ${pid} >/dev/null 2>&1
+	sleep 10
+
+	more=`/bin/sh -c "${pid_cmd}"`
+	if [ -z ${more} ]; then
+		echo "OK!"
+		return 0
+	fi
+
+	echo "FAILED!!!"
+	echo -n "Force kill..."
+	pid=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${pid}" ]; then
+		echo "Killed!"
+		return 0
+	fi
+
+	kill -9 ${pid} >/dev/null 2>&1
+	sleep 5
+
+	more=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${more}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+	
+	echo "FAILED!!!!"
+	echo -n "Retrying to kill..."
+
+	pid=`/bin/sh -c "${pid_cmd}"`
+	if [ -z "${pid}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+
+	kill -9 ${pid} >/dev/null 2>&1
+	sleep 10
+
+	more=`/bin/sh -c "${pid_cmd}"`
+
+	if [ -z "${more}" ]; then
+		echo "KILLED"
+		return 0
+	fi
+
+	hostname=`hostname -f`
+	mail -s "Cannot stop Optical Switch Daemon @ ${hostname} with kill -9!" "Iosif.Legrand@cern.ch,ramiro@roedu.net" 2>&1 >/dev/null &
+	echo "FAILED!!!"
+	return 1
+
+}
+
+restart(){
+	stop
+	if [ $? -eq 0 ]; then 
+		start
+	else
+		echo " Optical Switch Daemon was NOT started because stopping it failed! "
+		exit 1
+	fi
+}
+
+
+case $1 in
+'start')
+		start
+        ;;
+'stop')
+		stop
+        ;;
+'restart')
+		restart
+        ;;
+*)    
+        echo "Usage: $0 [ start | stop | restart ]"
+        ;;
+esac

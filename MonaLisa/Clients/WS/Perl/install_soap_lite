@@ -1,0 +1,13 @@
+#!/bin/bash
+
+PERL_MODULES=../lib/perl-modules/
+echo "Install SOAP::Lite module ..."
+cd $PERL_MODULES
+tar -zxf SOAP-Lite-latest.tar.gz
+cd  SOAP-Lite-0.55/
+perl Makefile.PL
+make
+make test
+make install
+rm -rf ../SOAP-Lite-0.55
+

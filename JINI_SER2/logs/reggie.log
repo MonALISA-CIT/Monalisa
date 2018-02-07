@@ -1,0 +1,14 @@
+May 19, 2003 10:42:43 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 6d109c2f-5a7e-481d-9146-715779df8d84, [alice1, alice2], jini://ml/
+May 19, 2003 10:44:09 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 7b59fde8-5302-4636-9a98-6916c6dc4756, [alice1, alice2], jini://ml/
+May 30, 2003 11:38:40 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 1babf71e-4919-4910-9cb6-3c071e778965, [alice1, alice2], jini://ui.rogrid.pub.ro/
+May 30, 2003 11:42:18 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 94f85d42-dee0-4c37-b73c-f869d532acba, [test], jini://ui.rogrid.pub.ro/
+May 30, 2003 11:55:48 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 206b892b-3d79-498f-baad-9c45c6d1e9c8, [test], jini://ui.rogrid.pub.ro/
+May 30, 2003 11:56:56 AM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: 22df995c-08c6-4ee0-83a4-b2f2c283f122, [test], jini://ui.rogrid.pub.ro/
+Jun 7, 2003 3:13:24 PM com.sun.jini.reggie.RegistrarImpl init
+INFO: started Reggie: d760e515-dadf-4d7a-99a5-8c6aeb685a64, [test], jini://ui/

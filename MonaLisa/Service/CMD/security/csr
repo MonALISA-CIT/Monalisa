@@ -1,0 +1,8 @@
+#!/bin/sh
+
+#This generate the private key and the certificate signing request 
+openssl req -newkey rsa:1024 -keyout servicekey.pem -keyform PEM -out service.csr -outform PEM -nodes
+
+if [ $? -eq 0 ]; then
+    chmod 400 servicekey.pem
+fi

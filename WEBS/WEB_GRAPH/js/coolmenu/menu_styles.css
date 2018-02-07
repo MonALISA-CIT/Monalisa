@@ -1,0 +1,9 @@
+div {
+	font-family: Tahoma, Helvetica;
+}
+
+.clsCMOn, .clsCMOver {
+	font-size: 12px;
+        padding: 2px 4px;
+	color: black;
+}

@@ -1,0 +1,6 @@
+  This program displays the configuration tree as it is received by the 
+client and stored in the database, in the table for the smallest interval.
+
+  It tries to read the configuration file from some default paths, but you
+can pass the full path to your App.properties file as the first argument
+of the script or directly to the Java program.

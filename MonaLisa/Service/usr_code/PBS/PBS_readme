@@ -1,0 +1,47 @@
+This is a simple MonALISA module to extract information from PBS
+
+The two scripts ( compile and run_test) can be used to recompile the 
+code and to test the module independently from MonaLISA
+If the module works fine in your environment you can add it into 
+the configuration file.
+
+The module accepts an input parameter which is list of keywords 
+(separated by",") in selection the jobs for which values are reported. 
+
+e.g:
+./run_test cmsim,test 
+
+
+In this case the module will report about the jobs for which cmsim and
+test strings appear in the job name. 
+
+If no argument is provided, the module will report globally about the 
+running and pending jobs
+(./run_test) 
+
+The module assumes that qstat is the path for th user from which 
+MonALISA is used. 
+
+You may change this, by editing the module. You will need to 
+recompile it (./compile) 
+
+For using the Module in MonLISA you need :
+1) to add it into the configuration file :
+
+*PBS-JOBS
+>localhost
+PBSjobs{cmsim,test}%30
+
+A functional unit "PBS-JOBS" will be created, running on localhost 
+and will report every 30s about the jobs having in the name the two 
+specified strings 
+
+If no arguments are passed  the line will be 
+PBSjobs%30 
+
+
+2) in ml.properties the ML classpath must include the PBS directory
+   for loading the module 
+e.g.:
+lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/PBS/
+

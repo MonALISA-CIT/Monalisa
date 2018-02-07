@@ -1,0 +1,85 @@
+
+This document describes the "MLWebService" web service. 
+This web service was developed using Apache Axis.
+
+Apache Axis web site from:
+   http://ws.apache.org/axis
+   
+Apache Axis is an implementation of the SOAP (Simple Object Access
+   Protocol).
+
+Service description:
+
+The service offers a single port type with three operations: "getValues", 
+"getConfiguration" and "getLatestConfiguration".
+
+ 
+    - Result[] getValues (String farmName, String clusterName, String nodeName,
+			  String parameterName, long fromTime, long toTime);
+			  
+	 This function interogates the database and gets all the
+	 parameters and parameters values from the farm, cluster and node spe-
+	 cified and the time when these parameters were registered was between
+	 "fromTime" and "toTime".
+	 
+	 The return value is an array of "Result" objects. The Result class is a
+	 Bean class and has the following important fields:
+	 
+	    public class Result	{
+		
+		String farmName; //farm name.
+		String clusterName; // cluster name.
+		String nodeName; // node name.
+		String[] param_name; // parameter names
+		double[] param; //values of the parameters
+		long time; //the absolute time when the Result was registered
+			   //in the database.
+			   
+		..... // Result get/set functions	   
+		
+	    } //class	 
+	    
+    - WSConf[] getConfiguration (long fromTime, long toTime);
+         
+        This function interogates the database and gets all the configu-
+	rations received between "fromTime" and "toTime".
+	The java classes that describes a configuration is the WSConf class. These 
+	classes are Bean classes. The  fields of these classes are:
+	
+	    //The java class that describes a farm configuration
+	    public class WSConf { 
+		private WSFarm wsFarm; // the farm that had this configuration
+		private long confTime; // the time when this configuration was registered in
+			       // the database
+		..... // set/get functions	       
+	    }  		    
+	    
+	    //the java class that describes a farm
+	    public class WSFarm {
+		private WSCluster[] clusterList; // the clusters of this farm
+		private String farmName; // the name of the farm.
+		..... // set/get functions
+	    }
+	    
+	    //the java class that describes a cluster
+	    public class WSCluster {
+		private String clusterName; //the name of this cluster
+		private WSNode[] nodeList; //the nodes of this cluster
+		..... // set/get functions
+	    }
+	    
+	    //the java class that describes a node
+	    public class WSNode {
+		private nodeName; // the name of the node
+		private String[] paramList; // the list of parameters for this node
+		..... // set/get functions
+	    }
+	    
+    - WSConf getLatestConfiguration (String farm) 
+	
+	This function returns the latest configuration received from the specified
+	farm. 
+	The "farm" argument must be specified. If it is null, the function returns
+	an error message.	     
+	
+	

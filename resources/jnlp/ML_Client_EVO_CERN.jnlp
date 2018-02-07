@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://monalisa.cern.ch/ml_vrvs_client">
+   <information> 
+      <title>MonALISA</title>  
+      <vendor>Caltech</vendor> 
+      <description>MonaLisa Monitoring System</description> 
+      <description kind="short">ML GUI for EVO</description> 
+      <icon href="img/ml_javaws_logo.jpg"/> 
+   </information> 
+   <security> 
+      <all-permissions/> 
+   </security>
+<resources>
+   <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se" initial-heap-size="128m" max-heap-size="1024m"/>
+   <jar href="lib/vrvs3dJMonitorClient-CERN.jar"/>
+   <jar href="lib/jini-core.jar"/>
+   <jar href="lib/jini-ext.jar"/>
+   <jar href="lib/plot.jar"/>
+   <jar href="lib/jcommon-0.9.0.jar"/>
+   <jar href="lib/map_base512.jar"/>	
+   <jar href="lib/jfreechart-0.9.15.jar"/>
+   <jar href="lib/backport-util-concurrent.jar"/>
+   <jar href="lib/cog-jglobus.jar"/>
+   <jar href="lib/cryptix.jar"/>
+   <jar href="lib/jgsi.jar"/>
+   <jar href="lib/puretls.jar"/>
+   <property name="com.apple.macos.useScreenMenuBar" value="false"/>
+   <extension name="jce" href="http://monalisa.cern.ch/ml_client/BouncyCastle-JCE.jnlp" />
+   <extension name="jogl" href="http://monalisa.cern.ch/jogl/jogl.jnlp" />
+   <property name="sun.java2d.noddraw" value="true"/>
+   <property name="com.sun.jini.jeri.connectionTimeout" value="360000"/>
+   <property name="lia.Monitor.AppConfig.WebStart" value="true"/>
+   <property name="lia.Monitor.ConfigURL" value="http://monalisa.cern.ch/ml_vrvs_client/ml-client-evo-cern.properties"/>
+   <property name="lia.util.ntp.enabled" value="false"/>
+</resources>
+<application-desc main-class="lia.Monitor.JiniClient.VRVS3D.Main" name="MonALISA 3D Client for EVO" />
+</jnlp>

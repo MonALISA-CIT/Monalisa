@@ -1,0 +1,32 @@
+#everything { WIDTH: 770px; MARGIN: 0 auto; TEXT-ALIGN: left; PADDING-BOTTOM: 25px; }
+
+#colorspy { border: 2px solid #EEEEEE; padding: 7px 0 20px 20px; margin: 0 0 7px 0; font-size: 16px; text-align: left; position: relative; top: -12px; COLOR: #555; background: #fbfbfb; }
+#colorspy a { COLOR: #e04f92; }
+#colorspy legend { font-size: 17px; color: #bbb; padding: 0; }
+#colorspy div div { WIDTH: 20px; HEIGHT: 20px; border-right: 1px solid #FFF; FLOAT: left; }
+#colorspy .swatch { float: left; margin-right: 21px; border-top: 2px solid #FFF; }
+#colorspy h2 { FONT-SIZE: 18px; LINE-HEIGHT: 0em; COLOR: #5888BF; FONT-WEIGHT: normal; TOP: 3px; position: relative; }
+
+.botLine { BORDER-TOP: 1px solid #EEE; WIDTH: 370px; MARGIN-TOP: 9px; PADDING-TOP: 9px; COLOR: #999; }
+.botLine a { COLOR: #e04f92; }
+.botLine a:hover { COLOR: #F360BB; }
+
+/* PLUGIN */
+
+#plugin { background-color: #0d0d0d; COLOR: #07628D; CURSOR: move; DISPLAY: block; FONT-FAMILY: arial; FONT-SIZE: 11px; PADDING: 7px 10px 11px 10px; _PADDING-RIGHT: 0; Z-INDEX: 1; TOP: 0; LEFT: 0; POSITION: absolute; WIDTH: 199px; _width: 210px; _padding-right: 0px; }
+#plugin br { CLEAR: both; MARGIN: 0; PADDING: 0;  }
+#plugin select { BORDER: 1px solid #333; BACKGROUND: #FFF; POSITION: relative; TOP: 4px; }
+
+#plugHEX { FLOAT: left; position: relative; top: -1px; }
+#plugCLOSE { FLOAT: right; cursor: pointer; MARGIN: 0 8px 3px; _MARGIN-RIGHT: 10px; COLOR: #07628D; -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+#plugHEX:hover,#plugCLOSE:hover { COLOR: #FFD000;  }
+
+#plugCUR { float: left; width: 10px; height: 10px; background: #FFF; margin-right: 3px; }
+
+#SV { background: #FF0000 url('/js/colors/media/SatVal.png'); _BACKGROUND: #FF0000; POSITION: relative; CURSOR: crosshair; FLOAT: left; HEIGHT: 166px; WIDTH: 167px; _WIDTH: 165px; MARGIN-RIGHT: 10px; filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src='media/SatVal.png', sizingMethod='scale'); -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+#SVslide { background: url('/js/colors/media/slide.gif'); HEIGHT: 9px; WIDTH: 9px; POSITION: absolute; _font-size: 1px; line-height: 1px; }
+
+#H { BORDER: 1px solid #000; CURSOR: crosshair; FLOAT: left; HEIGHT: 154px; POSITION: relative; WIDTH: 19px; PADDING: 0; TOP: 4px; -moz-user-select: none; -khtml-user-select: none; user-select: none; }
+#Hslide { BACKGROUND: url('/js/colors/media/slideHue.gif'); HEIGHT: 5px; WIDTH: 33px; POSITION: absolute; _font-size: 1px; line-height: 1px; }
+#Hmodel { POSITION: relative; TOP: -5px; }
+#Hmodel div { HEIGHT: 1px; WIDTH: 19px; font-size: 1px; line-height: 1px; MARGIN: 0; PADDING: 0; }

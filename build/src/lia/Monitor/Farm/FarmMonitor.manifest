@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Ant-Version: Apache Ant 1.9.7
+Created-By: 1.8.0_111-8u111-b14-2ubuntu0.16.10.2-b14 (Oracle Corporati
+ on)
+Main-Class: lia.Monitor.Farm.FarmMonitor
+Class-Path: backport-util-concurrent.jar joesnmp-0.3.3.jar snmp-1.4.1.
+ jar axis.jar commons-logging.jar commons-discovery.jar log4j-1.2.8.ja
+ r jaxrpc.jar saaj.jar wsdl4j.jar jnet.jar mysql-driver.jar postgresql
+ .jar mckoidb.jar update.jar xmlrpc-1.2-b1.jar jep-2.4.0.jar lazyj.jar
+  json-simple-1.1.1.jar ../../Control/lib/abing.jar ../../Control/lib/
+ pathload.jar
+Built-By: costing
+Release-Date: 2016-11-24 09:06
+MonALISA-Version: 16.11.05
+Implementation-Version: 16.11.05-b201611240806
+

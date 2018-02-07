@@ -1,0 +1,140 @@
+<!-- Use this file to deploy some handlers/chains and services      -->
+<!-- Two ways to do this:                                           -->
+<!--   java org.apache.axis.client.AdminClient deploy.wsdd          -->
+<!--      after the axis server is running                          -->
+<!-- or                                                             -->
+<!--   java org.apache.axis.utils.Admin client|server deploy.wsdd   -->
+<!--      from the same directory that the Axis engine runs         -->
+
+<deployment
+    xmlns="http://xml.apache.org/axis/wsdd/"
+    xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <!-- Services from MLWebServiceService WSDL service -->
+
+  <service name="MLWebService" provider="java:RPC" style="rpc" use="encoded">
+      <parameter name="wsdlTargetNamespace" value="urn:lia.ws"/>
+      <parameter name="wsdlServiceElement" value="MLWebServiceService"/>
+      <parameter name="wsdlServicePort" value="MLWebService"/>
+      <parameter name="className" value="lia.ws.MLWebServiceSoapBindingImpl"/>
+      <parameter name="wsdlPortType" value="MLWebService"/>
+
+      <operation name="getValues" qname="operNS:getValues" xmlns:operNS="urn:lia.ws" returnQName="getValuesReturn" returnType="rtns:ArrayOf_tns1_Result" xmlns:rtns="urn:lia.ws" >
+        <parameter name="in0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in1" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in2" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in3" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in4" type="tns:long" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in5" type="tns:long" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+      </operation>
+      
+      <operation name="getConfiguration" qname="operNS:getConfiguration" xmlns:operNS="urn:lia.ws" returnQName="getConfigurationReturn" returnType="rtns:ArrayOf_tns1_WSConf" xmlns:rtns="urn:lia.ws" >
+        <parameter name="in0" type="tns:long" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        <parameter name="in1" type="tns:long" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+      </operation>
+      
+      <operation name="getLatestConfiguration" qname="operNS:getLatestConfiguration" xmlns:operNS="urn:lia.ws" returnQName="getLatestConfigurationReturn" returnType="rtns:ArrayOf_tns1_WSConf" xmlns:rtns="urn:lia.ws" >
+        <parameter name="in0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+      </operation>
+
+      <operation name="getLastValues" qname="operNS:getLastValues" xmlns:operNS="urn:lia.ws" returnQName="getLastValuesReturn" returnType="rtns:ArrayOf_tns1_Result" xmlns:rtns="urn:lia.ws" >
+            </operation>
+
+      <operation name="getFilteredLastValues" qname="operNS:getFilteredLastValues" xmlns:operNS="urn:lia.ws" returnQName="getFilteredLastValuesReturn" returnType="rtns:ArrayOf_tns1_Result" xmlns:rtns="urn:lia.ws" >
+	          <parameter name="in0" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+	          <parameter name="in1" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+	          <parameter name="in2" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+	          <parameter name="in3" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema"/>
+        </operation>
+
+
+      <operation name="networkMeasurementSet" qname="operNS:networkMeasurementSet" xmlns:operNS="http://ws.lia" returnQName="networkMeasurementSetReturn" returnType="rtns:Map" xmlns:rtns="http://xml.apache.org/xml-soap" soapAction="" >
+			  <parameter qname="in0" type="tns:Map" xmlns:tns="http://xml.apache.org/xml-soap" />
+      </operation>
+
+
+      <parameter name="allowedMethods" value="networkMeasurementSet  getConfiguration getValues getLatestConfiguration getLastValues getFilteredLastValues"/>
+
+      <typeMapping
+        xmlns:ns="urn:lia.ws"
+        qname="ns:ArrayOf_tns1_Result"
+        type="java:lia.ws.Result[]"
+        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://ws.lia"
+        qname="ns:WSNode"
+        type="java:lia.ws.WSNode"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://ws.lia"
+        qname="ns:Result"
+        type="java:lia.ws.Result"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="urn:lia.ws"
+        qname="ns:ArrayOf_tns1_WSConf"
+        type="java:lia.ws.WSConf[]"
+        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="urn:lia.ws"
+        qname="ns:ArrayOf_xsd_string"
+        type="java:java.lang.String[]"
+        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://ws.lia"
+        qname="ns:WSConf"
+        type="java:lia.ws.WSConf"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="urn:lia.ws"
+        qname="ns:ArrayOf_tns1_WSNode"
+        type="java:lia.ws.WSNode[]"
+        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://ws.lia"
+        qname="ns:WSFarm"
+        type="java:lia.ws.WSFarm"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="http://ws.lia"
+        qname="ns:WSCluster"
+        type="java:lia.ws.WSCluster"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      <typeMapping
+        xmlns:ns="urn:lia.ws"
+        qname="ns:ArrayOf_tns1_WSCluster"
+        type="java:lia.ws.WSCluster[]"
+        serializer="org.apache.axis.encoding.ser.ArraySerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.ArrayDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+
+  </service>
+</deployment>

@@ -1,0 +1,1 @@
+javac -classpath .:../../../lib/FarmMonitor.jar:../../../lib/backport-util-concurrent.jar *.java

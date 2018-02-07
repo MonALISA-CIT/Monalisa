@@ -1,0 +1,110 @@
+a.menu_link_active:link,
+a.menu_link_active:active,
+a.menu_link_active:visited{
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #3A6C9A;
+    text-decoration: none
+}
+
+a.menu_link_active:hover{
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #3A6C9A;
+    text-decoration: underline
+}                                                
+					
+a.link_buton_start:link,
+a.link_buton_start:active,
+a.link_buton_start:visited{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: none;
+	border: solid 1px #CCCCCC;
+	background-color: #DFF3E4;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+a.link_buton_start:hover{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: underline;
+	border: solid 1px #CCCCCC;
+	background-color: #DFF3E4;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+
+}                                                
+
+a.link_buton_stop:link,
+a.link_buton_stop:active,
+a.link_buton_stop:visited{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: none;
+	border: solid 1px #CCCCCC;
+	background-color: #FFE7E7;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+a.link_buton_stop:hover{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: underline;
+	border: solid 1px #CCCCCC;
+	background-color: #FFE7E7;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+
+}                                                
+
+a.link_buton_tail:link,
+a.link_buton_tail:active,
+a.link_buton_tail:visited{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: none;
+	border: solid 1px #CCCCCC;
+	background-color: #E8F0FF;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+a.link_buton_tail:hover{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	color: #3A6C9A;
+	text-decoration: underline;
+	border: solid 1px #CCCCCC;
+	background-color: #E8F0FF;
+	padding-left: 5px;
+	padding-right: 5px;	
+	padding-top: 0px;
+	padding-bottom: 0px;
+
+}                                                

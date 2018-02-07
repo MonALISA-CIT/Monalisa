@@ -1,0 +1,40 @@
+
+# This is the configuration file for the iNetGeoClient to get information about a WAN link
+
+# The links' name MUST differ from one another and also differ from cities names.
+# A city can have multiple IP addresses and you
+
+# LINK_NAME 	SOURCE_IP 	DEST_IP 	SPEED
+
+Prod-US_OUT	192.65.185.4	192.65.184.25	622
+Prod-US_IN	192.65.184.25	192.65.185.4	622
+TW-CERN_IN	140.109.251.1	140.109.251.61	622
+TW-CERN_OUT	140.109.251.61	140.109.251.1	622
+Buc-Geant_IN    192.65.185.4    217.73.164.12   622
+Buc-Geant_OUT   217.73.164.12   192.65.185.4    622
+DataTag_IN	131.215.144.56	192.65.185.4	10000
+DataTag_OUT	192.65.185.4	131.215.144.56	10000
+#fictive wan CIT-Kek
+CIT-Kek_IN      130.87.4.101    131.215.144.56  2500
+CIT-Kek_OUT     131.215.144.56  130.87.4.101   	2500
+
+
+[Cities]	# do NOT delete this line
+
+# City		Country		LONGITUDE	LATITUDE	IP1*		IP2*		IP3*	...
+
+CatCity		CC		35.02		50.23		141.85.99.136
+AlisCity	AC		45.34		35.04		141.85.99.163
+
+Geneve		CH		6.15		46.22		192.65.185.4	137.138
+Chicago		US		-87.67		41.86		192.65.184.25	140.109.251.1
+Bucharest	RO		26.03		44.26		217.73.164.12	141.85
+Budapest	HU		19.05		47.30		62.40.103.77
+Taipei		TW		121.32		25.05		140.109.251.61
+Pasadena	US		-118.139	34.1503		131.215
+Batavia		US		-87.39		41.51		131.225
+Gainesville	US		-82.35		29.64		128.227
+La_Jola		US		-117.25		32.85		132.239
+Islamabad	PK		73.08		33.40		202.125.153 
+Kek             JP              140.04          36.09           130.87.4.101
+ 

@@ -1,0 +1,5 @@
+jobhistory_JobsCompleted=JobsCompleted
+jobhistory_JobsIdle=JobsIdle
+jobhistory_JobsRemoved=JobsRemoved
+jobhistory_JobsRunning=JobsRunning
+

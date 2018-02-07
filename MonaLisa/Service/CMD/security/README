@@ -1,0 +1,37 @@
+How to to enable your Monalisa service to register in secured LUSs?
+
+
+1) If the machine running the Monalisa service already have a private/public key-pair 
+(i.e Globus host credentials: /etc/grid-security/hostcert.pem and /etc/grid-security/hostkey.pem)
+the following steps must be performed:
+
+    1.1 Change the <monalisa_home>/Service/CMD/getPrivateKey and <monalisa_home>/Service/CMD/getCertificateChain scripts to match
+        the location where credentials can be found.
+        
+    1.2 Contact your system administrator and ask him to add these scripts in "sudoers" list of accepted scripts to be run 
+	with root privileges. (this step is necessary since private key file is only readable by root)
+
+----OR-----
+
+2)Generate Public/Private Key Pair for your Monalisa Service
+
+    2.1 ./csr - generate the private key and the certificate signing request
+    [!] For CommonName field use your host IP such as:
+        host/<your_ip_address>
+        This is used in host authorization when the service registers in LUS
+
+    2.2 Send the service.csr to your CA for signing.
+	The Certificate Authoriy must be trusted by the LUSs services you plan to register into.
+
+    2.3 After you received the signed certificate file (servicecert.pem) place it along with your private key file
+	(servicekey.pem) in your ML farm dir (<FARM_HOME>/servicecert.pem and 
+	<FARM_HOME>/servicekey.pem)
+	
+    2.4	Set in the ml.properties file the following entries in "Register in secured LUSs" Section:
+	
+	    lia.Monitor.useSecureLUSs = true
+	    lia.Monitor.login.sourceForKeys = files
+	    #these files have to be readable by monalisa user
+	    lia.Monitor.login.privateKeyFile = servicekey.pem 
+	    lia.Monitor.login.certChainFile = servicecert.pem
+    

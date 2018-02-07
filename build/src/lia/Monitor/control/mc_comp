@@ -1,0 +1,8 @@
+rm *.class
+javac -classpath $CLASSPATH *.java
+
+(cd ../../../; rmic -v1.2 lia.Monitor.control.MonitorControl)
+rm -f MonitorControl.jar
+(cd ../../../; jar cvfm  lia/Monitor/control/MonitorControl.jar lia/Monitor/control/manifest.mf lia/Monitor/control/*.class lia/Monitor/modules/*.class )
+(cd ../../../; jar uvf   lia/Monitor/control/MonitorControl.jar lia/Monitor/monitor/*.class  lia/Monitor/Farm/FarmMonitor_Stub.class )
+cp  MonitorControl.jar $LIA_HOME/MC_admn

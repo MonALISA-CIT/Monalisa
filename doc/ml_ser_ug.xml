@@ -1,0 +1,2266 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+  <bookinfo>
+    <title>MonALISA User Guide</title>
+<!--    <authorgroup>
+      <author>
+        <firstname>Iosif</firstname>
+        <surname>Legrand</surname>
+        <affiliation>
+          <address>
+            <email>Iosif.Legrand@cern.ch</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Ramiro</firstname>
+        <surname>Voicu</surname>
+        <affiliation>
+          <address>
+            <email>ramiro@roedu.net</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Mihaela</firstname>
+        <surname>Toarta</surname>
+        <affiliation>
+          <address>
+            <email>mickyt@cs.pub.ro</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Costin</firstname>
+        <surname>Grigoras</surname>
+        <affiliation>
+          <address>
+            <email>costing@cs.pub.ro</email>
+          </address>
+        </affiliation>
+      </author>
+      <author>
+        <firstname>Catalin</firstname>
+        <surname>Cirstoiu</surname>
+        <affiliation>
+          <address>
+            <email>catac@cs.pub.ro</email>
+          </address>
+        </affiliation>
+      </author>
+    </authorgroup>
+-->    <copyright>
+      <year>2005</year>
+      <holder>California Institute of Technology</holder>
+    </copyright>
+  </bookinfo>
+  <preface id="preface">
+    <title>Preface</title>
+    <para>The MonALISA framework provides a distributed monitoring service system using
+    JINI/JAVA and WSDL/SOAP technologies. Each MonALISA server acts as a dynamic service
+    system and provides the functionality to be discovered and used by any other services
+    or clients that require such information.</para>
+    <para>MonALISA is entirely written in java. The distribution is packed in several
+    self contain jar files. Practically it is required to have only java installed on the
+    system hosting the MonALISA Service (NOT on the monitored nodes!). The way to
+    configure and use the service is described in this guide. MonALISA also allows to
+    dynamically add new monitoring modules, Filters or Agents.</para>
+    <important>
+      <para>
+	Running a MonALISA service does not require any root privilegies, and we
+	strongly suggest to do not use the service from a root account.
+      </para>
+    </important>
+    <warning>
+      <para>
+	Do not run MonALISA on a distributed file system!
+      </para>
+    </warning>
+  </preface>
+  <chapter id="install-guide">
+    <title>MonALISA Installation Guide</title>
+    <sect1 id="what-you-need">
+      <title>What you need for running MonALISA service?</title>
+      <para>For running a MonALISA service you need to have the java runtime environment
+      (j2se 1.4.2 or higher) installed on one system that will run the Monitoring Service
+      for an entire farm. For development of dedicated modules or agents the user should
+      install the entire JDK.</para>
+      <para>Setting the environment to run java may look like this:</para>
+      <para>
+        <programlisting>
+        JAVA_HOME=$HOME/JAVA/jdk
+        export JAVA_HOME
+        export PATH=$JAVA_HOME/bin:$PATH
+        </programlisting>
+      </para>
+    </sect1>
+    <sect1 id="tools">
+      <title>Tools used for getting monitoring information</title>
+      <para>Collecting the monitoring information can be done in several ways using
+      dynamically loadable modules.</para>
+      <para>It is possible to collect information using: 
+      <itemizedlist>
+        <listitem>
+          <para>SNMP demons;</para>
+        </listitem>
+        <listitem>
+          <para>Ganglia;</para>
+        </listitem>
+        <listitem>
+          <para>LSF or PBS batch queueing systems;</para>
+        </listitem>
+        <listitem>
+          <para>Local or remote procedures to read <filename>/proc</filename> files;</para>
+        </listitem>
+        <listitem>
+          <para>User modules based on dedicated scripts or procedures.</para>
+        </listitem>
+      </itemizedlist></para>
+      <sect2 id="snmp">
+        <title>SNMP</title>
+        <para>MonALISA has dedicated modules to collect values provided by snmp demons.
+        Using snmp modules requires that the snmpd demons are installed and properly
+        configured on the nodes or network elements (switches or routers) the user want
+        to monitor.</para>
+	<para>
+	  Please see <xref linkend="how-to-test-snmp"/> to see how to
+	  test the well installation of snmp.
+	</para>
+      </sect2>
+      <sect2 id="proc-files">
+        <title>Kernel /proc files</title>
+        <para>Modules to collect the system monitoring information from the kernel are
+        part of the MonALISA distribution. These modules are mainly design to be used on
+        the node MonALISA service is running but they may also be used on remote systems
+        via rsh or ssh.</para>
+      </sect2>
+      <sect2 id="ganglia">
+        <title>Ganglia</title>
+        <para>Ganglia is a well known monitoring system which is using a multi cast
+        messaging system to collect system information from large clusters. MonALISA can
+        be easily interfaced with Ganglia. This can be done using the multicast messaging
+        system or the gmon interface which is based on getting the cluster monitoring
+        information in XML format. In the MonALISA distribution we provide modules for
+        both these two possibilities. If the MonALISA service runs in the multicast range
+        for the nodes sending monitoring data, we suggest using the Ganglia module which
+        is a multicast listener. The code for interfacing MonALISA with Ganglia using
+        gmon is 
+        <filename>Service/usr_code/GangliaMod</filename> and using the multicast messages
+        is 
+        <filename>Service/usr_code/GangliaMCAST</filename>. The user may modify these
+        modules. Please look at the service configuration examples to see how these
+        modules may be used.</para>
+      </sect2>
+    </sect1>
+    <sect1 id="installing-ml-service">
+      <title>Installing the MonALISA Service</title>
+      <para>The MonALISA Service package comes with installation scripts which can be
+      followed step-by-step for an automatic installation procedure, or you can manually
+      configure the service.</para>
+      <para>The automatical installation of MonALISA Service: 
+      <itemizedlist>
+        <listitem>
+          <para>The scripts from the distribution that help you install and configure
+          MonALISA are 
+          <filename>install.sh</filename> and 
+          <filename>install2.sh</filename>.</para>
+        </listitem>
+        <listitem>
+          <para>The 
+          <filename>install.sh</filename> script will check to see whether the user is
+          root or not. If the user is not root, then the 
+          <filename>install2.sh</filename> script is executed.</para>
+        </listitem>
+        <listitem>
+          <para>If the user is root then he will be asked for an account from which
+          MonaLisa will run.</para>
+        </listitem>
+        <listitem>
+          <para>If the specified account does not exist then the script will attempt to
+          create one, it will create a 
+          <filename>monalisa_install</filename> directory in this account, it will copy
+          the 
+          <filename>install2.sh</filename> and 
+          <filename>MonaLisa.v1.2.tar.gz</filename> in the user's 
+          <filename>~/monalisa_install</filename> directory, and will start 
+          <filename>install2.sh</filename> from there. After 
+          <filename>install2.sh</filename> finishes its execution, the 
+          <filename>~/monalisa_install</filename> will be deleted.</para>
+        </listitem>
+      </itemizedlist></para>
+      <para>The 
+      <filename>install2.sh</filename> script will ask for a destination folder, unpack
+      the 
+      <filename>MonaLisa.v1.2.tar.gz</filename> file and ask for the farm configuration
+      options. Make sure that the destination folder chosen is not 
+      <filename>.</filename>(
+      <filename>monalisa_install</filename>) or something like (
+      <filename>./monalisa_install/&lt;destination_folder&gt;</filename>) because the 
+      <filename>monalisa_install</filename> directory will be deleted after the
+      installation procedure.</para>
+      <para>After unpacking the service,the 
+      <filename>install2.sh</filename> script will ask the user for abasicconfiguration.
+      You will be asked to set the farm name (default to thehostnameof the computer) and
+      you have to be sure that this name is unique in theMonALISA environment. You will
+      also be asked to set the Latitude and Longitudeof the server. Aproximative values
+      can be found at 
+      <ulink url="http://geotags.com/">http://geotags.com/</ulink>.</para>
+      <para>If the destination folder already contains an older MonALISA installation
+      then all the configuration files are kept unchanged. In fact the
+      <filename>CMD</filename>, 
+      <filename>TEST</filename> and 
+      <filename>VDTFarm</filename> folders remain untouched, which is bad if you runan
+      older version of MonALISA. So if you want to upgrade from an older
+      MonALISAinstallation please choose another destination folder and then heck if
+      thenewly generated configuration is correct.</para>
+      <sect2 id="service-dir-contents">
+	<title>What does the service directory contain ?</title>
+	  <para>After unpacking the service archive, you can find the following structure:
+	  <variablelist>
+	    <varlistentry>
+	      <term>Service</term>
+	      <listitem><para>
+	      <variablelist>
+		<varlistentry>
+		  <term>CMD</term>
+		  <listitem><para>
+		  this directory contains a set of scripts that are used for the management   
+		  of the MonALISA service execution:
+		  <itemizedlist>
+		    <listitem><para>
+		    the <filename>MLD</filename> script is used to start the Monitoring Service 
+		    from <filename>init.d</filename>. See details in 
+		    <xref linkend="start-ml-service-from-initd"/> section from this guide.</para></listitem>
+		    <listitem><para>
+		    the <filename>CHECK_UPDATE</filename> script is used to automatically update
+		    the Monitoring Service. See details in <xref linkend="start-ml-service-with-autoupdate"/>
+		    section from this guide.</para></listitem>
+		    <listitem><para>
+		    the <filename>ML_SER</filename> script is used to start, stop or restart the 
+		    Monitoring Service.</para></listitem>
+		    <listitem><para>
+		    in the <filename>ml_env</filename> file you have to set some environment variables. 
+		    This is the only file from this directory that can be modified. See details about 
+		    how to set these variables in <xref linkend="global-ml-config-file"/> section from 
+		    this guide.</para></listitem>
+		  </itemizedlist>
+		  </para>
+		  </listitem>
+		</varlistentry>
+	      <varlistentry>
+		<term>SSecurity</term>
+		<listitem>
+		  <para>
+		    this directory contains the farm keystore (<filename>FarmMonitor.ks</filename>). 
+		    As an administrator of the farm service, you can export and import certificates or 
+		    create keys using <filename>exportCert</filename>, <filename>importCert</filename> 
+		    and <filename>genKey</filename> scripts.
+		  </para>
+		</listitem>
+		</varlistentry>
+	      <varlistentry>
+		<term>lib</term>
+		<listitem>
+		  <para>
+		    this directory contains the service packages
+		  </para>
+		</listitem>
+		</varlistentry>
+	      <varlistentry>
+		<term>ml_dl</term>
+		<listitem>
+		  <para>
+		    it contains the dl jar for registering in reggie jini service.
+		  </para>
+		</listitem>
+		</varlistentry>
+	      <varlistentry>
+		<term>myFarm</term>
+		<listitem>
+		  <para>
+		    In this directory you can set your farm. It contains the files that defines the 
+		    characteristics of your farm. You can rename it with the name of the farm.
+		  </para>
+		</listitem>
+		</varlistentry>
+	      <varlistentry>
+		<term>usr_code</term>
+		<listitem><para>
+		  this directory contains sources of some module examples. See details in the
+		  <xref linkend="writing-ml-modules"/> section from this guide.</para>
+		</listitem>
+		</varlistentry>
+	      </variablelist>
+	      </para>
+	      </listitem>
+	    </varlistentry>
+	  <varlistentry>
+	    <term>bin</term>
+	    <listitem>
+	      <para>
+		contains tools used from the scripts from <filename>Service/CMD</filename>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>policy</term>
+	    <listitem>
+	      <para>
+		contains policy files for running the MonALISA service.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>util</term>
+	    <listitem>
+	      <para>
+		contains different simple programs, their source and scripts for getting useful information:
+		<variablelist>
+		  <varlistentry>
+		    <term>ShowReceivedValues</term>
+		    <listitem>
+		      <para>
+			a short program example that interrogates a farm database and gets results from it. 
+			It receives as argument a configuration file, like the 
+			<filename>Service/TEST/ml.properties</filename>.
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>ShowStoreConfig</term>
+		    <listitem>
+		      <para>
+			a short program example that parses a farm configuration file (as 
+			<filename>Service/TEST/ml.properties</filename>) received as argument and shows 
+			the database tables structure used.
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>SimpleClient</term>
+		    <listitem>
+		      <para>
+			a program example that finds the MonALISA farm services registered in the reggie 
+			services from the locators given in the <filename>locators.conf</filename> file 
+			and shows their attributes.
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		  <varlistentry>
+		    <term>SimpleDBShell</term>
+		    <listitem>
+		      <para>
+			a set of useful scripts for getting information from a mysql farm database. For 
+			using these scripts you must first edit the <filename>mysql_console.sh</filename>
+			script, set the variables from here and delete the following lines:
+			<screen>echo "Please edit mysql_console.sh first" > /dev/stderr
+exit</screen>
+                        All the other scripts use "mysql_console.sh". Use them for getting information from 
+			the farm database tables.
+		      </para>
+		    </listitem>
+		  </varlistentry>
+		</variablelist>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+      </sect2>
+    </sect1>
+  </chapter>
+  <chapter id="config-guide">
+    <title>MonALISA Configuration Guide</title>
+    <para>
+      There are three configuration files that the user can modify for specifying farm service environment 
+      and characteristics: a global configuration file (<filename>$MonaLisa_HOME/Service/CMD/ml_env</filename>), 
+      and the others used by MonALISA itself (
+      <filename>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/ml.properties</filename> and 
+      <filename>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/&lt;YOUR_FARM_CONF_FILE&gt;.conf</filename>).
+    </para>
+    <sect1 id="global-ml-config-file">
+      <title>Global configuration file</title>
+      <para>
+	The file for the global configuration is <filename>$MonaLisa_HOME/Service/CMD/ml_env</filename>. 
+	The variables that the user has to set or can set are:
+	<variablelist>
+	  <varlistentry>
+	    <term>MONALISA_USER</term>
+	    <listitem>
+	      <para>
+		the name of the user that is running  the service. It will not start from other 
+		account or from the root account.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>JAVA_HOME</term>
+	    <listitem>
+	      <para>
+		the path to your current JDK.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>SHOULD_UPDATE</term>
+	    <listitem>
+	      <para>
+		whether or not MonALISA should check for updates when it is started. If this parameter 
+		is "true" when MonALISA is started, first it will check for updates and after that 
+		it will start. If set to "false" it will not check for updates. This parameter is also
+		used to check for autoupdates when it is running. Please see 
+		<xref linkend="start-ml-service-with-autoupdate"/> from this user guide.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>MonaLisa_HOME</term>
+	    <listitem>
+	      <para>
+		path to your MonALISA installation directory. Environment variables can also be used. 
+		(e.g <filename>${HOME}/MonaLisa</filename>) 
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>FARM_HOME</term>
+	    <listitem>
+	      <para>
+		path to a directory where reside your farm specific files. It's better to place 
+		this directory in the Service directory. (e.g. You can use the variable 
+		<varname>MonaLisa_HOME</varname> defined above. <filename>${MonaLisa_HOME}/Service/MyTest</filename>. 
+		MonALISA comes with a simple example in <filename>${MonaLisa_HOME}/Service/myFarm</filename>.
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>FARM_CONF_FILE</term>
+	    <listitem>
+	      <para>
+		the file used at the startup of the services to define the clusters, nodes and the 
+		monitor modules to be used. It should be in the <filename>${FARM_HOME}</filename> 
+		directory. (e.g <userinput>FARM_CONF_FILE="${FARM_HOME}/mytest.conf"</userinput>).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>FARM_NAME</term>
+	    <listitem>
+	      <para>
+		the name for your farm. (e.g <userinput>FARM_HOME="MyTest"</userinput>). We would like to 
+		ask the users to use short names to describe the SITE on which they are running MonALISA. 
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>JAVA_OPTS</term>
+	    <listitem>
+	      <para>
+		is an optional parameter to pass parameters directly to the Java Virtual Machine (e.g 
+		<userinput>JAVA_OPTS="-Xmx=128m"</userinput>).
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>	
+      </para>
+    </sect1>
+    <sect1 id="ml-service-properties">
+      <title>The MonALISA properties</title>
+      <para>
+	The file <filename>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/ml.properties</filename> 
+	is specific for your farm configuration.
+      </para>
+      <para>
+	 You can specify here:
+	 <itemizedlist>
+	   <listitem>
+	     <para>what lookup services to use (<userinput>lia.Monitor.LUSs</userinput>);</para>
+	   </listitem>
+	   <listitem>
+	     <para>the jini groups that your service should join (<userinput>lia.Monitor.group</userinput>);
+	     </para>
+	   </listitem>
+	   <listitem>
+	     <para>the location of the farm server (<userinput>MonaLisa.LAT, MonaLisa.LONG, 
+	     MonaLisa.Country</userinput>);
+	     </para>
+	   </listitem>
+	   <listitem>
+	     <para>Web Services settings (<userinput>lia.Monitor.startWSDL=true</userinput> starts the 
+	     MonALISA web service, <userinput>lia.Monitor.wsdl_port</userinput>);</para>
+	   </listitem>
+	   <listitem>
+	     <para>database configuration (<userinput>lia.Monitor.keep_history</userinput>  how long to keep 
+	     data in farm database, parameters to configurate database tables, etc.);</para>
+	   </listitem>
+	   <listitem>
+	     <para>parameters for logging (<userinput>.level</userinput> - the logging level -  defaults to 
+	     <userinput>INFO</userinput>, etc.)</para>
+	   </listitem>
+	 </itemizedlist>
+	 You will find explanations before every field for setting it correctly).
+      </para>
+    </sect1>
+    <sect1 id="ml-farm-config">
+      <title>The MonALISA Farm Configuration and Measured Parameters</title>
+      <para>
+	The MonALISA service is using a very simple configuration file to generate the site 
+	configuration and the modules to be used for collecting monitoring information. 
+	By using the administrative interface with SSL connection the user may dynamically 
+	change the configuration and modules used to collect data.
+      </para>
+      <para>
+	It is possible to use the build modules (for snmp, local or remote <filename>/proc</filename> 
+	file...) or external modules. We provide several modules which allow exchanging information 
+	with other monitoring tools. These modules are really very simple and the user can also 
+	develop its own modules.
+      </para>
+      <para>
+	Below we will present a few simple examples in how to make the configuration for a farm. 
+	This file is the <userinput>.conf</userinput> file from your 
+	<filename>Service/&lt;FARM_DIRECTORY&gt;</filename> directory.
+      </para>
+      <sect2 id="ml-farm-config-snmp">
+	<title>Monitoring a Farm using snmp</title>
+	<para>
+	  The configuration file should look like this:
+	</para>
+	<example id="ex-farm-config-with-snmp">
+	  <title>Farm configuration with SNMP</title>
+	  <para>
+	    <screen>
+    *Master   
+    >citgrid3.cacr.caltech.edu citgrid3   
+    monProcLoad%30   
+    monProcStat%30   
+    monProcIO%30
+    
+    *ABPing{monABPing, citgrid3.cacr.caltech.edu, " "}   
+    
+    *PN_CIT
+    >c0-0   
+    snmp_Load%30   
+    snmp_IO%30   
+    snmp_CPU%30   
+    >c0-1   
+    snmp_Load%30   
+    snmp_IO%30   
+    snmp_CPU%30   
+    >c0-2   
+    snmp_Load%30   
+    snmp_IO%30   
+    snmp_CPU%30   
+    >c0-3  
+    snmp_Load%30   
+    snmp_IO%30   
+    snmp_CPU%30</screen>
+	  </para>
+	</example>
+	<para>
+	  The first line (<userinput>*Master</userinput>) defines a Functional Unit (or Cluster).
+	  The second line (<userinput>&gt;citgrid3.cacr.caltech.edu citgrid3</userinput>) adds a node 
+	  in this Functional Unit class and optionally an alias. The lines:
+	  <screen>
+    monProcLoad%30   
+    monProcIO%30   
+    monProcStat%30</screen>
+	  define three monitoring modules to be used on the node "citgrid3". These measurements 
+	  are done periodically, every 30s. The <userinput>monProc*</userinput> modules are using the 
+	  local <filename>/proc</filename> files to collect information about the cpu, load and 
+	  IO. In this case this is a master node for a cluster, were in fact MonALISA service 
+	  is running and simple modules using the <filename>/proc</filename> files used to collect data. 
+	</para>
+	<para>The line:
+    <screen>
+    *ABPing{monABPing, citgrid3.cacr.caltech.edu, " "}
+	</screen>
+	defines a Functional unit named "ABPing" which is using an internal module <userinput>monABPing</userinput>. 
+	This module is used to perform simple network measurements using small UDP packages. It requires 
+	as the first parameter the full name of the system corresponding the real IP on which the ABping 
+	server is running (as part of the MonALISA service). The second parameter is not used. These 
+	ABPing measurements are used to provide information about the quality of connectivity among 
+	different centers as well as for dynamically computing optimal trees for connectivity (minimum 
+	spanning tree, minimum path for any node to all the others...) 	  
+	</para>
+	<para><screen>*PN_CIT</screen>
+	defines a new cluster name. This is for a set of processing nodes used by the site. The 
+	string "PN" in the name is necessary if the user wants to automatically use filters to generate
+	global views for all this processing units.
+	</para>
+	<para>
+	  Then it has a list of nodes in the cluster and for each node a list of modules to be used 
+	  for getting monitoring information from the nodes. For each module a repetition time is
+	  defined (%30). This means that each such module is executed once every 30s. Defining
+	  the repeating time is optional and the default value is 30s. 
+	</para>
+      </sect2>
+      <sect2 id="ml-farm-config-ganglia-gmon">
+	<title>Monitoring a Farm using Ganglia gmon module</title>
+	<para>
+	  The configuration file should look like this:
+	</para>
+	<example id="ex-farm-config-with-ganglia-gmon">
+	  <title>Farm configuration with Ganglia gmon</title>
+	  <para>
+	    <screen>
+    *Master   
+    >ramen gateway    
+    monProcLoad%30   
+    monProcIO%30   
+    monProcStat%30   
+    
+    *PN_popcrn {IGanglia, popcrn01.fnal.gov, 8649}   
+    
+    *ABPing{monABPing, ramen.fnal.gov, " "}   
+    
+    *Internet   
+    >tier2.cacr.caltech.edu   
+    monPing%50
+       </screen>
+	  </para>
+	</example>
+	<para>
+	  The first line (<userinput>*Master</userinput>) defines a Functional Unit (or Cluster).
+	  The Second line (<userinput>&gt;ramen gateway</userinput>) adds a node in this Functional Unit 
+	  class. In this case ramen is a computer name and optionally the user may add an alias 
+	  (gateway to this name).
+	</para>
+	<para>
+The lines:<screen>monProcLoad%30  
+monProcIO%30   
+monProcStat%30</screen>
+	  define three monitoring modules to be used on the node "ramen". These measurements are 
+	  done every 30s. The <userinput>monProc*</userinput> modules are using the local 
+	  <filename>/proc</filename> files to collect information about the cpu, load and IO. 
+	</para>
+	<para>
+	  The line:<screen>*PN_popcrn {IGanglia, popcrn01.fnal.gov, 8649}%30</screen>
+	  defines a cluster named "PN_popcrn" for which the entire information is provided by 
+	  the IGanglia module. This module is using telnet to get an XML based output from 
+	  the Ganglia gmon. The telnet request will be sent to node <userinput>popcrn01.fnal.gov</userinput>
+	  on port 8649.
+	</para>
+	<para>
+	  All the nodes which report to ganglia will be part of this cluster unit and for 
+	  all of them the parameters selected in the IGanglia module will be recorded. This 
+	  measurement will de done every 30s. 
+	</para>
+	<para>
+	  The Ganglia module is located in the <filename>Service/usr_code/GangliaMod</filename>. 
+	  The user may edit the file and customize it. This module is NOT in the MonaLISA jar 
+	  files and for using it the user MUST add the path to this module to the MonaLISA 
+	  loader. This can be done in <filename>ml.propreties</filename> by adding this line:
+	  <screen>lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/GangliaMod/</screen>
+	</para>
+	<para>
+	  The line:<screen>*ABPing{monABPing, ramen.fnal.gov, " "}</screen>
+	  defines a Functional unit named "ABPing" which is using an internal module 
+	  <userinput>monABPing</userinput>. This module is used to perform simple network measurements 
+	  using small UDP packages. The first parameter must be the full name of the system 
+	  which corresponds to the real IP on which the ABping server is running. The second 
+	  parameter is not used.
+	</para>
+	<para>
+	  The next lines:<screen>*Internet    
+ >tier2.cacr.caltech.edu caltech monPing%50 </screen>
+	  define a new functional unit (Internet) having one node <screen>tier2.cacr.caltech.edu</screen> 
+	  with the alias caltech for which a ping measurement is done by the monPing module every 50s. 
+	</para>
+      </sect2>
+      <sect2 id="ml-farm-config-ganglia-multicast">
+	<title>Monitoring a Farm using Ganglia Multicast module</title>
+	<para>
+	  For getting copies of the monitoring data sent by the nodes running the ganglia demons 
+	  (using a multicast port) it is necessary that the system on which MonaLISA is running to 
+	  be in muticast range for these messages.
+	</para>
+	<para>
+	  Adding such a line:
+	  <screen>*PN_cit{monMcastGanglia, tier2, "GangliaMcastAddress=239.2.11.71; GangliaMcastPort=8649"}</screen>
+	  in the configuration file, will use the Ganglia multicast module to listen to all the 
+	  monitoring data and then to select certain values which will be recorded into MonALISA. 
+	  The service system will automatically create a configuration for all the nodes which 
+	  report data in this way. 
+	</para>
+	<para>
+	  The <userinput>PN_cit</userinput> is the name of the cluster of processing nodes. Is is 
+	  important for the cluster name of processing nodes to contain the "PN" string. 
+	  This is used by farm filters to report global views for the farms. 
+	</para>
+	<para>
+	  The <userinput>tier2</userinput> is the name of the system corresponding to the real IP 
+	  address on which this MonALISA service is running. The second parameter defines the 
+	  multicast address and port used by Ganglia. 
+	</para>
+	<para>
+	  The GangliaMcat module is located in the <filename>Service/usr_code/GangliaMCAST</filename>. 
+	  The user may edit the file and customize it. This module is NOT in the MonaLISA jar 
+	  files and to be used, the user MUST add the path to this module to the MonaLISA loader. 
+	  This can be done in <filename>ml.propreties</filename> by adding this line:
+	  <screen>lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/GangliaMCAST/ </screen>
+	</para>
+      </sect2>
+      <sect2 id="ml-farm-config-pbs">
+	<title>Getting Job related information from PBS</title>
+	<para>
+	  To monitor data provided by the PBS, you will need to add these line into the config 
+	  file:<screen>*JOBS
+>tier2   PBSjobs{cmsim,ooHits}%30 </screen>
+	</para>
+	<para>
+	  The first line defines the name of the functional unit (JOBS). The second line 
+	  defines the node (normally the current system) where the PBSJobs module will run. 
+	  The module has a parameter containing a list o jobs for which information will
+	  be provided. The module will run every 30s. The code of the PBSJobs module is in
+	  <filename>Service/usr_code/PBS/</filename> and must be added to the MonaLISA class
+	  loader in similar way like the Ganglia modules.
+	</para>
+      </sect2>
+      <sect2 id="ml-farm-config-apmon">
+	<title>Monitoring Applications</title>
+	<para>MonALISA monitor external applications using ApMon API.
+    In order to configure MonALISA to listen on UDP port 8884 for incoming datagrams 
+    (XDR encoded, using ApMon) you should add the following line 
+    in your config file:
+    <screen>^monXDRUDP{ListenPort=8884}%30 </screen>
+    </para>
+    <para>
+    The Clusters, Nodes and Parameters are dynamically created in MonALISA's configuration tree every time 
+    a new one is received. It is possible, also, to dynamically remove "unused" Clusters/Nodes/Parameters, 
+    if there are no datagrams to match them for a period of time. The timeouts are in seconds:  
+    <screen>^monXDRUDP{ParamTimeout=10800,NodeTimeout=10800,ClusterTimeout=86400,ListenPort=8884}%30 </screen>
+    In the example above the parameters and the nodes are automatically removed from ML configuration tree 
+    if there are no data received for 3 hours (10800 seconds). 
+    The Cluster is removed after one day (24 hours - 86400 seconds).
+	</para>
+    <para>
+        For further informations how to send data into MonALISA please see ApMon API documentation.
+    </para>
+    </sect2>
+    </sect1>
+    <sect1 id="ml-db-config">
+      <title>Database support configuration</title>
+      <para>The configuration options relevant to the storage are set in the 
+      <filename>FARMNAME/ml.properties</filename> file:
+      <screen>lia.Monitor.use_emysqldb=true|false</screen> this will unpack the embedded mysql (if any)
+      <screen>lia.Monitor.use_epgsqldb=true|false</screen> for the embedded postgresql
+      </para><para>
+     If none of these options is enabled then the following options are relevant 
+     for the database server selection:
+     </para>
+     <para><screen>
+lia.Monitor.jdbcDriverString=
+       com.mckoi.JDBCDriver      or
+       com.mysql.jdbc.Driver     or
+       org.postgresql.Driver</screen></para>
+     <para>
+     McKoi is the default database if nothing else is available, but we don't 
+     recommend using it for storing large data structures. If you have a standalone 
+     database server you should disable the embedded 
+     databases and specify the mysql or postgresql driver here accordingly.
+     The following parameters are the connection parameters for the JDBC driver.
+     </para>
+     <para><screen>lia.Monitor.ServerName=IP_ADDRESS
+lia.Monitor.DatabasePort=TCP_PORT
+lia.Monitor.DatabaseName=DB_NAME
+lia.Monitor.UserName=DB_USERNAME
+lia.Monitor.Pass=DB_PASSWORD</screen></para>
+     <para>
+     The actual database structure is determined by the following options:
+     </para><para><screen>
+lia.Monitor.Store.TransparentStoreFast.web_writes=N</screen></para>
+     <para>
+     this option specify the number of tables that are used. For each X=0..N-1 you should have:
+     </para>
+     <para><screen>lia.Monitor.Store.TransparentStoreFast.writer_X.total_time=SECONDS
+lia.Monitor.Store.TransparentStoreFast.writer_X.table_name=UNIQUE_NAME
+lia.Monitor.Store.TransparentStoreFast.writer_X.writemode=MODE
+lia.Monitor.Store.TransparentStoreFast.writer_X.samples=SAMPLES
+lia.Monitor.Store.TransparentStoreFast.writer_X.descr=UNIQUE_STRING</screen></para>
+     <para>
+     SECONDS specify the time period for which the data is stored in the database. 
+     Data older than now()-SECONDS will be automatically deleted.
+     </para>
+     <para>
+     The "table_name" and "descr" should be unique among the other options of the 
+     same kind. "table_name" must be a valid database table name (no spaces and so 
+     on), "descr" can be any string you like.
+     </para>
+     <para>
+      You can store data in either averaged or raw modes. When using and averaged 
+      mode the SAMPLES value determine the number of values that are kept for the 
+      specified interval. For example if you want to store a single value each 
+      minute for an year you should specify SECONDS=31536000 and SAMPLES=SECONDS/60=525600.
+      This is applied separately for each parameter that you store, so such a 
+      database can become rather large.
+      </para>
+      <para>
+      MODE has these possible values:
+      <variablelist>
+         <varlistentry>
+           <term>0: averaged mode</term>
+           <listitem>
+              <para>
+              the table structure will be
+	      <screen>rectime | farm | cluster | node | function | mval   | mmin   | mmax
+long    | text | text    | text | text     | double | double | double</screen>
+              </para>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>1: raw mode</term>
+           <listitem>
+              <para>
+              same structure as 0
+              </para>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>2: raw mode for storing abstract Object values</term>
+           <listitem>
+              <para>
+              seldom used
+              </para>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>3:  averaged mode, data is only kept in memory</term>
+           <listitem>
+              <para>
+              to control the maximum size of the in-memory buffer use:
+              <screen>lia.Monitor.Store.TransparentStoreFast.writer_X.countLimit</screen>
+              if set to -1 then only the time limit given by SECONDS is relevant
+              </para>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>4:  raw mode, in memory, same as 3 but without data averaging</term>
+           <listitem>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>5, 6 : averaged / raw modes for an optimized table structure</term>
+           <listitem>
+              <para>
+              each <filename>farm/cluster/node/function</filename> combination is given an unique ID, stored
+              in <filename>monitor_ids</filename> table, and the database structure is now:
+              <screen>rectime | id | mval | mmin | mmax</screen>
+              this option is the best for large data but with always-changing parameter
+              names (for example netflow data aquisition)
+              </para>
+           </listitem>
+         </varlistentry>
+         <varlistentry>
+           <term>7,8 : averaged / raw modes for another ID-related structure</term>
+           <listitem>
+              <para>
+              for each unique ID a separate table is kept with the data from that series
+              only, the table name will be <filename>UNIQUE_NAME_id</filename> and the structure is
+              <screen>rectime | mval | mmin | mmax</screen>
+              this option is the best one when the data series are constant in time, it
+              works well with up to 10000 table names (10000 unique ids if you have a
+              single table writer, 5000 unique ids if you define 2 separate writers and so on).
+              </para>
+           </listitem>
+         </varlistentry>
+     </variablelist>
+     </para>
+     <important>
+         <para>Modes 7 and 8 only work with PostgreSQL because of some stored 
+         procedures needed to improve response times.
+         </para>
+     </important>
+     <para>
+     For a large data repository we would recommend using PostgreSQL with something like:
+     <screen>lia.Monitor.Store.TransparentStoreFast.web_writes = 2
+
+lia.Monitor.Store.TransparentStoreFast.writer_0.total_time=31536000
+lia.Monitor.Store.TransparentStoreFast.writer_0.samples=525600
+lia.Monitor.Store.TransparentStoreFast.writer_0.table_name=monitor_1y_1min
+lia.Monitor.Store.TransparentStoreFast.writer_0.descr=1y 1min
+lia.Monitor.Store.TransparentStoreFast.writer_0.writemode=7
+
+lia.Monitor.Store.TransparentStoreFast.writer_1.total_time=31536000
+lia.Monitor.Store.TransparentStoreFast.writer_1.samples=5256
+lia.Monitor.Store.TransparentStoreFast.writer_1.table_name=monitor_1y_100min
+lia.Monitor.Store.TransparentStoreFast.writer_1.descr=1y 100min
+lia.Monitor.Store.TransparentStoreFast.writer_1.writemode=7</screen></para>
+     <para>
+     We define 2 separate writers with different averaging intervals (1min and 
+     100min) so the repository can use the proper one in different situations. For 
+     example when plotting a 1-hour chart it will choose the 1min table, but if 
+     you plot a 6-months chart it will choose the 100min one, reducing the number 
+     of operations needed to plot that data. A single writer would either limit 
+     the data resolution or response speed, more than 2 writers add much overhead 
+     and supplemental disk usage without much benefit.
+     </para>
+     <para>
+     Whatever storage type you use there is a memory buffer that is used in 
+     parallel with the disk storage (if any). Its size depends on the maximum JVM 
+     memory (-Xmx parameter) and is dinamically adjusted so that it doesn't use 
+     all of the available memory. When making a history query this is the first 
+     source of data, if more data is needed then a separate database query is 
+     executed to retrieve the remaining interval. In a repository you can see the 
+     current buffer status in <filename>http://......./info.jsp</filename>, look for 
+     something like:
+     <screen>Data cache: values: 252275/262144 (max 262144), time frame: 2:13:29, served 
+requests: 16490</screen>
+     this tells you the number of values in the buffer, what period of time it 
+     holds and how many requests were served from this buffer.
+     </para>
+    </sect1>
+    <sect1 id="ml-farm-files-setup">
+      <title>How to setup the configuration files for your site</title>
+      <itemizedlist>
+	<listitem>
+	  <para>
+	    Go to <filename>"MonaLisa"/Service</filename> directory and create a directory for 
+	    your site (e.g <filename>MySite</filename>). You may copy the configuration files from
+	    one of the available site directory (e.g.: those from the <filename>"MonaLisa"/Service/TEST</filename> 
+	    directory). You must include the following files in you new Farm (<filename>ml.properties</filename>, 
+	    <filename>db.conf.embedded</filename> and <filename>my_test.conf</filename>)	
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Edit the configuration file (<filename>my_site.conf</filename>) to reflect the environment 
+	    you want to monitor.
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    Edit <filename>ml.properties</filename> if you would like to change the Lookup Discovery 
+	    Services that will be used or if you would like to use another DB System. 
+	  </para>
+	</listitem>
+	<listitem>
+	  <para>
+	    You may add a <filename>myIcon.gif</filename> file with an icon of your organization 
+	    in <filename>"MonaLisa"/Service/ml_dl</filename>. 
+	  </para>
+	</listitem>
+      </itemizedlist>
+      <para>
+	The only script used to start/stop/restart "MonaLisa" is <filename>ML_SER</filename> from 
+	this directory. After you have done what is described in <xref linkend="ml-farm-config"/>
+	section you can start using MonALISA:<screen>
+Service/CMD/ML_SER start
+	</screen>
+      </para>
+    </sect1>
+    <sect1 id="start-ml-service-from-initd">
+      <title>How to start a Monitoring Service from init.d</title>
+      <para>
+	Please set correctly <varname>MonaLisa_HOME</varname> and <varname>MONALISA_USER</varname> 
+	variables from <userinput>${MonaLisa_HOME}/Service/CMD/MLD</userinput>.
+      </para>
+      <variablelist>
+	<varlistentry>
+	  <term>For 'Rehat like'</term>
+	  <listitem>
+	    <para>
+	      <screen>
+#cp ${MonaLisa_HOME}/Service/CMD/MLD /etc/init.d 
+#chkconfig --add MLD 
+#chkconfig --level 345 MLD on 
+	      </screen>
+	    </para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>For Debian</term>
+	  <listitem>
+	    <para>
+	      <screen>
+#cp ${MonaLisa_HOME}/Service/CMD/MLD /etc/init.d 
+#update-rc.d MLD start 80 3 4 5 . 
+#update-rc.d MLD stop 86 3 4 5 .
+	      </screen>
+	    </para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </sect1>
+    <sect1 id="start-ml-service-with-autoupdate">
+      <title>How to start a Monitoring Service with Autoupdate</title>
+      <para>
+	This allows to automatically update your Monitoring Service. The cron script will 
+	periodically check for updates using a list of URLs. When a new version is published the 
+	system will check its digital signature and then will download the new distribution as a
+	set of signed jar files. When this operation is completed the MonALISA service will
+	restart automatically. The dependecies and the configurations related with the service
+	are done in a very similar way like the Web Start technology.
+      </para>
+      <para>
+	This functionality makes it very easy to maintain and run a MonALISA service. We 
+	recomnend to use it!
+      </para>
+      <para>
+	In this case you should add <filename>"MonaLisa"/Service/CMD/CHECK_UPDATE</filename> 
+	to the user's crontab that runs MonALISA. To edit your crontab use:
+	<userinput>
+$crontab -e
+	</userinput>
+      </para>
+      <para>
+	Add the following line:<screen>
+*/20 * * * * /&lt;path_to_your_MonaLisa&gt;/Service/CMD/CHECK_UPDATE
+	</screen>
+	This would check for update every twenty minutes. It is resonable value that this
+	value should be >= twenty minutes. To check for update every 30 minutes add the
+	following line instead of the one above.<screen>
+*/30 * * * * /&lt;path_to_your_MonaLisa&gt;/Service/CMD/CHECK_UPDATE
+	</screen>
+      </para>
+      <para>
+	To disable autoupdate you cand edit the <filename>ml_env</filename> file 
+	in <filename>"MonaLisa"/Service/CMD</filename> and set <userinput>SHOULD_UPDATE="false"</userinput>>. 
+	It is no need to remove the script <filename>CHECK_UPDATE</filename> from your crontab.
+      </para>
+      <para>
+	Launch <userinput>"MonaLisa"/Service/CMD/ML_SER start</userinput>. MonALISA should check for 
+	updates now.
+      </para>
+    </sect1>
+    <sect1 id="ml-service-under-fiewall">
+      <title>Running MonALISA behind a firewall</title>
+      <para>
+	The MonALISA service has no problem now running behind a firewall because of the new 
+	proxy services that connect clients with services. If the proxy service cannot create
+	the TCP connection with the farm service because of a firewall, then the farm starts
+	the connection with the proxy. 
+      </para>
+    </sect1>
+    <sect1 id="writing-ml-modules">
+      <title>Writing new Monitoring Modules</title>
+      <para>
+	New Monitoring modules can be easily developed. These modules may use SNMP requests
+	or can simply run any script (locally or on a remote system) to collected the requested
+	values. The mechanism to run these modules under independent threads, to perform the 
+	interaction  with the operating system or to control a snmp session are inherited 
+	from a basic monitoring class. The user basically should only provide the mechanism to
+	collect the values, to parse the output and to generate a result object. It is
+	also required to provide the names of the parameters that are collected by this module.
+      </para>
+      <para>
+        Creating a new module means writing a class that extends the
+        <classname>lia.Monitor.monitor.cmdExec</classname> class and
+        implements <classname>lia.Monitor.monitor.MonitoringModule</classname> interface.
+      </para>
+      <para>
+        This interface has the following structure:<programlisting>
+    package lia.Monitor.monitor;
+
+    public interface MonitoringModule extends lia.util.DynamicThreadPoll.SchJobInt {
+
+    public  MonModuleInfo init( MNode node, String args ) ;
+        public String[] ResTypes() ;
+        public String   getOsName();
+        public Object   doProcess() throws Exception ;
+
+        public MNode getNode();
+
+        public String getClusterName();
+        public String getFarmName();
+
+        public boolean isRepetitive() ;
+
+        public String getTaskName();
+        public MonModuleInfo getInfo();
+
+    }</programlisting>
+
+	The <function>doProcess</function> is actuly the function that
+	collects and returns the results. Usually the return type is a
+	Vector of <classname>lia.Monitor.monitor.Result</classname>
+	objects. It can also be a simple <classname>Result</classname>
+	object.
+      </para>
+      <para>
+	The <function>init</function> function initializes the useful
+	information for the module, like the cluster that contains the
+	monitoring nodes, the farm and the command line parameters for
+	this module. This function is the first called when the farm
+	loads the module.
+      </para>
+      <para>
+	The <function>isRepetitive</function> function tells if the
+	module has to collect results only once or repe-titively. The
+	return values is the <varname>isRepetitive</varname> module
+	boolean variable. If true, then the module is called from time
+	to time. The repetitive time is specified in the &lt;farm&gt;
+	<filename>.conf</filename> file. If not there, then the
+	default repetitive call time is 30s.
+      </para>
+      <para>
+	The rest of functions returns different module information.
+      </para>
+      <para>
+	Examples to generate new modules can be found in 
+	<filename>${MonaLisa_HOME}/Service/usr_code</filename>. 
+      </para>
+      <para>
+	In <filename>usr_code/MDS</filename> is an example of writing the received values
+	into MDS. This is done using a unix pipe to communicate between the dynamically
+	loadable java module and the script performing the update into the LDAP server. 
+      </para>
+      <para>
+	Another simple example which simply print all the values on sysout can be found on
+	<filename>usr_code/SimpleWriter</filename>. 
+      </para>
+      <para>
+	Another example to write the values into UDP sockets is in <filename>usr_code/UDPWriter</filename>.
+      </para>
+    </sect1>
+    <sect1 id="writing-ml-filters">
+      <title>Writing new Filters</title>
+      <para>
+	Filters allow to dynamically create any new type of derived
+	value from the collected values.  Es an example it allow to
+	evaluate the integrated traffic over last n minutes, or the
+	number of nodes for which the load is less than x. Filters may
+	also send an email to a list or SMS messages when predefined
+	complex condition occur. These filters are executed in
+	independent threads and allow any client to register for its
+	output. They may be used to help application to react on
+	certain conditions occur, or to help in presenting global
+	values for large computing facilities.
+      </para>
+    </sect1>
+  </chapter>
+  <chapter id="ml-features">
+    <title>MonALISA Features</title>
+    <sect1 id="remote-control-and-config-of-apps">
+      <title>Remote Control and Configuration of Applications</title>
+      <sect2 id="general-description">
+	<title>General description</title>
+	<para>
+	  MonALISA Service is not just a monitoring tool. Starting
+	  with this version, it has incorporated an Application
+	  Control Interface (AppControl) that allows the farm
+	  administrator to remotely start, stop, restart and configure
+	  different applications. This service starts automatically
+	  when the MonALISA service starts.
+	</para>
+	<para>
+	  <emphasis>The security part</emphasis> is important for this remote
+	  administration interface. All the communication between
+	  clients and server is done over SSL. The server has a
+	  keystore with the clients' public keys, so only the
+	  administrators can access this application.
+	</para>
+	<para>
+	  For each controlled application it must exist a
+	  corresponding module. Each module can have multiple
+	  instances with <emphasis role="bold">different</emphasis>
+	  configuration files.
+	</para>
+	<para>
+	  When a module is loaded you must specify a <emphasis
+	  role="bold">unique</emphasis> file name which will store the
+	  specified modules configuration. After that, you must
+	  correctly configure the module for working properly.
+	</para>
+	<para>
+	  New modules can be added at any time by uploading a
+	  <filename>.jar</filename> file with classes that correspond
+	  with the module functionality and conform to a given
+	  standard. For more details, please see <xref
+	  linkend="writing-app-modules"/> section. The upload of the
+	  new module can be easily done from the client interface.
+	</para>
+	<para>
+	  The AppControl has some default module:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">Apache</emphasis> module lets
+		you start, stop and configure Apache web server
+		remotely.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">Bash</emphasis> module lets you
+		execute commands remotely.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">Proc</emphasis> module is for
+		browsing <!--and (if run as root) changing the values in-->
+		the <filename>/proc</filename> directory.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">MonALISA</emphasis> lets you
+		remotely configure and execute MonALISA service.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	  There are two <emphasis>clients</emphasis> that can be used:
+	  a graphical one incorporated in the MonALISA Client GUI, and
+	  a command line one.
+	</para>
+      </sect2>
+      <sect2>
+	<title>Client-Server Protocol</title>
+	<para>
+	  The protocol is a text based, request-response one. The
+	  server messages have one of the following format:
+	  <screen>+OK
+&lt;lines to be parsed by the client as response&gt;
+.</screen>or<screen>-ERR &lt;error message&gt;</screen>
+	  so the server responses starts with +OK in case of a correct
+	  execution of the client request, or with ERR in case of an
+	  error message. If the response was positive (i.e. +OK), then
+	  the client has to read the actual response until he receives
+	  a single dot on a line. If the original output contained a
+	  single dot on a single line, then this dot is transformed in
+	  two dots by the server, like .. instead of . .
+	</para>
+	<para>
+	  Many of the commands parameters and output strings are
+	  encoded using URLEncoder with UTF-8. Whenever you will see
+	  <emphasis>enc(something)</emphasis> it means that
+	  <emphasis>something</emphasis> is encoded using this
+	  encoder.
+	</para>
+	<para>
+	  The set of commands that the server can process are:
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">availablemodules</emphasis> -
+		lists all the available modules on the server, one per
+		line.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">loadedmodules</emphasis> - lists
+		all the loaded modules on the server, one per line.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">deletemodule
+		enc(&lt;module_name&gt;)
+		enc(&lt;configuration_file&gt;)</emphasis> - when
+		receiving this command, the server will delete the
+		module with <emphasis>&lt;module_name&gt;</emphasis> name and with the
+		configuration file <emphasis>&lt;configuration_file&gt;</emphasis> from the
+		loaded modules.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">createmodule
+		enc(&lt;module_name&gt;)
+		enc(&lt;configuration_file&gt;)</emphasis> - receiving
+		this command, the server will add a new module with
+		name <emphasis>&lt;module_name&gt;</emphasis> and with configuration file name
+		<emphasis>&lt;configuration_file&gt;</emphasis> to the list of loaded modules.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">start enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		starts the module with <emphasis>&lt;module_name&gt;</emphasis> name and with
+		configuration file <emphasis>&lt;configuration_file&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">stop enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		stops the module with <emphasis>&lt;module_name&gt;</emphasis> name and with
+		configuration file <emphasis>&lt;configuration_file&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">restart enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		restarts the module with <emphasis>&lt;module_name&gt;</emphasis> name and with
+		configuration file <emphasis>&lt;configuration_file&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">status enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		returns the status of the module with
+		<emphasis>&lt;module_name&gt;</emphasis> name and with
+		configuration file
+		<emphasis>&lt;configuration_file&gt;</emphasis>. "0"
+		means that the module is stopped, "1" means that the
+		module is running, and "2" means that the satus of the
+		module is unknown.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">info enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		will return the configuration file
+		<emphasis>&lt;configuration_file&gt;</emphasis> of the
+		module <emphasis>&lt;module_name&gt;</emphasis> packed
+		as an XML response. The XML response looks like this:<screen><![CDATA[
+<config app=ApplicationName>
+  <file name=AppConfigurationFileName>
+    <key name=ConfigurationKey value=Value line=N read=true|false write=true|false />
+    <section name=ConfigurationSection value=Value line=N read=true|false write=true|false
+	......
+      Other keys in this section
+	......
+    </section>
+  </file>
+</config>
+]]></screen>
+              For example let's look at a part of the XML for Apache's 
+	      <filename>httpd.conf</filename>:<screen><![CDATA[
+<config app="Apache">
+  <file name="httpd.conf">
+    <key name="ServerType" value="ceva" line="51" read="true" write="true"/>
+    <key name="ServerRoot" value="%22%2Fusr%22" line="62" read="true" write="true"/>
+	    ...
+    <section name="IfModule" value="mod_mime_magic.c" line="506" read="true" write="true">
+      <key name="MIMEMagicFile" value="%2Fetc%2Fapache%2Fmagic" line="507" read="true" write="true"/>
+    </section>
+	    ...
+    <section name="VirtualHost" value="*" line="1010" read="true" write="true">
+      <key name="SeverName" value="localhost" line="1011" read="true" write="true"/>
+    </section>
+  </file>
+</config>
+]]></screen>
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">exec enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)
+		enc(&lt;command&gt;)</emphasis> - this command returns
+		execution results of the command <emphasis>&lt;command&gt;</emphasis> on the
+		module <emphasis>&lt;module_name&gt;</emphasis> with
+		configuration file
+		<emphasis>&lt;configuration_file&gt;</emphasis>.
+		For example, execution the <userinput>ls -l</userinput>
+		command on the bash module makes sense.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">update enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)
+		enc(&lt;update_comm&gt;)</emphasis> - *
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">getconfig
+		enc(&lt;module_name&gt; :
+		&lt;configuration_file&gt;)</emphasis> - this command
+		returns the configuration file of the module
+		<emphasis>&lt;module_name&gt;</emphasis> with
+		configuration file name
+		<emphasis>&lt;configuration_file&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">updateconfig
+		enc(&lt;module_name&gt; : &lt;configuration_file&gt;)
+		enc(&lt;configuration file content&gt;)</emphasis> -
+		this command will modify the content of the
+		configuration file for module
+		<emphasis>&lt;module_name&gt;</emphasis> with
+		<emphasis>&lt;configuration file
+		content&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		<emphasis role="bold">upload enc(&lt;file_name&gt;)
+		enc(&lt;binary file content&gt;)</emphasis> - this
+		command creates a new available module with name
+		<emphasis>&lt;file_name&gt;</emphasis> uploading the
+		<filename>.jar</filename> archive with content
+		<emphasis>&lt;binary file content&gt;</emphasis>.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+      </sect2>
+      <sect2 id="writing-app-modules">
+	<title>Writing New Modules for AppControl</title>
+	<sect3>
+	  <title>The <classname>lia.app.AppInt</classname> interface</title>
+	<para>
+	  All the modules must implement the <classname>lia.app.AppInt</classname> interface
+	  and must be packaged in <filename>.jar</filename> files that exactly respect the
+	  package structure.
+	</para>
+	<para>
+	  The definition for <classname>lia.app.AppInt</classname> is:<programlisting>
+package lia.app;
+
+public interface AppInt {
+
+    public boolean start();
+    public boolean stop();
+    public int     status();
+    public String  info();
+    public String  exec(String sCmd);
+    public boolean update(String sUpdate);
+    public boolean update(String sUpdate[]);
+    
+    public String  getConfiguration();
+    public boolean updateConfiguration(String s);
+
+    public boolean init(String sPropFile);
+    
+    public String  getName();
+    public String  getConfigFile();
+
+} // end of interface AppInt
+</programlisting>
+	</para>
+	<para>
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<function>start()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  This function should start the service and return
+		  <emphasis>true</emphasis> if the service could be
+		  started and <emphasis>false</emphasis> if the
+		  service could not be started.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>stop()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  This function should stop the service and return
+		  <emphasis>true</emphasis> if the service could be
+		  stopped and <emphasis>false</emphasis> if the
+		  service could not be stopped.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>status()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns one of the following codes:
+		  <itemizedlist>
+		    <listitem>
+		      <para>
+			<classname>lia.app.AppUtils.APP_STATUS_STOPPED</classname>
+			(0) - the application is not running
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			<classname>lia.app.AppUtils.APP_STATUS_RUNNING</classname>
+			(1) - the application is running
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			<classname>lia.app.AppUtils.APP_STATUS_UNKNOWN</classname>
+			(2) - application status could not be
+			determined
+		      </para>
+		    </listitem>
+		  </itemizedlist>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>info()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns a string with the application configuration
+		  files as an XML. See the examples above to see how
+		  the XML looks like.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>exec(String)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Executes the given command and returns the output of
+		  the command. You can return null if the application
+		  you are controlling does not accept any user
+		  commands.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>update(String)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Changes the application configuration files
+		  according to the given argument. You should
+		  implement the commands explained in the
+		  Client-Server protocol document. The return value
+		  must be true if the requested update could be done
+		  or false if the configuration could not be updated.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>update(String [])</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Executes a set of updates. It's implementation might
+		  be as simple as: 
+<programlisting>for (int i=0; i&lt;sUpdate.length; i++) update(sUpdate[i]);</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>getConfiguration()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the content of the module's configuration
+		  file as a string value. You should use
+		  <classname>lia.app.AppUtils.getConfig(Properties prop, String sFile)</classname>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>updateConfiguration(String)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Replaces the content of the configuration file with
+		  the given string. You should use
+		  <classname>lia.app.AppUtils.updateConfig(String sFile, String
+		  sContent)</classname>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>init(String)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  This function is called by the main program when the
+		  module is loaded. The parameter is the module's
+		  configuration file. You should use
+		  <classname>lia.app.AppUtils.getConfig(Properties prop, String
+		  sFile)</classname> to read the contents of this file.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>getName()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Should return the complete name of the module to
+		  make sure that there is no conflict in names.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>getConfigFile()</function>
+	      </term>
+	      <listitem>
+		<para>
+		  Returns the configuration file name given as
+		  parameter to <function>init(String)</function>.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</para>
+        </sect3>
+	<sect3>
+	  <title>The <classname>lia.app.AppUtils</classname> class</title>
+	  <para>
+	    This class offers functions that will ease the writing of
+	    new modules. We strongly encourage you to use these
+	    functions so whenever there is a change in the main code
+	    all the modules will keep working.
+	  </para>
+	  <para>
+	    The classes public, static functions are:
+	  </para>
+	  <programlisting>
+    String enc(String s);
+    String dec(String s);
+    String getOutput(String s);
+    String getOutput(String vs[]);
+    java.util.Vector getLines(String s);
+    void getConfig(Properties prop, String sFile);
+    boolean updateConfig(String sFile, String sContent);</programlisting>
+          <para>
+	    <variablelist>
+	      <varlistentry>
+		<term>
+		  <function>enc(String s)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Returns the URLEncoded value of the given
+		    parameter using the UTF-8 charset.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>dec(String s)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Returns the URLDecoded value of the given
+		    parameter using the UTF-8 charset.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>getOutput(String s)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Returns the output generated by the given system
+		    command or null if the command could not be
+		    executed. You can separate the parameters by
+		    spaces and you can enclose a large parameter (with
+		    spaces) between " characters. This function only
+		    builds a <classname>String[]</classname> of the command tokens and calls
+		    <function>getOutput(String vs[])</function>.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>getOutput(String vs[])</function>
+		</term>
+		<listitem>
+		  <para>
+		    Returns the output generated by the given system
+		    command or null if the command could not be
+		    executed.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>getLines(String s)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Returns a <classname>java.util.Vector</classname>
+		    having each line of s as an element. It saves you
+		    from parsing the output of a command or the
+		    content of a text configuration file.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>getConfig(Properties prop, String sFile)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Loads the contents of the sFile file from
+		    <filename>conf/</filename> folder into the prop
+		    <classname>Properties</classname> object. You
+		    should use this method to load the configuration
+		    file instead of directly using the
+		    <filename>conf/sFile</filename> file.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	      <varlistentry>
+		<term>
+		  <function>updateConfig(String sFile, String sContent)</function>
+		</term>
+		<listitem>
+		  <para>
+		    Writes the value of <varname>sContent</varname>
+		    into <varname>sFile</varname>. You should use this
+		    method instead of directly writing the string to
+		    <filename>conf/sFile</filename> file because the
+		    configuration files' location might change in the
+		    future.
+		  </para>
+		</listitem>
+	      </varlistentry>
+	    </variablelist>
+	  </para>
+	</sect3>
+      </sect2>
+      <sect2>
+	<title>Remote Interface for MonALISA Modules Management</title>
+	<para>
+	  As an administrator, you have also access for modules
+	  management in MonALISA Service. Using this interface, which
+	  is also integrated with the MonALISA Client, you can start,
+	  stop, restart or upload a module in MonALISA Service.
+	</para>
+      </sect2>
+      <sect2>
+	<title>Clients for the Application Control Interface</title>
+	<para>
+	  There are two clients: <emphasis>a graphical one</emphasis>
+	  and <emphasis>a command line one</emphasis>.
+	</para>
+	<para>
+	  The simple command line client has a command, <emphasis
+	  role="bold">help</emphasis> which shows all the available
+	  commands and how to use them. For details, please see <xref linkend="general-description"/>.
+	</para>
+	<para>
+	  The graphical interface is integrated in the MonALISA
+	  client, but, for accessing it, you must have the right
+	  keystore. It presents Application Control server commands in
+	  a nice and friendly way.
+	</para>
+      </sect2>
+    </sect1>
+    <sect1 id="ws-for-ml">
+      <title>Web Services for MonALISA</title>
+      <para>
+	A simple Web Service is integrated with the MonALISA service,
+	as well with the MonALISA Repository. The Web service,
+	"MLWebService", provides an interface for publishing the
+	monitoring data using a WSDL/SOAP technology. In this way, any
+	client can connect and receive selected monitoring data.
+      </para>
+      <sect2 id="ws-description">
+	<title>Service description</title>
+	<para>
+	  The service offers a single port type with three operations:
+	  <function>getValues</function>, <function>getConfiguration</function> and
+	  <function>getLatestConfiguration</function>.
+	  <itemizedlist>
+	    <listitem>
+	      <para>
+		the <function>getValues</function> operation
+		interrogates the database and gets all the parameter
+		values for the farm, the cluster, the node and the
+		parameter name specified as arguments. The time when
+		the parameter(s) was registered in the database must
+		be between two moments of time (fromTime and toTime)
+		also specified as operation input. The return type is
+		a complex schema type, an array of results containing
+		all the values taken from the database.
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		the <function>getConfiguration</function> operation
+		interrogates the database and gets all configurations
+		of all farms that were registered in the database
+		between two limits of time (from time and to time)
+		given as input. The return type is a complex schema
+		type, an array of configurations that were found in
+		the database that matched the constraints .
+	      </para>
+	    </listitem>
+	    <listitem>
+	      <para>
+		the <function>getLatestConfiguration</function>
+		operation interrogates the database and returns the
+		last configuration received in the database for a
+		given farm. It receives as input a string, the farm
+		name. It returns a complex schema type that represents
+		the configuration.
+	      </para>
+	    </listitem>
+	  </itemizedlist>
+	</para>
+      </sect2>
+      <sect2 id="ws-implementation">
+	<title>Service implementation</title>
+	<para>
+	  The web service application was developed using Apache Axis
+	  (See <ulink url="http://ws.apache.org/axis">http://ws.apache.org/axis</ulink>).
+	</para>
+	<para>
+	  The interface of the service contains the following
+	  functions:
+	  <variablelist>
+	    <varlistentry>
+	      <term>
+		<function>Result[] getValues (String farmName, String clusterName, String nodeName, String parameterName, long fromTime, long toTime);</function>
+	      </term>
+	      <listitem>
+		<para>
+		  This function can be called in two ways:
+		  <itemizedlist>
+		    <listitem>
+		      <para>
+			specifying negative values for times. For
+			example, if the call is
+			<programlisting>getValues( "*", "*", "*", "*",-3600000,0)</programlisting> 
+			the service will return all the values registered in the
+			database in the last hour.
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			specifying absolute values for time. For
+			example, if the call is 
+			<programlisting>getValues ("*", "*", "*", "*", 1060400000000, 1065000000000)</programlisting> 
+			the service will return all the values registered
+			in the database with the registration time
+			between the two values specified in milliseconds.
+		      </para>
+		    </listitem>
+		  </itemizedlist>
+		</para>
+		<para>
+		  The Result class is a Bean class and has the following description:
+		  <programlisting>
+public class Result {
+    private String farmName;      // the farm name that contains the parameters 
+    private String clusterName;   // the cluster name that contains the parameters 
+    private String  nodeName ;    // the node name that contains the parameters 
+    private String[] param_name ; // the parameters names
+    private double[] param;       // the parameters values
+    private long time;            // the absolute time in milliseconds when this value was   
+                                  // registered in the database
+    ............                  // get/set functions
+}</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>WSConf[] getConfiguration (long fromTime, long toTime);</function>
+	      </term>
+	      <listitem>
+		<para>
+		  The times specified for this function are absolute
+		  moments of time in milliseconds.
+		</para>
+		<para>
+		  The WSConf is a Bean class and has the following description:
+		  <programlisting>
+public class WSConf {
+    private WSFarm wsFarm; // the farm that had this configuration
+    private long confTime; // the time when this configuration was registered in 
+                           // the database
+    .............          // get/set functions
+} 
+		  </programlisting>
+		  the java class that describes a farm:<programlisting>
+public class WSFarm {
+    private String farmName;         // the name of the farm
+    private WSCluster[] clusterList; // the clusters of this farm
+    ..........                       // get/set functions
+}</programlisting>
+                  the java class that describes a cluster:<programlisting>
+public class WSCluster {
+    private String clusterName; // the name of the cluster
+    private WSNode[] nodeList ; // the nodes contained in this cluster
+    ..........                  // get/set functions
+}</programlisting>
+                  the java class that describes a node:<programlisting>
+public class WSNode {
+    private nodeName ;        // the node name
+    private String paramList; // the list of parameters for this node
+    .........                 // get/set functions
+}</programlisting>
+		</para>
+	      </listitem>
+	    </varlistentry>
+	    <varlistentry>
+	      <term>
+		<function>WSConf[] getLatestConfiguration (String farm)</function>
+	      </term>
+	      <listitem>
+		<para>
+		  returns the latest configurations received in the
+		  database for all farms (farm="*") or returns the
+		  latest configuration for a specified farm.
+		</para>
+	      </listitem>
+	    </varlistentry>
+	  </variablelist>
+	</para>
+      </sect2>
+      <sect2 id="ws-client-examples">
+	<title>Clients Examples for MLWebService</title>
+	<para>
+	  An archive with Java and Perl examples of simple
+	  MLWebService clients example can be downloaded from
+	  <ulink url="http://monalisa.cacr.caltech.edu/">http://monalisa.cacr.caltech.edu/</ulink>. 
+	  These examples shows you
+	  how to interrogate the web service from MonALISA and get
+	  monitoring data using the SOAP protocol.
+	</para>
+	<sect3>
+	  <title>MLWebService clients examples presentation</title>
+	  <para>
+	    The client examples presented here can interrogate both
+	    the MLWebService from the Repository and the MLWebService
+	    from the MonALISA service. There are examples for
+	    <emphasis role="bold">Java-Axis</emphasis>, <emphasis
+	    role="bold">WSIF</emphasis> and <emphasis
+	    role="bold">Perl</emphasis>.
+	  </para>
+	</sect3>
+	<sect3>
+	  <title>Examples archive structure</title>
+	  <para>
+	    The sources of the clients examples are located in the
+	    <filename>WS-Clients</filename> directory. There are
+	    special subdirectories in it
+	    (<filename>Java-Axis</filename>,
+	    <filename>Perl</filename>, <filename>Wsif</filename>),
+	    each containing clients developed using different
+	    libraries (<emphasis role="bold">Apache Axis</emphasis>,
+	    <emphasis role="bold">Soap:Lite</emphasis> and <emphasis
+	    role="bold">Apache Wsif</emphasis>). Every client example
+	    calls a function of the MLWebService and is located in a
+	    directory having the name of the called function of the
+	    service. The source of every example is called <emphasis
+	    role="bold">Client</emphasis>
+	    (<filename>Client.java</filename> or
+	    <filename>Client.pl</filename>). There are special scripts
+	    in each directory for automating the installation of used
+	    libraries, the compilation and execution of each client:
+	    <itemizedlist>
+	      <listitem>
+		<para>
+		  for the examples developed in Java (Axis or WSIF)
+		  each example contains the following scripts
+		  <itemizedlist>
+		    <listitem>
+		      <para>
+			the <filename>generate_classes</filename>
+			script uses the WSDL2Java tool for generating
+			the client used classes;
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			the <filename>compile_classes</filename>
+			script compiles the client classes;
+		      </para>
+		    </listitem>
+		    <listitem>
+		      <para>
+			the <filename>run_client</filename> script
+			executes the example.
+		      </para>
+		    </listitem>
+		  </itemizedlist>
+		</para>
+	      </listitem>
+	      <listitem>
+		<para>
+		  for the example developed in Perl, there were used
+		  special modules (<emphasis
+		  role="bold">Soap::Lite</emphasis> and <emphasis
+		  role="bold">Time:HiRes</emphasis>). This modules are
+		  automatically installed using the
+		  <filename>install_soap_lite</filename> and
+		  <filename>install_time_hires</filename> scripts
+		  located in the Perl directory.
+		</para>
+	      </listitem>
+	    </itemizedlist>
+	    For details see the <filename>Readme</filename> files from
+	    every example directory.
+	  </para>
+	</sect3>
+      </sect2>
+    </sect1>
+  </chapter>
+  <chapter id="proxy-service">
+    <title>Proxy Service</title>
+    <para>
+      This service intermediates communication between MonALISA
+      Service and its clients. It registers as a Jini client being, in
+      this way, found by clients. It also finds farms in given lookup
+      services and connects with them. Clients send request messages
+      to the known proxy, which forwards them to the specified farm.
+    </para>
+    <sect1>
+      <title>Why this proxy?</title>
+      <para>
+	This service was introduced because of the following reasons:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      it limits the number of TCP connections to
+	      farms. Without this proxy, every client starts its TCP
+	      connection with every found farm. With a big number of
+	      clients, a farm could be overloaded. But having a number
+	      of proxy services, the number of farm clients is much
+	      greater
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      the number of messages between farms and clients
+	      decreases. For example, without this proxy, every client
+	      received from every farm the same filter messages, but
+	      on its TCP connection. Using the proxy service, this
+	      kind of messages are transmitted only between the farms
+	      and the proxy service and then spread by it to all known
+	      clients interested in those filters.
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      the MonALISA service can now run behind a firewall
+	      without any problem. If the proxy cannot connect to the
+	      found farm, then the farm initiates the TCP connection
+	      with the proxy announcing its presence.
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+    </sect1>
+    <sect1>
+      <title>Where are these proxy services? The communication with clients</title>
+      <para>
+	These proxy services run on different machines and register
+	with known lookup services. The client finds these services
+	and, getting the proxys attributes, makes a decision on which
+	to choose. After choosing one, the communication with farms is
+	intermediated by this one.
+      </para>
+      <para>
+	If the connection with the chosen proxy has died, the client
+	tries to find another one and initiates a new dialog with
+	farms through the new one.
+      </para>
+    </sect1>
+  </chapter>
+  <chapter id="ml-repositories">
+    <title>MonALISA Repositories</title>
+    <para>
+      A Repository is actually a client to farm services that collects
+      data from these services, has dedicated procedures to compress
+      old values and to mediate them and stores the results locally
+      into a relational database (MySQL).
+    </para>
+    <para>
+      These data are used by the Repository to present a WEB synthetic
+      view of the large distributed system. A servlet engine is used
+      to present historical and real time values in a flexible
+      way. The same mechanism is used to offer access to this
+      information from mobile phones using the Wireless Access
+      Protocol (WAP).
+    </para>
+    <sect1>
+      <title>Currently available repositories</title>
+      <para>
+	<variablelist>
+	  <varlistentry>
+	    <term>
+	      WAP
+	    </term>
+	    <listitem>
+	      <para>
+		Please set this address into your mobile phone:
+	      </para>
+	      <para>
+		<ulink url="http://monalisa.cacr.caltech.edu:8080/wap/index.wml">http://monalisa.cacr.caltech.edu:8080/wap/index.wml</ulink>
+	      </para>
+	      <para>
+		It provides real-time information about:
+		<itemizedlist>
+		  <listitem>
+		    <para>
+		      <emphasis role="bold">US-CMS</emphasis> production farms
+		    </para>
+		  </listitem>
+		  <listitem>
+		    <para>
+		      Wide Area Network Traffic from <emphasis
+		      role="bold">CERN</emphasis> and <emphasis
+		      role="bold">PoP in Chicago</emphasis>.
+		    </para>
+		  </listitem>
+		</itemizedlist>
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	  <varlistentry>
+	    <term>
+	      WEB
+	    </term>
+	    <listitem>
+	      <para>
+		<ulink url="http://monalisa.cacr.caltech.edu:8080/index.html">http://monalisa.cacr.caltech.edu:8080/index.html</ulink>
+	      </para>
+	      <para>
+		Provides information about:
+		<itemizedlist>
+		  <listitem>
+		    <para>
+		      <emphasis role="bold">US-CMS</emphasis>
+		      production farms: Farms Usage, Masters Load, IO
+		      Traffic.
+		    </para>
+		  </listitem>
+		  <listitem>
+		    <para>
+		      Wide Area Network Traffic from <emphasis
+		      role="bold">CERN</emphasis> and <emphasis
+		      role="bold">Chicago</emphasis>.
+		    </para>
+		  </listitem>
+		</itemizedlist>		
+	      </para>
+	    </listitem>
+	  </varlistentry>
+	</variablelist>
+      </para>
+      <para>
+	Please see the <ulink
+	url="http://monalisa.cacr.caltech.edu/">http://monalisa.cacr.caltech.edu/</ulink>
+	for other available repositories.
+      </para>
+    </sect1>
+  </chapter>
+  <chapter id="other-related-topics">
+    <title>Other Related Topics</title>
+    <sect1 id="how-to-test-snmp">
+      <title>How to test SNMP</title>
+        <para>You can test the values provided by the snmpd demon (based on how it is
+        configured) by using: 
+        <variablelist>
+          <varlistentry>
+            <term>legacy ucd-snmp</term>
+            <listitem>
+              <para>
+		Use the following command:
+                <screen>$ snmpwalk [-p port_no] system_name community OID</screen>
+              </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>net-snmp</term>
+            <listitem>
+              <para>
+		Use the following command:
+                <screen>$ snmpwalk -v2c -c community system_name[:port_no] OID</screen>
+              </para>
+            </listitem>
+          </varlistentry>
+        </variablelist></para>
+        <example>
+          <title>SNMP</title>
+          <para>
+            <screen>snmpwalk -v2c -c public host_name:161 .1.3.6.1.2.1.2.2.1.10</screen>
+          </para>
+        </example>
+        <para>In the previous example the query is performed on the host "host_name",
+        using default settings for snmp (transport = UDP; port = 161; community =
+        public). The output should look like this: 
+        <screen>IF-MIB::ifInOctets.1 = Counter32: 1430 
+IF-MIB::ifInOctets.2 = Counter32: 966737519</screen></para>
+        <para>For more information in how to configure and use SNMP: 
+        <ulink url="http://www.net-snmp.org/">
+        http://www.net-snmp.org/</ulink>MonALISAprovides snmp modules to collect: 
+        <itemizedlist>
+          <listitem>
+            <para>IO traffic from nodes and network elements</para>
+          </listitem>
+          <listitem>
+            <para>CPU usage</para>
+          </listitem>
+          <listitem>
+            <para>System Load</para>
+          </listitem>
+          <listitem>
+            <para>Disk IO traffic</para>
+          </listitem>
+          <listitem>
+            <para>etc.</para>
+          </listitem>
+        </itemizedlist></para>
+        <para>Here are the OIDs that must be "exported" by the snmpd daemon in order to
+        allow various dedicated MonALISA snmp modules to collect the data: 
+        <variablelist>
+          <varlistentry>
+            <term>snmp_IO</term>
+            <listitem>
+	      <para>
+		Incoming / outgoing network traffic:
+		<screen>IN: .1.3.6.1.2.1.2.2.1.10 
+OUT: .1.3.6.1.2.1.2.2.1.16</screen>
+	      </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>snmp_Load</term>
+            <listitem>
+	      <para>
+		Load5, Load10 and Load15:
+		<screen>.1.3.6.1.4.1.2021.10.1.3</screen>
+	      </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>snmp_CPU</term>
+            <listitem>
+	      <para>
+		CPU_usr, CPU_nice and CPU_idle:
+		<screen>.1.3.6.1.4.1.2021.11</screen>
+	      </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>snmp_MEM</term>
+            <listitem>
+              <para>
+		MEM_free, Swap_MEM_Free
+		<screen>.1.3.6.1.4.1.2021.4</screen>
+	      </para>
+            </listitem>
+          </varlistentry>
+          <varlistentry>
+            <term>snmp_Disk</term>
+            <listitem>
+              <para>
+		FreeDSK, UsedDsk:
+		<screen>.1.3.6.1.4.1.2021.9</screen>
+	      </para>
+            </listitem>
+          </varlistentry>
+        </variablelist>
+	</para>
+    </sect1>
+  </chapter>
+</book>

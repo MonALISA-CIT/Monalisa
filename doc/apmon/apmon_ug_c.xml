@@ -1,0 +1,332 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+<bookinfo>
+  <title>ApMon C User Guide</title>
+  <!--
+      <authorgroup>
+      <author>
+      <firstname>Iosif</firstname>
+      <surname>Legrand</surname>
+	<affiliation>
+	<address>
+	<email>Iosif.Legrand@cern.ch</email>
+	</address>
+	</affiliation>
+	</author>
+	</authorgroup>
+  -->	 
+  <copyright>
+    <year>2005</year>
+    <holder>California Institute of Technology</holder>
+  </copyright>
+</bookinfo>
+
+<chapter id="installation" xreflabel="Installation">
+  <title>Installation</title>
+  
+  <para>
+    The ApMon archive contains the following files and directories:
+    <itemizedlist>
+      <listitem><emphasis>apmon/</emphasis>
+      - directory with the ApMon sources</listitem>
+     <listitem><emphasis>examples/</emphasis>
+     - examples for using the ApMon routines</listitem>
+     <listitem><emphasis>build_apmon.sh, env_apmon</emphasis>
+     - scripts for building and running ApMon</listitem>
+     <listitem><emphasis>lib/</emphasis>
+     - directory created after building ApMon, which contains the ApMon
+     library</listitem> 
+     <listitem><emphasis>README</emphasis></listitem>
+    </itemizedlist> 
+    There is an additional directory, ApMon_docs, which contains the Doxygen
+    documentation of the source files.
+  </para>
+  <para>
+    To compile the ApMon routines and all the examples, type:
+    <screen>./build_apmon.sh</screen>
+  </para>
+  <para>
+    In order to use ApMon, the following files are necessary: the <emphasis>
+    libapmonc.a</emphasis> library (which is placed in the <emphasis>lib/
+    </emphasis> directory after running the build script) and the <emphasis>
+    ApMon.h</emphasis> header file; the <emphasis>utils.h</emphasis> header is 
+    also necessary 
+    for using the ApMon logging facility (see <xref linkend="logging"/>). 
+    The header files are 
+    in the <emphasis>apmon/</emphasis> directory. By sourcing the <emphasis>
+    env_apmon</emphasis> script, the <emphasis>apmon/</emphasis> directory is 
+    included in the CPATH environment variable so that the C compiler 
+    searches it for header files.
+  </para>
+ <para>
+  To compile the ApMon examples, cd to the <emphasis>examples/</emphasis>
+  directory and type:
+  <screen>make</screen>
+  </para>
+</chapter>
+
+<chapter id="using-apmon" xreflabel="Using ApMon">
+  <title>Using ApMon</title>
+
+  <sect1 id="initialization">
+    <title>ApMon Initialization</title>
+    
+    <para>
+      In the C version, the ApMon features are available as functions that 
+      operate on a structure called ApMon. An ApMon structure can be 
+      initialized with one of the functions (see the API docs for more 
+      details):
+
+      <screen>ApMon* apMon_init(char *filename);</screen>
+      - initializes ApMon from a configuration file or webpage, whose name/URL
+      is given as parameter
+
+       <screen>ApMon *apMon_stringInit(char *destinationsList);</screen>
+       - initializes ApMon from a list which contains destination hosts, 
+       specified as "address:[port][ password]", and/or configuration 
+       webpages; the items of list are placed in a string, separated by commas 
+
+       <screen>ApMon *apMon_arrayInit(int nDestinations, char **destAddresses, int *destPorts, char **destPasswds);</screen>
+       - initializes ApMon from a list of destination hosts and the 
+       correspondong lists of ports and passwords
+    </para>
+  </sect1>
+
+  <sect1 id="sending-datagrams">
+    <title> Sending Datagrams</title>
+
+    <para>
+    There are two ways in which the user can send parameter values to MonALISA:
+    <orderedlist numeration="loweralpha">
+	<listitem>a single parameter in a datagram</listitem>
+	<listitem>multiple parameters in a datagram</listitem>
+      </orderedlist>
+    </para>
+    <para>
+      For sending a datagram with a single parameter, the user should call the
+      function <code>apMon_sendParameter()</code> which has several overloaded 
+      variants.
+    </para>
+    <para>  
+      For sending multiple parameters in a datagram, the user should call the
+      function <code>apMon_sendParameters()</code>, which receives as 
+      arguments arrays with the names and the values of the parameters to be 
+      sent.
+    </para>
+    <para>
+      Since version 2.0 there are two additional functions, <code>
+      apMon_sendTimedParameter()</code> and <code>apMon_sendTimedParameters()
+      </code>, which allow the user to specify a timestamp for the parameters.
+    </para>
+    <para>
+      ApMon C does not send parameters whose names are NULL strings or string 
+      parameters that have NULL value (these parameters are "skipped").
+    </para>
+  </sect1>
+
+  <sect1 id="configuring-apmon">
+    <title>Configuring ApMon with the aid of the API</title>
+    
+    <para>
+    The behaviour of ApMon can be configured not only from the configuration 
+    files or webpages, but also with the aid of the API.
+    </para>
+    <para>
+    In order to enable the periodical reloading of the configuration files, 
+    the user should call <code>apMon_setConfRecheck_d()</code>; the value of 
+    the time interval at which the recheck operatins are performed, can be set
+    with the functions <code>apMon_setConfRecheck()</code> or <code>
+    apMon_setRecheckInterval()</code>.
+    </para>
+    <para>
+    To enable/disable the automated job/system monitoring, and also to set the 
+    time intervals, the functions <code>apMon_setJobMonitoring()</code> and 
+    <code>apMon_setSysMonitoring()</code> can be used.
+    </para>
+ </sect1>
+
+ <sect1 id="automated-job-monitoring">
+   <title>Automated Job Monitoring</title>
+   
+   <para>
+     To monitor jobs, you have to specify the PID of the parent process for 
+     the tree of processes that you want to monitor, the working directory, 
+     the cluster and the node names that will be registered in MonALISA (and 
+     also the job monitoring must be enabled). If work directory is "", no 
+     information will be retrieved about disk:
+     <screen>
+       apMon_addJobToMonitor(ApMon *apm, long pid, char *workdir, char *clusterName, char *nodeName);
+     </screen>
+   </para>
+   <para>
+     To stop monitoring a job, the <code>removeJobToMonitor(long pid)</code>
+     should be called.
+   </para>
+ </sect1>
+
+ <sect1 id="logging">
+   <title>Logging</title>
+
+   <para>
+     ApMon prints its messages to the standard output, with the aid of the 
+     <code>logger()</code> function from <emphasis>utils.c</emphasis> (see 
+     the API documentation). The user may print its own messages with this 
+     function (see <emphasis>example_1.cpp</emphasis>, <emphasis>example_2.cpp
+     </emphasis>). Each message has a level which represent its importance.
+     The possible levels are FATAL, WARNING, INFO, FINE, DEBUG. Only the 
+     messages which have a level with greater or equal importance than the 
+     current ApMon loglevel are printed. The ApMon loglevel can be set from 
+     the configuration file (by default it is INFO):
+     <screen>
+       xApMon_loglevel = &lt;level&gt;
+     </screen>
+     e.g.,
+     <screen>
+       xApMon_loglevel = FINE
+     </screen>
+     The ApMon loglevel can also be set with the <code>apMon_setLogLevel()
+     </code> function.
+   </para>
+   <para>
+     For a better understanding of how to use the functions mentioned above, 
+     see the Doxygen documentation and the examples.
+   </para>
+ </sect1>
+
+<sect1 id="restrictions">
+   <title>Restrictions</title>
+  <para>
+   The following values are limited to some constants defined in ApMon.h:
+   <itemizedlist>
+     <listitem>
+       the maximum number of destinations to which the datagrams can be sent 
+       (specified by the constant MAX_N_DESTINATIONS; by default it is 30)
+     </listitem>
+     <listitem>
+       the maximum size of a datagram (specified by the constant 
+       MAX_DGRAM_SIZE; by default it is 8192B and the user should not modify 
+       this value as some hosts may not accept larger datagrams)
+     </listitem>
+     <listitem>
+       the password may have at most 20 characters
+     </listitem>
+     <listitem>
+       the maximum number of jobs that can be monitored is 30 	
+     </listitem>
+   </itemizedlist>
+  </para>
+ </sect1>
+
+</chapter>
+ <chapter id="tutorial">
+   <title>How to Write a Simple C Program with ApMon</title>
+   
+   <para>
+     In this section we show how the ApMon API can be used to write a simple
+     program that sends monitoring datagrams. The source code for this short 
+     tutorial (slightly modified)  can be found in the <emphasis>
+     example_2.c</emphasis> file under the <emphasis>examples/</emphasis>
+     directory.
+   </para>
+   <para>
+     The program generates some double values for a parameter called 
+     "my_cpu_load"  and sends them to the MonALISA destinations. The number of 
+     iterations is given as a command line argument; in each iteration two 
+     datagrams are sent, one with timestamp and one without timestamp. 
+   </para>
+   <para>
+     With this example program we'll illustrate the steps that should usually 
+     be taken to write a program with ApMon:
+   </para>
+   <para>
+
+     1. Include the ApMon headers (and possibly other necessary headers):
+     <screen>
+       #include &lt;stdlib.h&gt;
+       #include &lt;time.h&gt;
+       
+       #include "ApMon.h"
+     </screen>
+   </para>
+   <para>
+     2. Initialize  the variables we shall use...
+     <screen>
+       int main(int argc, char **argv) {
+         char *destinationsList = "rb.rogrid.pub.ro password, http://lcfg.rogrid.pub.ro/~corina/destinations_2.conf";  
+	 int nDatagrams = 20;
+	 ApMon *apm;
+	 double val;
+	 int i, ret, timestamp;
+	 srand(time(NULL));
+	 
+	 if (argc ==2)
+	   nDatagrams = atoi(argv[1]);
+     </screen>
+   </para>
+   <para>
+     3. Initialize the ApMon structure (in this example we used an 
+     intialization list containing the name of a destination host, 
+     rb.rogrid.pub.ro, and a webpage where other destination hosts and 
+     possibly ApMon options can be specified).
+   <screen>
+       /* initialize the ApMon structure */
+       apm = apMon_stringInit(destinationsList);
+       if (apm == NULL)
+       apMon_errExit("\nError initializing the ApMon structure");
+   </screen>
+   </para>
+   <para>
+     4. Adjust ApMon's settings, if necessary (here we set the
+     time interval for reloading the configuration page to 300 sec). This can
+     also be done from the configuration file.
+     <screen>
+           apMon_setRecheckInterval(apm, 300);
+	     nDatagrams = atoi(argv[1]);
+     </screen>
+   </para>
+   <para>
+     5. Send datagrams; we used here two kinds of functions: one that includes
+     a timestamp in the datagram and one that doesn't.
+     <screen>
+         for (i = 0; i &lt; nDatagrams; i++) {
+	   /* add a value for the parameter (random between 0 and 2) */
+	   val = 2 * (double)rand() / RAND_MAX;  
+	   printf("Sending %lf for cpu_load\n", val);
+	   /* use the wrapper function with simplified syntax */
+	   /* (the node name is left NULL, so the local IP will be sent instead) */
+	   ret = apMon_sendParameter(apm, "TestCluster2_c", NULL, "my_cpu_load", XDR_REAL64, (char *)&amp;val);
+     </screen>
+   </para>
+   <para>
+     6. For each datagram, check that it was send successfully. The ApMon 
+     functions return RET_SUCCESS (0) on success and RET_ERROR (-1) if an 
+     error occured.
+     <screen>
+           if (ret != RET_SUCCESS) {
+	     apMon_free(apm);
+	     fprintf(stderr, "\nError sending result");
+	   }
+
+	   /* now send the datagram with a timestamp */
+	   timestamp = time(NULL) - (5 * 3600); /* as if it was sent 5 hours ago */
+	   ret = apMon_sendTimedParameter(apm, "TestCluster2_c_5", NULL, "my_cpu_load", XDR_REAL64, (char *)&amp;val, timestamp);
+	   if (ret != RET_SUCCESS) {
+	     apMon_free(apm);
+	     fprintf(stderr, "\nError sending result");
+	   }
+
+	   sleep(2);
+	 }
+     </screen>
+   </para>
+   <para>
+     7. Destroy the ApMon structure:
+     <screen>
+         apMon_free(apm);
+         return 0;
+       }
+     </screen>
+   </para>
+ </chapter>
+</book>

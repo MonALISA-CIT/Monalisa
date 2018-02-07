@@ -1,0 +1,153 @@
+*****************************************
+PN Modules for OpenPBS/Torque and Condor
+*****************************************
+
+Contents
+--------
+1. General Description
+2. Compiling and Running the Modules
+3. Results Provided by the Modules
+
+----------------------------------------
+ 1. General Description
+----------------------------------------
+The PN modules offer monitoring information about the processing nodes 
+from a cluster. The metrics provided are a subset of the Ganglia metrics
+(see section 3), but the information is obtained from a job manager running on
+the cluster instead of Ganglia. Currently the modules work with Condor and 
+OpenPBS/Torque and the commands used to obtain the nodes' status are:
+  - for Condor: condor_status -l
+  - for OpenPBS/Torque: pbsnodes [-s <server_name>] -a
+
+
+--------------------------------------
+ 2. Compiling and Running the Modules
+----------------------------------------
+In order to use the PN_LCG_Condor and PN_LCG_PBS modules, you should have MonALISA 
+1.2.38 or newer.
+
+If you have the OSG distribution and put the modules in your folder in urs_code
+folder from Monalisa/Service, it is necessary to source two scripts:
+
+	. /OSG/setup.sh
+	. /OSG/MonaLisa/Service/CMD/ml_env
+
+(replace "/OSG" with the path to your OSG directory)
+
+If you have the LCG distribution it is not necessary to source any script.
+
+To compile, just run the "comp" script from the modules' directory:
+
+	./comp
+
+To enable the modules you should add to the farm configuration file a line of 
+the following form:
+
+*<cluster_name>{moduleName, localhost, <arguments>}%<time_interval> 
+
+where:
+cluster_name - the cluster name for the results that this module produces
+moduleName - name of module: monPN_Condor or monPN_PBS
+<arguments> - list of arguments. The arguments that may be passed to the 
+modules are presented below.
+
+
+If the Statistics argument appears in the list of arguments, the module will 
+provide an aditional "cluster" that contains statistics about number of nodes 
+in the cluster.
+For example:
+
+	PN_PBS_LCG_Statistics
+		|____Statistics
+		     (parameters)
+			|_____Total Nodes
+			|_____Total Available Nodes
+			|_____Total Down Nodes
+
+Note: For the PN_LCG_Condor module the "Total Nodes" and "Total Down Nodes" may
+have inaccurate values.
+
+The Server argument indicates the name of PBS server / Condor central manager
+that will be queried. For example:
+	Server=lcfg.rogrid.pub.ro 
+is a valid entry for this parameter. This argument is optional and it can 
+appear more than once in the list; if it doesn't appear, the PBS server from 
+the local machine will be used.
+
+ The UseLocal argument is used to specify that the local PBS server / Condor 
+central manager should be queried; this argument can be used together with one 
+or more Server arguments (in this case, both the local server and the ones
+given by the Server arguments will be queried).
+
+ The RemoteHost argument is used to specify the IP or hostname of 
+a remote host on which the commands will be issued instead of the local 
+machine, via ssh. A username can also be given here (e.g., lcfg.rogrid.pub.ro
+or monalisa@lcfg.rogrid.pub.ro are valid values for this parameter). 
+ATTENTION! If you use this option, you must be able to connect to the remote
+host with ssh without giving a password (e.g., you should use public key
+authentication).
+
+ The CanSuspend argument is a boolean one; if set to true, the module
+is suspended for a period of time if it produces errors three times 
+consecutively when it is run. By default, the value is false. Example:
+	      CanSuspend=true	      
+
+Examples:
+	*PN_Condor{monPN_Condor, localhost}%120
+	*PN_Condor{monPN_Condor, localhost, Statistics}%240
+	*PN_Condor{monPN_Condor, localhost, UseLocal, Server=lcfg.rogrid.pub.ro}%60
+	*PN_Condor{monPN_Condor, localhost, Server=lcfg.rogrid.pub.ro, CanSuspend=false}%80
+	*PN_Condor{monPN_Condor, localhost, Server=lcfg.rogrid.pub.ro, Server=wn1.rogrid.pub.ro}%180
+
+
+	
+
+	
+
+	*PN_PBS{monPN_PBS, localhost}%120
+	*PN_PBS{monPN_PBS, localhost, Statistics}%120
+	*PN_PBS{monPN_PBS, localhost, Server=lcfg.rogrid.pub.ro, CanSuspend=true}%90
+	*PN_PBS{monPN_PBS, localhost, Statistics, Server=gw01.rogrid.pub.ro, server=lcfg.rogrid.pub.ro}%180
+	*PN_PBS{monPN_PBS, localhost, UseLocal, Server=lcfg.rogrid.pub.ro}%90
+
+Note: The verification of the parameter names for these modules is not case
+sensitive (i.e., you can write "statistics" or "Statistics").
+
+When the modules are run, there are some environment variables that should be
+set, which indicate the location of the available queue managers:
+
+- for PBS: if you have PBS, you should set the PBS_LOCATION variable; this
+variable should be set such that the path to the pbsnodes command is
+${PBS_LOCATION}/bin/pbsnodes.
+
+- for Condor: if you have Condor, you should set the CONDOR_LOCATION variable; 
+this variable should be set such that the path to the condor_status command is
+${CONDOR_LOCATION}/bin/condor_status.
+
+If you have the OSG distribuition and you sourced the OSG/setup.sh script,
+all the needed variables are already set and it is not necessary to set any
+other environment variables.
+
+----------------------------------------
+ 3. Results Provided by the Modules
+----------------------------------------
+
+The parameters provided by the PN_Condor and PN_PBS  modules are:
+ 
+    PN_Condor/PN_PBS
+	|____node1
+	|____node2
+	|    (parameters)
+	|	|____NoCPUs
+	|	|____VIRT_MEM_free
+	|	|____MEM_total
+	|	|____Load1
+	|......
+	|____nodeN
+
+
+where:
+	- No_CPUs - the number of CPUs on the node
+	- VIRT_MEM_free - the amount of free memory (physical + swap) in MB
+	- MEM_total - the total amount of physical memory, in MB
+	- Load1 - load average for 1 minute on the node

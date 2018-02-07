@@ -1,0 +1,27 @@
+HOW TO START A LUS
+
+Edit the variable JAVA_HOME (full path) in conf/set_env to point to your current JDK
+PLEASE USE the latest stable version from Sun ( at least 1.4.1_02 )
+
+1) Edit groups (param initialMemberGroups) under Services/LU_reggie/persistent/persistence.config
+
+2) Go to scripts directory ( $cd scripts )
+
+3) Init the Reggie keystore ($./init_LUS_keystore)
+
+4) Import the CAs root certificates. ($./import_CA_cert <alias> <ca_cert.pem>)
+   Only those Jini services started with a certificate signed by these CAs will be able to register in this LUS
+
+5) Start the WebServer ($./jini_httpd start)
+
+6) Start reggie ($./reggie_persistent start)
+
+IMPORTANT
+ Before you start reggie you must start the WebServer.
+
+The logs for the WebServer and Reggie should be found in logs directory.
+
+HOW TO STOP IT
+
+1) stop reggie ( $cd scripts; ./reggie_persistent stop )
+2) stop the WebServer ( $cd scripts; ./jini_httpd stop )

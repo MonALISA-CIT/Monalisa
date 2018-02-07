@@ -1,0 +1,117 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><font size="2"><img src="img/ml_main_top_name_line.png"></font></td>
+		</tr>
+		<tr>
+			<td>
+              <p><strong class="page_title"><font size="+2">&nbsp; WS Clients</font></strong></p>
+            </td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><font size="2"><img src="img/ml_main_top_corner.gif"></font></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal"><font size="2">&nbsp;</font>  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><font size="2"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></font></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<b><font face="Verdana" size="2"><br>
+Introduction:</font></b>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp; The interoperability and
+scalability of Web services offers an easy way for applications to discover,
+communicate and use their functionality.&nbsp;<br>
+There are many existing libraries for developing Web services clients.</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp; This document explains how
+to develop MLWebService clients using Apache Axis (<a href="http://ws.apache.org/axis" target="_blank">http://ws.apache.org/axis</a>),
+Apache WSIF (<a href="http://ws.apache.org/wsif" target="_blank">http://ws.apache.org/wsif</a>)
+and Perl Soap::Lite modules (<a href="http://www.soaplite.com" target="_blank">http://www.soaplite.com</a>).&nbsp;<br>
+</font></p>
+<p><b><font face="Verdana" size="2">MLWebService clients examples presentation:
+</font></b></p>
+<p><font face="Verdana" size="2"><b>&nbsp;&nbsp;&nbsp; </b>The client examples
+presented here can interrogate both the MLWebService from the Repository and the
+MLWebService from the MonALISA service.<b><br>
+<br>
+&nbsp;&nbsp;&nbsp; <i>Examples archive structure:</i><br>
+</b>
+</font><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; Clients examples developed for accessing Web service
+(MLWebService) can be downloaded from <a href="dev_ws_dl.html">here</a>.&nbsp;</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp; The sources of
+the clients examples are located in the WS-Clients directory. There are special
+subdirectories in it (Java-Axis, Perl, Wsif), each containing clients developed
+using different libraries (Apache Axis, Soap:Lite and Apache Wsif). Every client
+example calls a function of the MLWebService and is located in a directory
+having the name of the called function of the service. The source of every
+example is called &quot;Client&quot; (&quot;Client.java&quot; or &quot;Client.pl&quot;).
+There are special scripts in each directory for automating the installation of
+used libraries, the compilation and execution of each client:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; - for
+the examples developed in Java (Axis or WSIF) each example contains the
+following scripts:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- the &quot;<i>generate_classes&quot;</i> script uses the WSDL2Java tool for
+generating the client used classes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- the &quot;<i>compile_classes&quot;</i> script compiles the client classes;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- the &quot;<i>run_client</i>&quot; script executes the example.</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- for the example developed in Perl, there were used special modules (Soap::Lite
+and Time:HiRes). This modules are automatically installed using the &quot;<i>install_soap_lite&quot;
+</i>and &quot;<i>install_time_hires&quot;</i> scripts located in the Perl
+directory.</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp;<i> </i><b><i>Examples
+developed using Apache Axis, Perl SOAP::Lite modules and Apache WSIF:<br>
+</i><br>
+&nbsp;&nbsp;&nbsp;&nbsp;</b>&nbsp; Apache Axis is an implementation of the SOAP
+(Simple Object Access Protocol).</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp;&nbsp; SOAP::Lite for Perl is
+a collection of Perl modules which provide a simple and lightweight interface to
+the Simple Object Access Protocol, both on client and server side.</font></p>
+<p><font face="Verdana" size="2">&nbsp;&nbsp;&nbsp; WSIF (Web Service Invocation
+Framework) is a simple Java API for invoking Web services no matter or how and
+where the services are provided. WSIF is closely based upon WSDL (Web Service
+Description Language - See <a href="http://www.w3.org/TR/wsdl" target="_blank">http://www.w3.org/TR/wsdl</a>),
+so it can invoke any service that can be described in WSDL.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; There are three types of clients, one that
+interrogates the &quot;<i>getConfiguration&quot;</i> function of the service and
+returns the configuration registered in the database in the last week,
+one that interrogates the &quot;<i>getValues</i>&quot; function and returns all
+the parameters and parameter values respecting specified constraints and another
+one that interrogates the &quot;<i>getLatestConfiguration&quot;</i> service
+function and returns the latest configuration received in the database for a
+given farm (See <a href="dev_mlws.html">MLWebService documentation</a>
+for the definition of these functions).</font></p>
+	 
+<p>
+</p>
+</td>
+</tr>
+<tr>
+<td class="normal">
+</td>
+</tr>
+</table>
+</body>
+</html>

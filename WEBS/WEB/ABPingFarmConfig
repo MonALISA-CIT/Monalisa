@@ -1,0 +1,139 @@
+# host and it's peers, separated by spaces
+
+# upb
+se.rogrid.pub.ro pccit6.cern.ch monalisa.sinica.edu.tw tier2b.cacr.caltech.edu
+
+# cern
+pccit6.cern.ch ufloridaDGT.phys.ufl.edu se.rogrid.pub.ro ramen.fnal.gov monalisa.sinica.edu.tw 130.199.130.108 152.92.103.129
+
+# caltech
+tier2.cacr.caltech.edu t2cms0.sdsc.edu antonia.slac.stanford.edu ramen.fnal.gov monalisa.sinica.edu.tw 130.199.130.108
+
+#caltech2
+tier2b.cacr.caltech.edu citgrid3.cacr.caltech.edu se.rogrid.pub.ro
+
+# ucsd
+t2cms0.sdsc.edu tier2.cacr.caltech.edu ufloridaDGT.phys.ufl.edu 
+
+# ufl
+ufloridaDGT.phys.ufl.edu t2cms0.sdsc.edu pccit6.cern.ch ramen.fnal.gov 130.199.6.168 152.92.103.129
+
+# slac
+antonia.slac.stanford.edu tier2.cacr.caltech.edu ramen.fnal.gov 130.199.6.168
+
+# fnal
+ramen.fnal.gov tier2.cacr.caltech.edu antonia.slac.stanford.edu ufloridaDGT.phys.ufl.edu pccit6.cern.ch monalisa.sinica.edu.tw citgrid3.cacr.caltech.edu
+
+# ascc
+monalisa.sinica.edu.tw tier2.cacr.caltech.edu ramen.fnal.gov pccit6.cern.ch se.rogrid.pub.ro
+
+# UERJ
+152.92.103.129 ufloridaDGT.phys.ufl.edu pccit6.cern.ch citgrid3.cacr.caltech.edu
+
+#nust
+202.125.153.141 tier2.cacr.caltech.edu pccit6.cern.ch
+#monalisa.sinica.edu.tw t2cms0.sdsc.edu ufloridaDGT.phys.ufl.edu
+
+130.199.6.168 antonia.slac.stanford.edu ufloridaDGT.phys.ufl.edu 130.199.130.108
+
+#TEST_BNL
+130.199.130.108 tier2.cacr.caltech.edu pccit6.cern.ch ramen.fnal.gov 130.199.6.168
+
+#GRID2003
+citgrid3.cacr.caltech.edu a197107.n1.vanderbilt.edu 128.227.64.91 ramen.fnal.gov a197107.n1.vanderbilt.edu 155.230.20.58 pdsfgrid3.nersc.gov tier2b.cacr.caltech.edu nest.phys.uwm.edu 152.92.103.129 uscmstb0.ucsd.edu
+
+nest.phys.uwm.edu citgrid3.cacr.caltech.edu grid02.uchicago.edu
+
+#phys.ufl.edu spider.usatlas.bnl.gov nest.phys.uwm.edu grid02.uchicago.edu tam01.fnal.gov iuatlas.physics.indiana.edu a197107.n1.vanderbilt.edu
+
+a197107.n1.vanderbilt.edu grid02.uchicago.edu citgrid3.cacr.caltech.edu 155.230.20.58
+grid02.uchicago.edu a197107.n1.vanderbilt.edu nest.phys.uwm.edu 128.227.64.91
+
+
+155.230.20.58 a197107.n1.vanderbilt.edu citgrid3.cacr.caltech.edu
+
+pdsfgrid3.nersc.gov citgrid3.cacr.caltech.edu 
+
+uscmstb0.ucsd.edu citgrid3.cacr.caltech.edu
+
+# UFlorida-PG
+128.227.64.91 citgrid3.cacr.caltech.edu grid02.uchicago.edu a197107.n1.vanderbilt.edu 129.79.228.231
+
+# BNL
+#  spider.usatlas.bnl.gov 128.227.64.91
+
+# IIU_ATLAS_Tier2
+#bh1.uits.indiana.edu 128.227.64.91
+129.79.228.231 128.227.64.91
+
+# IU_iuatlas
+iuatlas.physics.indiana.edu 128.227.64.91
+
+# ALICE
+
+# lxgate02
+lxgate02.cern.ch alicegrid2.ba.infn.it pdsflx002.nersc.gov zeus05.cyf-kr.edu.pl
+
+# lxts04
+lxts04.gsi.de golias.farm.particle.cz
+140.181.96.139 golias.farm.particle.cz
+
+# golias
+golias.farm.particle.cz lxts04.gsi.de alicegrid2.ba.infn.it
+147.231.19.51 lxts04.gsi.de alicegrid2.ba.infn.it
+
+# alicegrid2
+alicegrid2.ba.infn.it lxgate02.cern.ch golias.farm.particle.cz
+193.206.185.119 lxgate02.cern.ch golias.farm.particle.cz
+
+# pdsflx002
+pdsflx002.nersc.gov lxgate02.cern.ch
+128.55.24.102 lxgate02.cern.ch
+
+# zeus05
+zeus05.cyf-kr.edu.pl alicegrid2.ba.infn.it golias.farm.particle.cz
+149.156.9.15 alicegrid2.ba.infn.it golias.farm.particle.cz
+
+# alien
+203.145.188.20 lxgate02.cern.ch alicegrid2.ba.infn.it
+alien.sahagrid.res.in lxgate02.cern.ch alicegrid2.ba.infn.it
+
+# dell26
+dell26.cnaf.infn.it pdsflx002.nersc.gov
+131.154.99.166 pdsflx002.nersc.gov
+
+#alifarm01
+alifarm01.to.infn.it pdsflx002.nersc.gov
+193.206.184.21 pdsflx002.nersc.gov
+
+##################################################
+# ml-test-wn1
+#wn1.rogrid.pub.ro ce.rogrid.pub.ro se.rogrid.pub.ro pccil.cern.ch tier2.cacr.caltech.edu
+
+# ml-test-ce
+#ce.rogrid.pub.ro wn1.rogrid.pub.ro se.rogrid.pub.ro pccil.cern.ch
+
+
+# RTime, the link performance indicator is computed like this:
+# RTime = OVERALL_COEF + RTT_COEF * rtt + PKT_LOSS_COEF * loss% + JITTER_COEF * jitter%
+# lower is better
+
+# double values
+OVERALL_COEF 0
+RTT_COEF 0.5
+PKT_LOSS_COEF 500
+JITTER_COEF 10
+
+# We keep last RTT_SAMPLES rtts (integer value)
+RTT_SAMPLES 6
+
+# The history of Lost Packages is PKT_LOSS_MEM long (integer value)
+PKT_LOSS_MEM 10
+
+# The size of the packet sent over the net (must be bigger than 3 bytes)
+PACKET_SIZE 450
+
+# Time between pings (milliseconds). Should be big enough to alow reasonable time for
+# packets to return to sender and not consider them lost
+PING_INTERVAL 4000
+

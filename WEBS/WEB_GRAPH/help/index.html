@@ -1,0 +1,135 @@
+<html>
+    <head>
+	<title>
+	    MonaLisa Repository FAQ page
+	</title>
+    </head>
+    <body bgcolor=white>
+	<a href="#1">1. How do I create a new chart?</a><br>
+	<a href="#2">2. I want to change the look of the pages. How do I do that?</a><br>
+	<a href="#3">3. Can I start only the storage client, without the web interface?</a><br>
+	<a href="#4">4. How can I get the data from the repository?</a><br>
+	<a href="#5">5. How can I put data into the repository?</a><br>
+	<br>
+	<br>
+	<a name="1"><b>1. How do I create a new chart?</b></a><br>
+	<br>
+	For each chart there is (at least) one <i>.properties</i> file that describes what needs to be plotted.
+	These files are located in <i>REPOSITORY_HOME/tomcat/webapps/ROOT/WEB-INF/conf</i>.<br>
+	<br>
+	There are many types of charts that can be created, for each one there is a sample configuration 
+	file in that folder having each option explained.<br>
+	<br>
+	After you create a configuration file you can test it in the browser typing something like:<br>
+	<i>http://localhost/display?page=your_new_file</i><br>
+	Do NOT specify the <i>.properties</i> extension of the file name. The extension is automatically appended
+	to the name you give as parameter.<br>
+	<br>
+	There are 3 servlets that handle your files:<br>
+	<li><b>display</b>, that handles all the graphical charts</li>
+	<li><b>stats</b>, shows the html (text) statistics</li>
+	<li><b>genimage</b>, to display a map</li>
+	<br>
+	You can safely call <i>display</i> with any file as parameter, it will redirect the request to the proper servlet.<br>
+	<br>
+	To modify the tree structure you need to edit <i>REPOSITORY_HOME/tomcat/webapps/ROOT/WEB-INF/tree1_nodes.js</i>. 
+	<i>tree1_format.js</i> from the same folder controlls the aspect of the tree. To specify which nodes should
+	automatically open when you load the page you must edit <i>leftp.html</i> that is in that folder too.<br>
+	<br>
+	<br>
+	<a name="2"><b>2. I want to change the look of the pages. How do I do that?</b></a><br>
+	<br>
+	All the html code that is used to create the pages is located in <i>REPOSITORY_HOME/tomcat/webapps/ROOT/WEB-INF/res</i>.
+	When editing the <i>.res</i> files that contain the actual html code please make sure you don't 
+	change the special tags (eg. the ones enclosed by <b>&lt;&lt;:</b> and <b>:&gt;&gt;</b>).<br>
+	<br>
+	You can add dynamic html code to some of your pages like this:<br>
+	<li>edit <i>display/hist.res</i> or <i>display/rt.res</i> and enter a unique tag, we suggest something like <b>&lt;&lt;:page.content.1:&gt;&gt;</b></li>
+	<li>in one/any <i>.properties</i> file add an option like:<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<i>page.content.1=Some html code you want to add to that chart</i><br>
+	<br>
+	<br>
+	<a name="3"><b>3. Can I start only the storage client, without the web interface?<b></a><br>
+	<br>
+	Sure thing, edit <i>REPOSITORY_HOME/JStoreClient/njGlobal</i> and comment out the line <i>TOMCAT="true"</i> 
+	and restart the repository. To enable the web interface again just uncomment that line and restart the 
+	repository again.
+	<br>
+	<br>
+	<a name="4"><b>4. How can I get the data from the repository?</b></a><br>
+	<br>
+	There are more ways of doing this:
+	<li>You can directly extract the data from the database, but we don't recommend this. We already have three database 
+	formats now and we don't guarantee there won't be some other format available in the future.</li>
+	<li>You can use the WebServices interface that is automatically deployed with the repository. 
+	To use this please take a look at some sample programs in <i>REPOSITORY_HOME/WS-Clients</i></li>
+	<li>You can include the storage client in your own Java application. In <i>REPOSITORY_HOME/Embedded</i> is a 
+	simple application that starts the MonaLisa client and waits to receive some data. For each data that
+	matches some rules the value that was received and the average value in the last 30 minutes for that
+	data are displayed.</li>
+	<li>There is also a more direct method of connecting to the repository through TCP/IP, a sample code
+	is provided in the <i>REPOSITORY_HOME/DirectClient</i> folder. Please take note that we <b>don't</b>
+	recommend using this method to connect to the repository. The WebService is far more flexible for
+	distance connections while embedding the repository in your application will provide the best 
+	possible performance. But this method can have its uses too so feel free to use it if it suits your 
+	needs.</li>
+	<br>
+	<br>
+	<a name="5"><b>5. How can I put data into the repository?</b></a><br>
+	<br>
+	We recommend you to write MonALISA service modules and set the repository to store the data that is 
+	produced by the service.
+	But if you don't want to have a MonALISA service installed you can directly insert data into the repository.
+	For this you have to write a script/program that writes on the standard output lines with the following format:<br>
+	&nbsp;&nbsp;&nbsp;&nbsp;<code>FARMNAME CLUSTER NODE FUNCTION VALUE TIME</code><br>
+	<br>
+	<code>FARMNAME</code> : string<br>
+	<code>CLUSTER</code> : string<br>
+	<code>NODE</code> : string<br>
+	<code>FUNCTION</code> : string<br>
+	<code>VALUE</code> : double<br>
+	<code>TIME</code> : longint (absolute time of the event in milliseconds, like <code>System.currentTimeMillis()</code> from Java)<br>
+	<br>
+	The columns are separated by a single tab character (<code>\t</code>).<br>
+	<br>
+	A simple sample script that produces correct output:<br>
+	<br>
+	<pre><code>
+	#!/bin/bash
+	
+	FARM=MyFarm
+	CLUSTER=LoadAvg
+	NODE=localhost
+	TIME=`date "+%s"000`
+	
+	function process(){
+	    echo -e "${FARM}\t${CLUSTER}\t${NODE}\tLoad5\t$1\t${TIME}"
+	    echo -e "${FARM}\t${CLUSTER}\t${NODE}\tLoad10\t$2\t${TIME}"
+	    echo -e "${FARM}\t${CLUSTER}\t${NODE}\tLoad15\t$3\t${TIME}"
+	}
+	
+	process `cat /proc/loadavg`
+	</code></pre><br>
+	Now you need to modify the <i>App.properties</i> file located in <i>REPOSITORY_HOME/JStoreClient/conf</i>.
+	You have to add/edit the following options:<br>
+	<code>lia.Monitor.JStore.inserters=<i>N</i></code> : <i>N</i> is the number of scripts you have<br>
+	for each script you have to define two options:<br>
+	<code>lia.Monitor.JStore.execute_<i>X</i>.path=<i>/path/to/your/script.sh</i></code><br>
+	<code>lia.Monitor.JStore.execute_<i>X</i>.time=<i>how often is this script run (in seconds)</i></code><br>
+	<br>
+	For example:<br>
+	<code>lia.Monitor.JStore.inserters=2<br>
+	<br>
+	lia.Monitor.JStore.execute_0.path=/home/monalisa/MLrepository/bin/myscript.sh<br>
+	lia.Monitor.JStore.execute_0.time=60<br>
+	<br>
+	lia.Monitor.JStore.execute_1.path=/home/monalisa/MLrepository/bin/myotherscript.sh<br>
+	lia.Monitor.JStore.execute_1.time=120<br>
+	</code>
+	<br>
+	<br>
+	<br>
+	For any other questions regarding the repository please contact us at : 
+	<a href="mailto:developers@monalisa.cern.ch?Subject=Repository">developers@monalisa.cern.ch</a>.<br>
+    </body>
+</html>

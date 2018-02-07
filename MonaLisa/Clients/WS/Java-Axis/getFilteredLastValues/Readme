@@ -1,0 +1,39 @@
+
+Client developed using Apache Axis for the "MLWebService".
+Invoking the "getValues" function of the MLWebService.
+
+Apache Axis is an implementation of the SOAP (Simple Object Access
+Protocol).  
+
+The "getFilteredLastValues" operation interrogates the database for getting
+the last received results. It takes as input farm name - the name of the farm 
+interested in, cluster name -the name of the cluster intrested in, node 
+name - the name of the node interested in, parameter name - the
+parameter name interested in. 
+
+The return value is complex schema type, an array of results.
+
+This client is called from the command line running the following scripts:
+     - ./generate_classes - generate classes from service wsdl file;
+                            The tool used for generating the needed classes
+			    is "WSDL2Java" which generates Bean classes for
+			    return and parameter complex types  starting
+			    from the wsdl service description file.
+			     
+     - ./compile_classes - compile client classes
+     - ./run_client "*" "*" "*" "*" - in this case the service URL will be
+    				      taken from the environment variable
+				      MONALISA_WS;
+        or
+       ./run_client "*" "*" "*" "*" "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService"
+
+and will return the last known results from all the farms ("*") - the first argument,
+all the clusters ("*") - the second argument, all the nodes ("*") - the
+third argument, all the parameters ("*") - the forth argument.
+
+Another example 
+
+./run_client  "*" "Master" "*" "Load5" "http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService"
+and will return the last known results from all farms ("*") - the first argument,
+from the cluster named "Master" - the second argument, all the nodes ("*") - the
+third argument, the "Load5"  parameter  - the forth argument.

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+  <servlet>
+    <servlet-name>index</servlet-name>
+    <display-name>index</display-name>
+    <servlet-class>
+	lia.web.servlets.wap.index
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <servlet>
+    <servlet-name>rt</servlet-name>
+    <display-name>rt</display-name>
+    <servlet-class>
+	lia.web.servlets.wap.rt
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- ................................. -->
+    
+  <servlet-mapping>
+    <servlet-name>index</servlet-name>
+    <url-pattern>/index</url-pattern>
+  </servlet-mapping>
+  
+  <servlet-mapping>
+    <servlet-name>rt</servlet-name>
+    <url-pattern>/rt</url-pattern>
+  </servlet-mapping>
+    
+  
+  <!-- ................................. -->
+  
+  <mime-mapping>
+      <extension>wbmp</extension>
+      <mime-type>image/vnd.wap.wbmp</mime-type>
+  </mime-mapping>
+
+  <mime-mapping>
+      <extension>wml</extension>
+      <mime-type>text/vnd.wap.wml</mime-type>
+  </mime-mapping> 
+  
+  <!-- ................................. -->
+
+  <welcome-file-list>
+    <welcome-file>
+      index.jsp
+    </welcome-file>
+  </welcome-file-list>
+
+</web-app>

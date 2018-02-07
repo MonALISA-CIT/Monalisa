@@ -1,0 +1,49 @@
+#!/bin/sh -
+#
+#	MLrepository $Id: repository,v 1.1 2004-01-22 15:01:55 costing Exp $
+# 
+# chkconfig: 2345 95 5
+# description: MonaLisa Web Repository
+#
+# repository	Script to stop/start MLrepository
+#
+# Author:       Costin Grigoras <costing@cs.pub.ro>
+#
+
+# Source function library. Not needed
+#. /etc/rc.d/init.d/functions
+
+#Don't delete the following line. Needed for RedHat compatibility !!!
+#daemon repository
+
+MLUSER="__mluser__"
+MLPATH="__mlpath__"
+
+stop_mlrepository() {
+    su - $MLUSER -c "$MLPATH/stop.sh"
+}
+
+start_mlrepository() {
+    su - $MLUSER -c "$MLPATH/start.sh"
+}
+
+# See how we were called.
+case "$1" in
+  start)
+	echo "Initializing MLrepository ..."
+	start_mlrepository ;;
+  stop)
+	echo "Stopping MLrepository ..."
+	stop_mlrepository ;;
+  status)
+	echo "Command not implemented" ;;
+  restart|reload)
+	echo "Restarting MLrepository ..."
+	stop_mlrepository
+	start_mlrepository ;;
+  *)
+	echo "Usage: repository {start|stop|restart|reload}"
+	exit 1
+esac
+
+exit 0

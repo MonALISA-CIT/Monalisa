@@ -1,0 +1,4 @@
+java -classpath .:monalisa_hawkeye.jar:$MonaLisa_HOME/Service/lib/FarmMonitor.jar: \
+ -Dcondor.MonaLisa.HawkeyeModule.config_file=HawkeyeModuleConfig \
+ -Dcondor.MonaLisa.PoolHawkeyeModuleAdd.config_file=PoolHawkeyeModuleAddConfig \
+  PoolHawkeyeModuleAdd condor-unsup-7.cs.wisc.edu:9618

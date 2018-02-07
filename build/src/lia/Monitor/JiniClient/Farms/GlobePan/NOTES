@@ -1,0 +1,6 @@
+The Earth is given a radius of 1.0. Everything else should be sized accordingly.
+
+If you try to make the Mmap the topmost tab, with the GlobePanel3D underneath,
+the 3D scene will initially be rendered over the Mmap panel. The solution:
+set up the application with the GlobePanel3D on top by default, or manually
+call setSelectedComponent() on the TabbedPane component holding the panels.

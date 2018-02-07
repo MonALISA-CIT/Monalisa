@@ -1,0 +1,125 @@
+/*
+ * This is an example policy file to use with RMID and the policy
+ * files in this directory.  JDK1.2.2_006 and later require an "exec
+ * policy" to be setup for RMID to control what executables and
+ * command line options can be used to setup activation groups (an
+ * activation group is effectivly a discription of how to set up a
+ * JVM).  One way to setup an exec policy for RMID is to use a
+ * security policy file with RMID and grant various
+ * "com.sun.rmi.rmid.ExecPermission" and
+ * "com.sun.rmi.rmid.ExecOptionPermission" permissions to allow
+ * various command lines.  This file is an example of such a security
+ * policy file.  You can set RMID's security policy file with
+ * following command line option to RMID:
+ *
+ *     -J-Djava.security.policy=/files/jini1_1/policy/policy.rmid
+ * 
+ * As a practical matter setting up an exec policy in this way
+ * requires knowing where the starter kit was installed.  To get
+ * around this we have used the property expansion feature of policy
+ * files to abstract out the location of the starter kit.  This makes
+ * it likely that you will be able to use the file directly without
+ * editing if you simply set the com.sun.jini.jsk.home property on
+ * RMID to be the top level directory of the starter kit.  If the top
+ * level directory of the starter was /files/jini1_1 you could set
+ * this property on RMID with:
+ *
+ *     -J-Dcom.sun.jini.jsk.home=/files/jini1_1
+ *
+ * If for some reason you can't set this property on RMID you will need
+ * to replace each occurrence of "${com.sun.jini.jsk.home} in this file
+ * with the directory in which you unpacked the starter kit.
+ *
+ * You will also need to edit this file if you add your own
+ * activatable services, need to run with a specific VM, or
+ * need to run the various services with other command line options.
+ *
+ * For more information on RMID exec polices see:
+ *     doc/release-notes/jsk/execpolicy.html
+ *     (also at http://developer.java.sun.com/developer/products/jini/execpolicy.html)
+ *     http://java.sun.com/j2se/1.3/docs/tooldocs/solaris/rmid.html 
+ */
+grant {
+    /*
+     * There are two types of grants.  The first is
+     * com.sun.rmi.rmid.ExecPermission which allows services to use some
+     * other VM implementation than the default "java" executable
+     * associated with RMID.  This allows you to use something like
+     * java_g, or a VM from a different release of the JDK, etc.  You
+     * will need a permission like this if you want to use the
+     * optional "server_jvm" argument when creating one of the
+     * services provided with the starter kit.  Most people don't need
+     * this so we don't include any ExecPermissions
+     */
+    // permission com.sun.rmi.rmid.ExecPermission /usr/j2se/bin/java_g
+
+    /*
+     * The other type of grant is ExecOptionPermission which controls
+     * what arguments can be passed to the jvm when starting an activation
+     * group.
+     */
+
+    // Let everyone use any codebase they want
+    permission com.sun.rmi.rmid.ExecOptionPermission 
+	"-Djava.rmi.server.codebase=*";
+
+    // Most of the services in the starter kit setup their classpath
+    // using the -cp option.
+    permission com.sun.rmi.rmid.ExecOptionPermission
+        "-cp";
+
+    // Make it easy to turn on discovery, join, and reggie proxy debugging
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Dcom.sun.jini.reggie.proxy.debug=*";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Dnet.jini.discovery.debug=*";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Dcom.sun.jini.join.debug=*";
+    /*
+     * We now have a section for each activatable service that ships
+     * with starter kit.  For each we grant two permissions: the
+     * policy file to use, and the classpath (which combines with the grant
+     * for -cp above).
+     */
+
+    // Reggie - Our contributed lookup service implementation
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${/}cil${/}CIL${/}myAGENT1${/}policy${/}policy.reggie";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"${/}cil${/}CIL${/}JINI${/}my_jini11${/}source${/}vob${/}jive${/}lib${/}reggie.jar";
+         
+
+    // Mahalo - Our contributed tranaction manager implementation
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${com.sun.jini.jsk.home}${/}policy${/}policy.mahalo";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"${com.sun.jini.jsk.home}${/}lib${/}mahalo.jar";
+
+    // Fiddler - Our contributed lookup discovery service implementation
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${com.sun.jini.jsk.home}${/}policy${/}policy.fiddler";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"${com.sun.jini.jsk.home}${/}lib${/}fiddler.jar";
+
+    // Mercury - Our contributed event mailbox implementation
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${com.sun.jini.jsk.home}${/}policy${/}policy.mercury";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"${com.sun.jini.jsk.home}${/}lib${/}mercury.jar";
+
+    // Norm - Our contributed lease renewal service implementation
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${com.sun.jini.jsk.home}${/}policy${/}policy.norm";
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"${com.sun.jini.jsk.home}${/}lib${/}norm.jar";
+
+    // Outrigger (aka FrontEndSpace) - Our contributed implementation of 
+    // of a persistent JavaSpace(tm) service (we don't need one for
+    // transient space because it is not activatable)
+    permission com.sun.rmi.rmid.ExecOptionPermission
+	"-Djava.security.policy=${com.sun.jini.jsk.home}${/}policy${/}policy.outrigger";
+    // Ourigger loads its classes through the boot class path, not
+    // the application classloader
+    permission com.sun.rmi.rmid.ExecOptionPermission
+        "-Xbootclasspath/p:${path.separator}${com.sun.jini.jsk.home}${/}lib${/}outrigger.jar${path.separator}${com.sun.jini.jsk.home}${/}lib${/}transient-outrigger.jar${path.separator}${com.sun.jini.jsk.home}${/}lib${/}pro.zip";
+};

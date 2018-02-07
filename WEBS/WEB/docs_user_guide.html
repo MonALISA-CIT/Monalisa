@@ -1,0 +1,490 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>MonALISA</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">&nbsp; User Guide</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+<tr>
+	<td align="center"><p class="normal"><font size="+2"><strong class="page_title">MonALISA&nbsp;User&nbsp;Guide</strong></font>
+		<br>version 1.0, September 14, 2003</p></td>
+	<td width="100%"></td>
+	<td align="center"><a href="documentation/MonALISA_User_Guide.pdf"><img src="img/icon_pdf.gif" border="0"><br>PDF&nbsp;version</a></td>
+</tr>
+</table><br>
+<p>
+The MonALISA framework  provides a distributed monitoring service system using JINI/JAVA  and WSDL/SOAP technologies. 
+Each MonALISA server  acts as a dynamic service system and provides the functionality to be discovered and used by 
+any other services or clients that require such information. 
+<br><br>
+MonALISA is entirely written in java. The distribution is packed in several self contain jar files. Practically it 
+is required to have only java installed on the system hosting the MonALISA Service (NOT on the monitored nodes!).  
+The way to configure and use  the service is described in this guide. MonALISA also allows to dynamically 
+add new  monitoring modules, Filters or Agents. 
+</p>
+<font color="#FF0000"><p class="attention">Running a MonALISA service does not require any root privilegies, and we 
+	<strong>strongly suggest</strong> to do not use the service from a root account.</p></font>
+<br>
+<font size="+1"><strong class="page_subtitle">Java</strong></font>
+<p>For running a MonALISA service you need to have the java runtime environment (j2se 1.4.2 or higher) 
+installed on one system that will run the Monitoring Service for an entire farm. For development of 
+dedicated modules or agents the user  should install the entire JDK.</p>
+<p>Setting  the environment to run java may look like this:</p>
+<pre>   JAVA_HOME=$HOME/JAVA/jdk 
+   export JAVA_HOME
+   export PATH=$JAVA_HOME/bin:$PATH</pre>
+<br>
+<font size="+1"><strong class="page_subtitle">The monitoring Information</strong></font>
+<p>Collecting the monitoring information can be done  in several ways using dynamically loadable modules.<br>
+It is possible to collect information using:
+<ul>
+  <li> SNMP demons</li>
+  <li> Ganglia</li>
+  <li> LSF  or PBS batch quing systems   </li>
+  <li> Local or remote procedures to read <tt>/proc</tt> files </li>
+  <li> User modules based on dedicated scripts or procedures.</li>
+</ul>
+<p></p>
+<br>
+<font size="+1"><strong class="page_subtitle">SNMP</strong></font>
+<p>MonALISA has dedicated modules to collect values provided by snmp demons. 
+Using snmp modules requires  that  the snmpd demons are  installed and properly configured on the 
+nodes or network elements (switches or routers) the user want to monitor. </p>
+<p>You can test the values provided by the snmpd demon (based on how it is configured) by  using:</p>
+<ul>
+	<li>legacy ucd-snmp:  <tt>$snmpwalk  [-p port_no]  system_name community  OID</tt> </li>
+	<li>net-snmp: <tt>$snmpwalk  -v2c -c community system_name[:port_no] OID</tt> </li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre>   $ snmpwalk -v2c -c public host_name:161 .1.3.6.1.2.1.2.2.1.10</pre>
+<p>In the previous example the query is performed on the host "host_name", using default settings 
+for snmp (transport = UDP; port = 161; community = public). The output should look like this:</p>
+<pre>   IF-MIB::ifInOctets.1 = Counter32: 1430
+   IF-MIB::ifInOctets.2 = Counter32: 966737519 </pre>
+<p>For more information in  how to configure and use SNMP: <a href="http://www.net-snmp.org/">http://www.net-snmp.org/</a> </p>
+MonALISA provides snmp modules to collect:
+<ul>
+	<li>IO traffic from nodes and network elements</li>
+	<li>CPU usage</li>
+	<li>System Load</li>
+	<li>Disk IO traffic</li>
+	<li>...</li>
+</ul>
+<p>Here are the OIDs that must be "exported" by the snmpd daemon in order to allow 
+various dedicated MonALISA snmp modules to collect the data:</p>
+<ul>
+	<li>
+		<strong>snmp_IO</strong>:<br>
+		<tt>incoming network traffic: .1.3.6.1.2.1.2.2.1.10<br>
+		outgoing network traffic: .1.3.6.1.2.1.2.2.1.16</tt><br><br>
+	</li>
+	<li>
+		<strong>snmp_Load</strong>:<br>
+		<tt>Load5, Load10 and Load15:.1.3.6.1.4.1.2021.10.1.3</tt><br><br>
+	</li>
+	<li>
+		<strong>snmp_CPU</strong>:<br>
+		<tt>CPU_usr, CPU_nice and CPU_idle:.1.3.6.1.4.1.2021.11</tt><br><br>
+	</li>
+	<li>
+		<strong>snmp_MEM</strong>:<br>
+		<tt>MEM_free, Swap_MEM_Free:.1.3.6.1.4.1.2021.4</tt><br><br>
+	</li>
+	<li>
+		<strong>snmp_Disk</strong>:<br>
+		<tt>FreeDSK, UsedDsk:.1.3.6.1.4.1.2021.9</tt><br><br>
+	</li>
+</ul>
+<br>
+<font size="+1"><strong class="page_subtitle">Kernel <tt>/proc</tt> files</strong></font>
+<p>Modules to collect the system monitoring information from the kernel are part of the MonALISA 
+distribution. These modules are mainly design to be used on the node MonALISA service is running 
+but they may also be used on remote systems via rsh or ssh. </p>
+<br>
+<font size="+1"><strong class="page_subtitle">Ganglia</strong></font>
+<p>Ganglia is a well known monitoring system which is using a multi cast messaging system to 
+collect system information from large clusters. MonALISA can be easily interfaced with Ganglia. 
+This can be done using the multicast messaging system or the gmon interface which is based on 
+getting the cluster monitoring information in XML format. In the MonALISA distribution we 
+provide modules for both these two possibilities. If the MonALISA service runs  in the multicast 
+range for  the nodes sending monitoring data, we suggest using the Ganglia module which is a 
+multicast listener. The code  for interfacing MonALISA with Ganglia using gmon is 
+<tt>Service/usr_code/GangliaMod</tt> and using the multicast messages is <tt>Service/usr_code/GangliaMCAST</tt>.
+The user may modify these modules. Please look at the <b>service configuration examples</b> to see how these modules may be used. 
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">DataBase system</strong></font>
+<p>MonAISA comes with an embedded SQL Data Base (McKoiDB) which is used by default. If you are 
+happy with this option nothing has to be done. If you would like to use an other DB system, you 
+need to have the JDBC driver for it and to create initially the tables used by MonALISA. We tested 
+the system with MySQL. The MonALISA distribution provides the drivers and the configuration scripts 
+for the two DataBase systems. We also provide for convenience 
+an <a href="download_mysql.html">archive</a> which has all the scripts to install and configure MySQL 
+to be used as a storage mechanism for monitoring values. To install and use MySQL it is not required 
+root access. In <tt>$MonaLisa_HOME/Service/Examples</tt> there are simple scripts (in <tt>SimpleEx_MySql/</tt>) 
+for using MonALISA with MySQL. The JDBC drivers can be found in <tt>$MonaLisa_HOME/Service/lib/mysql-driver.jar</tt>. 
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">MonALISA Configuration</strong></font>
+<p>There are two main configuration files: a global configuration file (<tt>$MonaLisa_HOME/Service/CMD/ml_env</tt>) 
+used by the scripts and the other one used by MonALISA itself (<tt>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/ml.properties</tt>).
+</p>
+<p><strong>Global configuration file</strong> (<tt>$MonaLisa_HOME/Service/CMD/ml_env</tt>)
+<ul>
+	<li><strong>MONALISA_USER</strong> - the user name under wich the service is running. 
+		It will not start from other account or from the root account.
+	</li>
+	<li><strong>JAVA_HOME </strong> - the path to your current JDK. The starting expects to 
+		find <tt>JAVA_HOME/bin/java</tt> to start MonALISA
+	</li>
+	<li><strong>SHOULD_UPDATE </strong> - whether or not MonALISA should check for updates when is started. 
+		If this parameter is "true" when MonALISA is started first will check for updates and after that 
+		it will start. If set to "false" it will not check for updates. This parameter is also used to 
+		check for autoupdates when it is running. Please see Starting a Monitoring Service with Autoupdate 
+	</li>
+	<li><strong>MonaLisa_HOME </strong> - path to your MonALISA installation directory. Environment variables 
+		can also be used. (e.g <tt>${HOME}/MonaLisa</tt>)
+	</li>
+	<li><strong>FARM_HOME </strong> - path to a directory where to your farm specific files resides. It's 
+		better to place this directory under Service directory. (e.g. You can use the variable <tt>MonaLisa_HOME</tt> 
+		defined above. <tt>${MonaLisa_HOME}/Service/MyTest</tt>. MonALISA comes with a simple example 
+		in <tt>${MonaLisa_HOME}/Service/TEST</tt> 
+	</li>
+	<li><strong>FARM_CONF_FILE </strong> - the file used at the startup of the services to define the clusters, 
+		nodes and the monitor modules to be used. It should be under <tt>${FARM_HOME}</tt> directory. 
+		(e.g <tt>FARM_CONF_FILE="${FARM_HOME}/mytest.conf"</tt>)
+	</li>
+	<li><strong>FARM_NAME </strong> - the name for your farm. (e.g <tt>FARM_HOME="MyTest"</tt>). We would like 
+	to ask the users to <font color="RED">use short names to describe the SITE</font> on which they are running MonALISA. 
+	</li>
+	<li>JAVA_OPTS - is an <strong>optional</strong> parameter to pass parameters directly to the Java 
+		Virtual Machine (e.g <tt>JAVA_OPTS="-Xmx=128m"</tt>)
+	</li>
+</ul>
+<p></p>
+<p><strong>The MonALISA properties</strong></p>
+<p>The file <tt>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/ml.properties</tt>  is  specific for your 
+farm configuration. (e.g lookup services to use, the jini group that your service should join, etc.  
+You should find comments on in the file) </p>
+<p>The configuration, the monitored parameters and the repetition time  may be changed via de Administrative GUI. </p>
+<p>Setup the configuration files for your site:</p>
+<ul>
+	<li>Go to <tt>"MonaLisa"/Service</tt> directory and create a directory for  your site (e.g MySite). You may 
+		copy  the configuration files from one of the available site directory (e.g.: under <tt>"MonaLisa"/Service/TEST</tt>). 
+		You <strong>must</strong> include the folowing files in you new Farm (<tt>ml.properties</tt>, 
+		<tt>db.conf.embedded</tt> and <tt>my_test.conf</tt>) 
+	</li>
+	<li>Edit the configuration file (<tt>my_site.conf</tt>) to reflect the environment you want to monitor.	
+	</li>
+	<li>Edit <tt>ml.properties</tt> if you would like to change the Lookup Discovery Services that will be used 
+		or if you would like to use another DB System.
+	</li>
+	<li>You may add a <tt>myIcon.gif</tt> file with an icon of your organization in <tt>"MonaLisa"/Service/ml_dl</tt>
+	</li>
+</ul>
+The <strong>only</strong> script used to start/stop/restart "MonaLisa" is ML_SER under this directory.
+<p>After you have done what is described in the "Configuration" section you can start using MonALISA:
+<pre>   Service/CMD/ML_SER start. </pre>
+<p></p>
+<p><strong>Authentication & Security</strong></p>
+<p>The Administration of the service can be done from a GUI and is done via a SSL connection.  
+This requires the user to provide X.509 certificate to be imported into the key trust store of the service. 
+Once the user's certificate becomes a trusted certificate for the service it allows the Administrator user to 
+change the configuration from a GUI.  This is required only if the user want to change the configuration of this service. 
+</p>
+<p><strong>Running MonALISA behind a firewall</strong></p>
+<p>MonALISA can run behind a firewall if there are three open ports. These ports are dynamicaly assigned when MonALISA 
+starts and can be configured in <tt>$MonaLisa_HOME/Service/&lt;YOUR_FARM_DIRECTORY&gt;/ml.properties</tt>. There 
+are two parameters <tt><strong>lia.Monitor.MIN_BIND_PORT</strong></tt> and <tt><strong>lia.Monitor.MAX_BIND_PORT</strong></tt>. 
+MonALISA will try to bind the first three available ports in this range, starting from 
+lia.Monitor.MIN_BIND_PORT until lia.Monitor.MAX_BIND_PORT is reached. 
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">Start a Monitoring Service with Autoupdate</strong></font>
+<p>This allows to automatically update your Monitoring Service.  The cron script will periodicaly chech for updates 
+using a list of URLs.  When a new version is published the system will check its digital signature and then will 
+download the new distrbution as a set of signed jar files. When this opration is completed the MonALISA service will 
+restart atomaticaly. The dependecies and the  configurations realted with the service are done is very similar 
+way with the Web Start technology.
+</p>
+<p>This funtionaly  makes  it very easy to maintan and run a MonALISA service. <font color="#FF0000">We recomand to use it!</font></p>
+<p>In this case you should add "MonaLisa"/Service/CMD/CHECK_UPDATE to the user's crontab that runs MonALISA. To edit  your crontab use:
+</p>
+<pre>   $crontab -e</pre>
+<p>Add the folowing line:</p>
+<pre>*/20 * * * * /path_to_your_MonaLisa/Service/CMD/CHECK_UPDATE</pre>
+<p>This would check for update every twenty minutes. It is resonable value that this value should be >= twenty minutes. 
+To check for update every 30 minutes add the folowing line instead of the one above.
+</p>
+<pre>*/30 * * * * /path_to_your_MonaLisa/Service/CMD/CHECK_UPDATE
+</pre>
+<p>To disable autoupdate you cand edit the ml_env file in <tt>"MonaLisa"/Service/CMD</tt> and set <tt>SHOULD_UPDATE="false"</tt>. 
+It is no need to remove the script CHECK_UPDATE from your crontab.</p>
+<p>Launch <tt>"MonaLisa"/Service/CMD/ML_SER start </tt><br>
+MonALISA should check for updates now.
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">The  Administration GUI </strong></font>
+<p>In order to connect to a MonALISA service as an administrator your X.509 certificate must first be imported into 
+the MonALISA service keystore as a trusted entry. The MonALISA keystore is located under the  SSecurity directory 
+(<tt>FarmMonitor.ks</tt>). A script to import a certificate into the keystore  can be found in the same directory. 
+We also provide scripts to create a new keystore, export your certificate from the keystore and import into MonALISA 
+Service keystore. Following is an example how to create a keystore with your private key and how to import your 
+public key into the service keystore. The example will use the <tt>keytool</tt> command under <tt>$JAVA_HOME/bin</tt>. 
+The scripts assumes that your <tt>$PATH</tt> environment variable contains <tt>$JAVA_HOME/bin</tt>.</p>
+
+<ol>
+	<li>First go to under <tt>"MonaLisa"/Service/SSecurity</tt></li>
+	<li>Generate a private key. This will also generate a keystore(<tt>MyAdmin.ks</tt>) with your private key in it. 
+		The last parameter is an alias used to identify your private key in <tt>MyAdmin.ks</tt>. Please do not forget 
+		the password that you will give to your keystore. You will use it from the GUI Client to administer your farm.
+		<pre>   $./genKey MyAdmin.ks myadmin_private</pre>
+	</li>
+	<li>Export now your public key into a file (<tt>myadmin.cer</tt>)
+		<pre>   $./exportCert MyAdmin.ks myadmin_private myadmin.cer</pre>
+		The first parameter is the path to the keystore generate at step 2). The second parameter (also given at step 2) 
+		is the alias that identifies your private keystore and the last one is the file wich will hold your public key.
+	</li>
+	<li>Import your public key into the MonALISA trusted keystore
+		<pre>   $./importCert myadmin_public myadmin.cer</pre>
+		This will import the public key from <tt>myadmin.cer</tt> into the <tt>FarmMonitor.ks</tt>.
+	</li>
+</ol>
+Use the security menu in the Global Client to authentificate yourself using the keystore which contains your private key. For 
+all the farms which have your cerificate imported in the trust keystore you will atomatically get administravie rights. 
+This allows to change the configuration, to add or stop modules for individual nodes or clusters as well as to re-start or stop the service.
+<br><br><br>
+<font size="+1"><strong class="page_subtitle">Start a Global GUI </strong></font>
+<p>This program allows to discover all the registered centers with any set of Lookup Discovery services 
+(started with jrun command) and  allows any user to see real-time global values as well  any measurement for each component 
+in the system and its history.</p>
+<pre>   cd Clients/Gui/ 
+   ./jGlobal</pre>
+<p>The global GUI can be started from the MonALISA web page (<a href="dl_jClient.html">http://monalisa.carc.caltech.edu</a>) 
+select Download -> Web Start client.  This will guarantee that you will use always the updated version and it is 
+also possible to install the client of your system very easily. <br>
+We strongly suggest using this option.</p>
+<p>If you want to change the list of Lookup Discovery services to be used by the global client simply edit the <tt>jGlobal</tt> 
+script or use the Discovery menu in the client window to add/remove lookup discovery services.</p>
+<p>You also change the groups you are interested to monitor. Details in how to use the GUI are presented in the help 
+file and in the Examples under MonALISA documentation.  
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">Web Service Client  WSDL/SOAP (java)</strong></font>
+<p>MonaLisa provides also a Web Service interface. It allows any client to connect and receive selected values.
+A predicate mechanism can be used.  Client examples code for java (using Axis or WSIF) and perl are provided 
+as a separate package the user may download from the Web Services section.  These Web Services clients allow the 
+user to dynamically access monitoring information from any MonALISA monitoring services or global  MonALISA repositories. 
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">Writing into MDS or any other programs or database systems </strong></font>
+<p>The MonALISA framework allows to dynamically load additional modules for writing (or processing) the collected values. 
+In <tt>usr_code/MDS</tt>  is an example of writing the received values into MDS. This is done using a unix pipe to communicate between the 
+dynamically loadable java module and the script performing the update into the LDAP server.</p> 
+<p>Please also read the ReadMe file from this directory. </p>
+<p>* Another simple example which simply print all the values on sysout  can be found on <tt>usr_code/SimpleWriter </tt><br>
+* Another example to write the values into UDP sockets is in  <tt>usr_code/UDPWriter</tt>
+</p>
+<br>
+<font size="+1"><strong class="page_subtitle">Writing new Monitoring Modules</strong></font>
+<p>New Monitoring modules can be easily developed. These modules may use SNMP requests or can simply run any script (locally or 
+on a remote system)  to collected the requested values. The mechanism to run these modules under independent threads, to perform 
+the interaction with the operating  system or to control an snmp session are inherited from a basic monitoring class. The user 
+basically should only provide the mechanism to collect the values. to parse the output and to generate a result object.  
+It is also required to provide the  names of the parameters this module is collecting. 
+</p>
+<p>Examples to generate new modules are in <tt>${MonaLisa_HOME}/Service/usr_code</tt>. Please see the <tt>ReadMe.txt</tt> in this directory</p>
+<br>
+<font size="+1"><strong class="page_subtitle">Writing new Filters </strong></font>
+<p>Filters allow to dynamically create any new type of derived value from the collected values. Es an example it allow to evaluate the 
+integrated traffic over last n minutes, or the number of nodes for which the load is less than x.  Filters may also send an email to 
+a list or SMS messages when predefined complex condition occur.  These filters are executed in independent threads and allow 
+any client to register for its output. They may be used to help application to react on certain conditions occur, or to 
+help in presenting global values for large computing facilities. 
+</p>
+<br>
+<br>
+<font size="+1"><strong class="page_subtitle">Farm Configuration Examples</strong></font>
+<p>The MonALISA service is using  a very simple configuration file to generate the site configuration and the 
+modules to be used for collecting monitoring information.  By using the administrative interface with SSL connection 
+the user may dynamically change the configuration and modules used to collect data.
+</p> 
+<p>It is possible to use the build modules (for snmp, local or remote /proc file... ) or external modules. 
+We provide several modules which allow exchanging information with other monitoring tools.  These modules are 
+really very simple and the user can also develop its own modules.<br>  
+In what follows we will present a few simple examples in how to make the configuration for a farm. 
+<br>
+<p><strong>Monitoring a Farm using snmp</strong></p>
+<p>The configuration file should look like this:</p>
+<pre>   *Master
+   >citgrid3.cacr.caltech.edu citgrid3
+   monProcLoad%30
+   monProcStat%30
+   monProcIO%30
+   *ABPing{monABPing, citgrid3.cacr.caltech.edu, " "}
+   *PN_CIT
+   >c0-0
+   snmp_Load%30
+   snmp_IO%30
+   snmp_CPU%30
+   >c0-1
+   snmp_Load%30
+   snmp_IO%30
+   snmp_CPU%30
+   >c0-2
+   snmp_Load%30
+   snmp_IO%30
+   snmp_CPU%30
+   >c0-3
+   snmp_Load%30
+   snmp_IO%30
+   snmp_CPU%30</pre>
+<p>The first line (<tt>*Master</tt>) defines a Functional  Unit (or Cluster)<br>
+The Second line ( <tt>&gt;citgrid3.cacr.caltech.edu citgrid3</tt>) adds  a node in this Functiona Unit class and optionally an alias.
+</p>
+<p>The lines:
+<pre>   monProcLoad%30
+   monProcIO%30
+   monProcStat%30</pre>
+are defining three monitoring modules to be used on the node "citgrid3".  These measurements are done 
+periodically every 30s. The <tt>monProc*</tt> modules are using the local <tt>/proc</tt> files to collect 
+information about the cpu, load and IO.  In this case this a master node for a cluster, were in fact 
+MonALISA service is running and simple modules using the <tt>/proc</tt> files are used to collect data.  
+<p></p>
+<p>The line:
+<pre>   *ABPing{monABPing, citgrid3.cacr.caltech.edu, " "}</pre>
+defines a Functional unit named "ABPing" which is using an internal module monABPing. This module is used 
+to perform simple network measurements using small UDP packages.  It requires as the first parameter the 
+full name of the system corresponding the real IP on which the ABping server is running (as part of the 
+MonALISA service)  The second parameter is not used.  These ABPing measurements are used to provide 
+information about the quality of connectivity among different centers as well as for dynamically computing 
+optimal trees for connectivity (minimum spanning tree, minimum path for any node to all the others...)
+<p></p>
+<p>
+<pre>   *PN_CIT</pre>
+defines a new cluster name. This is for a set of processing nodes used by the site.  The string "PN" in the name 
+is necessary if the user wants to automatically use filters to generate global views for all this procesing units. 
+<p></p>
+<p>Then it has a list of nodes in the cluster and for each node a list of modules to be used for getting 
+monitoring information from the nodes.   For each module a repetition  time is defined (%30). 
+This means taht each such module is executed ones every 30s.   Defining the repeating  time 
+is optional and the default value is 30s.
+</p>
+<br>
+<p><strong>Monitoring a Farm using Ganglia gmon module </strong></p>
+<p>The farm configuration file will look like this:
+<pre>   *Master
+   >ramen gateway 
+   monProcLoad%30
+   monProcIO%30
+   monProcStat%30
+   *PN_popcrn {IGanglia, popcrn01.fnal.gov, 8649}
+   *ABPing{monABPing, ramen.fnal.gov, " "}
+   *Internet
+   >tier2.cacr.caltech.edu
+   monPing%50</pre>
+The first line (*Master)  defines a Functional  Unit (or Cluster).<br>
+The Second line ( >ramen gateway  ) adds  a node in this Functional Unit class<br><br>
+In this case ramen is computer name and optionally the user may add an alias (gateway to this name).
+<p></p>
+<p>The lines:
+<pre>   monProcLoad%30
+   monProcIO%30
+   monProcStat%30</pre> 
+are defining three monitoring modules to be used on the node "ramen".  These measurements are done 
+repeatedly every 30s. The monProc* modules are using the local /proc files to collect information about the cpu, load and IO.
+<p></p>
+<p>The line:
+<pre>   *PN_popcrn {IGanglia, popcrn01.fnal.gov, 8649}%30</pre>
+defines a cluster named "PN_popcrn" for which the entire information is provided by the IGanglia module.  
+This module is using telnet to get and XML based output from the Ganglia gmon.  The telnet request will 
+be send to node <tt>popcrn01.fnal.gov</tt> on port 8649.<br>
+All the nodes which report to ganglia will we part of this cluster unit and for all of the them the 
+parameters selected in the IGanglia module will be recorded.  This measurement will de done every 30s. 
+<p></p>
+<p>The Ganglia module is localted in the <tt>Service/usr_code/GangliaMod</tt>.  The user may edit the file and 
+customize it. This module is NOT in the MonaLISA jar files and to be used, the user MUST add the path to 
+this module to the MonaLISA loader. This can be done in ml.propreties by adding this line:
+<pre>   lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/GangliaMod/</pre>
+<p></p>
+<p><pre>   *ABPing{monABPing, ramen.fnal.gov, " "}</pre>
+This like defines a Functional unit named "ABPing" which is using an internal module monABPing. 
+This module is used to perform simple network measurements using small UDP packages.  The first 
+parameter must be the full name of the system which corresponds to the real IP on which the 
+ABping server is running.  The second parameter is not used.
+<p></p>
+<p>The next lines:
+<pre>   *Internet  
+   >tier2.cacr.caltech.edu  caltech
+   monPing%50</pre>
+Defines a new functional unit (Internet) having one node <tt>tier2.cacr.caltech.edu</tt> with the alias caltech 
+for which a ping measurement is done by the monPing module every 50s.
+<p></p>
+<br>
+<p><strong>Monitoring a Farm using Ganglia Multicast module</strong></p>
+<p>For getting copies of the monitoring data send by the nodes running the ganglia demons (using a multicast port) 
+it is necessary that the system on which MonaLISA is running to be in muticast range for these messages. 
+</p>
+<p>Adding such a line: 
+<pre>   *PN_cit{monMcastGanglia, tier2, " GangliaMcastAddress=239.2.11.71; GangliaMcastPort=8649"}</pre>
+in the configuration file, will use the Ganglia multicast module to listen to all the monitoring data and 
+then to select certain values which will be recorded into MonALISA. The service  system will automatically create 
+a configuration for all the nodes which report data in this way. 
+<p></p>
+<p>The PN_cit is the name of the cluster of processing nodes.  Is is important for the cluster name 
+of processing nodes to contain the "PN" string. This is used by farm filters to report global views for the farms. 
+</p>
+<p>The tier2 is the name of the system corresponding  to the real IP address  on which this MonALISA service is 
+running.  The second parameter defines the multicast address and port used by Ganglia.
+</p>
+<p>The GangliaMcat  module is located in the <tt>Service/usr_code/GangliaMCAST</tt>.  The user may edit the 
+file and customize it. This module is NOT in the MonaLISA jar files and to be used, the user MUST add the 
+path to this module to the MonaLISA loader. This can be done in ml.propreties by adding this line:
+<pre>   lia.Monitor.CLASSURLs=file:${MonaLisa_HOME}/Service/usr_code/GangliaMCAST/</pre>
+<p></p>
+<br>
+<p><strong>Getting Job related information from PBS</strong></p>
+<p>To monitor data provided by the PBS, you will need to add these line into the config file:
+<pre>   *JOBS
+   >tier2
+   PBSjobs{cmsim,ooHits}%30</pre>
+The first line defines the name of the functional unit (JOBS). The second line defines the node 
+(normally the current system) where the PBSJobs module will run.  The module has a parameter containing 
+a list o jobs for which information will be provided.  The module will run every 30s. The code of 
+the PBSJobs module is in <tt>Service/usr_code/PBS/</tt> and must be added to the MonaLISA class loader 
+in similar way like the Ganglia modules. 
+<p></p>
+<p>&nbsp;</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

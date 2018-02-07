@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.2//EN" "http://java.sun.com/j2ee/dtds/web-app_2_2.dtd">
+
+<web-app>
+  <servlet>
+    <servlet-name>GetIPids</servlet-name>
+    <display-name>GetIPids</display-name>
+    <servlet-class>
+	lia.util.topology.GetIPids
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet>
+    <servlet-name>AddTrace</servlet-name>
+    <display-name>AddTrace</display-name>
+    <servlet-class>
+	lia.util.topology.AddTrace
+    </servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+
+  <!-- .............................. -->
+
+  <servlet-mapping>
+    <servlet-name>GetIPids</servlet-name>
+    <url-pattern>/GetIPids</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AddTrace</servlet-name>
+    <url-pattern>/AddTrace</url-pattern>
+  </servlet-mapping>
+  <!-- .............................. -->
+
+  <welcome-file-list>
+    <welcome-file>
+      index.html
+    </welcome-file>
+  </welcome-file-list>
+
+</web-app>

@@ -1,0 +1,2 @@
+Main-Class: lia.osdaemon.OSDaemon
+Class-Path: jini-core.jar jini-ext.jar backport-util-concurrent.jar

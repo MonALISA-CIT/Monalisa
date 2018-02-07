@@ -1,0 +1,69 @@
+    MonaLisa for VDT
+    ----------------
+
+    This package contains a MonaLisa distribution for VDT.
+    
+    There are 4 files in this archive:
+README : this file
+install.sh : the install script you should run
+install2.sh : this script is run by install.sh with the MonaLisa's user credentials
+MonaLisa.v1.1.tar.gz : the MonaLisa main distribution file
+
+    
+    Install
+    -------
+    
+    You can either use install.sh and follow the step-by-step procedure or you
+can manually unpack the archive and configure yourself the MonALISA. If you want
+to do the configuration yourself you can find documentation at:
+    http://monalisa.cacr.caltech.edu/
+
+    install.sh will check to see whether the user is root or not. If the user is
+not root then install2.sh will be executed.
+    If the user is root then it will be asked for an account from which MonaLisa 
+will run. If the specified account does not exist then the script will attempt to
+create one then it will copy the install2.sh and MonaLisa.v1.1.tar.gz in the users'
+~/monalisa_install and will start install2.sh from there. After install2 finished
+the ~/monalisa_install will be deleted.
+
+    install2.sh will ask for the destination folder, unpack the MonaLisa.v1.1.tar.gz 
+file and ask for the farm configuration options. One of the first options you have
+to make is the farm name, this option defaults to the short hostname of the computer
+but you have to make sure this name is unique in the MonaLisa environment. You will
+also have to enter the Lat and Long of your server. You can find an aproximate value 
+with http://geotags.com/
+
+
+    Upgrade
+    -------
+
+    If the destination folder already contains an older MonaLisa installation then
+all the configuration files are kept unchanged. In fact the CMD, TEST and VDTFarm 
+folders remain untouched, which is bad if you run an older version of MonaLisa.
+So if you want to upgrade from an older MonaLisa installation please choose another 
+destination folder and then check if the newly generated configuration is correct.
+
+
+    Running 
+    -------
+
+    After the install completes you can check the configuration by editing the 
+following files:
+  ML_HOME/Service/CMD/ml_env
+  ML_HOME/Service/CMD/site_env
+  ML_HOME/Service/VDTFarm/ml.properties
+  ML_HOME/Service/VDTFarm/vdtFarm.conf
+    
+  In Service/CMD folder you have some usefull scripts :
+ML_SER        - starts,stops or restarts the service
+MLD           - to be put in init.d so you can control the service
+CHECK_UPDATE  - should be put in crontab to automatically update the MonALISA
+
+ For exporting global variables ( like VDT_LOCATION, GLOBUS_LOCATION ), please use
+ML_HOME/Service/CMD/site_env. 
+
+    Contact information
+    -------------------
+
+    You can contact us at : developers@monalisa.cern.ch
+    For more details please see http://monalisa.cacr.caltech.edu/

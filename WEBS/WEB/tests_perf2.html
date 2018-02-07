@@ -1,0 +1,118 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+	<title>Mona Lisa</title>
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+</head>
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+<tr>
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+		<tr valign="top">
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+		</tr>
+		<tr>
+			<td><font size="+2"><strong class="page_title">&nbsp; Large Farm 2</strong></font></td>
+		</tr>
+		</table>
+	</td>
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+	<td width="90%" height="40">
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+		</table>
+	</td>
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+</tr>
+</table>
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+<tr>
+<td class="normal">
+<p class="normal">&nbsp;</p>
+
+<font size="+1"><strong class="page_subtitle">MonALISA Performance Test </strong></font>
+<p>
+<font color="#FF0000"><strong>Perform high rate SNMP queries  on  a large farm (500 nodes)</strong></font>
+</p>
+<p>MonALISA version : 0.2 , java virtual machine 1.4 beta SUN</p>
+<p>The monitoring service run on Dell 8100 ( Pentium ||| @ 1 GHz ) laptop connected to LAN at 10Mbps 
+running linux (RH 7.2)The same system runs the embedded (InstantDB) data base to store the collected values </p>
+<p>Date: 26 August 02 / CERN</p>
+<p><font color="#FF0000">We monitored the lxbatch farm at CERN (500 nodes)  performing  two snmp requests every 30 s for each node. 
+This setup is somehow equivalent  with monitoring 1000 nodes every 30s and collecting 15 values.</font>
+</p>
+
+<p align="center">
+	<img src="tests_perf2/threads.gif" border="0"><br>
+	The total number of threads (created -red and active - blue ) to perform these measurements.<br>
+	A mean of ~45 active threads were used to perform ~ 30 snmpwalk requests per second . Each snmp request  returned   15  metrics values. 
+</p>
+<p align="center">
+	<img src="tests_perf2/rate.gif" border="0"><br>
+	The rate for performing monitoring tasks (in this case snmp requests).<br>
+	A rate of ~ 30 tasks per second corresponds to ~ 450  metrics values 
+collected  per second. This information was stored in a relational data base embed 
+and running in the same JVM.  
+</p>
+<p align="center">
+	<img src="tests_perf2/time_per_job.gif" border="0"><br>
+	The mean time to perform a task.<br>
+	The mean time for performing such an snmp request was ~1.3 s.  
+</p>
+<p align="center">
+	<img src="tests_perf2/total_jobs.gif" border="0"><br>
+	The total no. of tasks performed in time.
+</p>
+
+<p align="center">
+	<img src="tests_perf2/time_out.gif" border="0"><br>
+	Around 5% of the tasks had to be stop due to a time-out limit. This is perhaps  related with the poor connectivity between the system running MonALISA and the farm (please see the next plots).<br>
+	The mean time for performing such an snmp request was ~1.3 s.  
+</p>
+<p align="center">
+	<img src="tests_perf2/io.gif" border="0"><br>
+	The IO traffic on the system running the MonALISA service.<br>
+	The in and out traffic from the system running MonALISA  is measured in Kb/s.  
+</p>
+<p align="center">
+	<img src="tests_perf2/memory.gif" border="0"><br>
+	The memory (MB) used by the MonALISA service  including (DB, WebServices, Jini service and the thread engine).
+</p>
+
+<p align="center">
+	<img src="tests_perf2/load.gif" border="0"><br>
+	The Load on the system running MonALISA service.<br>
+	Despite the large number of concurrent threads for collecting and storing data the load of the system running MonALISA is quite low.  
+</p>
+<p align="center">
+	<img src="tests_perf2/cpu.gif" border="0"><br>
+	The CPU usage in % (user and system) to run this configuration.<br>
+	In fact the load in linux is over evaluated for multi-thread applications.   
+</p>
+<p align="center">
+	<img src="tests_perf2/rtt.gif" border="0"><br>
+	The RRT  (in ms) between the system running MonaLisa and the five major  switches  serving  the LXBATCH farm.   
+</p>
+<p align="center">
+	<img src="tests_perf2/ping.gif" border="0"><br>
+	The estimated bandwidth in KB/s  (using a simple  procedure based on ping) from the node running MonALISA and these switches.
+</p>
+<p align="center">
+	<img src="tests_perf2/farm_loadok.gif" border="0"><br>
+	At the same time the farm was running at a relative high load (mean ~2.6).<br>
+	Here it is shown the distribution for all the nodes in the farm.   
+</p>
+<p align="center">
+	<img src="tests_perf2/Farm_load3.gif" border="0"><br>
+	The  time evolution of the load.   
+</p>
+
+<p>&nbsp;</p>
+</td>
+</tr>
+</table>
+</body>
+</html>

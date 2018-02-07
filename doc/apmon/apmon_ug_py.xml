@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE book SYSTEM "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd">
+<book id="BookId" lang="en">
+<bookinfo>
+  <title>ApMon Python User Guide</title>
+  <!--
+      <authorgroup>
+      <author>
+      <firstname>Iosif</firstname>
+      <surname>Legrand</surname>
+	<affiliation>
+	<address>
+	<email>Iosif.Legrand@cern.ch</email>
+	</address>
+	</affiliation>
+	</author>
+	</authorgroup>
+  -->	 
+  <copyright>
+    <year>2005</year>
+    <holder>California Institute of Technology</holder>
+  </copyright>
+</bookinfo>
+
+<chapter id="installation" xreflabel="Installation">
+  <title>Installation</title>
+  
+  <para>
+    The ApMon archive contains the following files in the ApMon module:
+    <itemizedlist>
+      <listitem><emphasis>apmon.py</emphasis> - 
+      main ApMon module. It can be instantiated by users to send data.
+      </listitem>
+      <listitem><emphasis>ProcInfo.py</emphasis> - 
+      procedures to monitor the system and a given application.
+      </listitem>
+      <listitem><emphasis>README</emphasis>
+      </listitem>
+      <listitem><emphasis>example/*.py</emphasis> - 
+      a set of examples with the usage of the ApMon module.
+      </listitem>
+      <listitem><emphasis>example/*.conf</emphasis> - 
+      a set of sample destination files, for url/file configuration.
+      </listitem>
+      <listitem><emphasis>ApMon_doc/*.html</emphasis> - 
+      HTML documentation
+      </listitem>
+    </itemizedlist>
+  </para>
+</chapter>
+<chapter id="using-apmon" xreflabel="Using ApMon">
+  <title>Using ApMon</title>
+
+  <sect1 id="initialization">
+    <title>ApMon Initialization</title>
+    
+    <para>
+      In the Python version, the ApMon features are available as methods of a 
+      class called <code>ApMon</code>. The <emphasis>ApMon.pm</emphasis> 
+      module defines the <code>ApMon</code> class that has to be instantiated 
+      in one of the following ways:
+      <itemizedlist>
+	<listitem>
+	  passing as parameter a location from where the configuration will
+	  be loaded. This should be a string that represents either a filename,
+	  or an URL address (if it starts with "http://"). The <code>ApMon
+	  </code> class will start a second thread that will verify 
+	  periodically the configuration file/webpage for any changes. This 
+	  verification is done in a sepparate thread because there could be 
+	  long waiting times for the downloading and the resolving of the 
+	  destination hosts for the udp datagrams. This way, the <code>
+	  sendParam*</code> functions will not block. You can also pass an
+	  array of file/url strings in order to initialize ApMon.
+	  </listitem>
+	  <listitem>
+	  passing as parameter a tuple, containg as elements directly the 
+	  destinations (<code>host[:port][ pass]</code>). ApMon will send 
+	  datagrams to all valid given destinations (i.e.hosts that can be 
+	  resolved), with default options. 
+	  </listitem>
+	  <listitem>
+	    passing as parameter to the constructor a hash. In this case, the 
+	    keys will be destinations and the corresponding values will be 
+	    references to another hash in which the key is a configuration 
+	    option and the value is the value of that option. Note that in 
+	    this case, the options should not be preceded by xApMon_ and 
+	    options should be True/False instead of on/off as in the 
+	    configuration file.
+	  </listitem>
+      </itemizedlist>
+    </para>
+  </sect1>
+
+  <sect1 id="sending-datagrams">
+    <title> Sending Datagrams</title>
+
+    <para>
+      To send user parameters to MonALISA, you have the following set of 
+      functions:
+      <screen>
+	sendParameters ( clusterName, nodeName, params);
+      </screen>
+      Use this function to send a set of parameters to all given destinations.
+      The default cluster an node names will be updated with the values given 
+      here. If afterwards you want to send more parameters, you can use the 
+      shorter version of this function, sendParams. The parameters to be sent 
+      can be eiter a list, or a hash. If list, it should have an even length 
+      and should contain pairs like (paramName, paramValue). paramValue can be 
+      a string, an integer or a float. 
+      <screen>
+	sendParams (params);
+      </screen>
+      Use this to send a set of parameters without specifying a cluster and a 
+      node name. In this case, the default values for cluster and node name 
+      will be used. See the sendParameters function for more details.
+      <screen>
+	sendTimedParameters (clusterName, nodeName, time, params);
+      </screen>
+      Use this instead of sendParameters to set the time for each packet that 
+      is sent. The time is in seconds from Epoch. If you use the other 
+      function, the time for these parameters will be sent by the MonALISA 
+      service that receives them. Note that it is recommended to use the other
+      version unless you really need to send the parameters with a different 
+      time, since the local time on the machine might not be synchronized to
+      a time server. The MonALISA service sets the correct real time for the 
+      packets that it receives.
+    </para>
+    <para>
+      Please see the examples/*.py files for examples of using these functions.
+    </para>
+  </sect1>
+
+  <sect1 id="configuring-apmon">
+    <title>Configuring ApMon with the aid of the API</title>
+    
+    <para>
+      The behaviour of ApMon can be configured not only from the configuration 
+      files or webpages, but also with the aid of the API.
+    </para>
+    <para>
+      If you want to disable temporarily sending of background monitoring 
+      information, and to enable it afterwards, you can use:
+      <screen>
+	enableBgMonitoring (bool)
+      </screen>
+      To force sending monitoring information with background monitoring 
+      disabled, you can use the following function:
+      <screen>
+	sendBgMonitoring ();
+      </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="automated-job-monitoring">
+    <title>Automated Job Monitoring</title>
+   
+    <para>
+      To monitor jobs, you have to specify the PID of the parent process for 
+      the tree of processes that you want to monitor, the working directory, 
+      the cluster and the node names. If work directory is "", no information 
+      will be retrieved about disk:
+      <screen>
+	addJobToMonitor (pid, workDir, clusterName, nodeName);
+      </screen>
+      To stop monitoring a job, just call:
+      <screen>
+	removeJobToMonitor (pid);
+      </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="logging">
+    <title>Logging</title>
+    
+    <para>
+      To change the log-level of the ApMon module, you can either set it in 
+      the configuration file or use the following function:
+      <screen>
+	setLogLevel(level);
+      </screen>
+      with the following valid log-levels: "DEBUG", "NOTICE", "INFO", 
+      "WARNING", "ERROR", "FATAL"
+    </para>
+    <para>
+      From the configuration file the log-level can be set as follows:
+      <screen>
+	xApMon_loglevel = &lt;level&gt;
+      </screen>
+      e.g.,
+      <screen>
+	xApMon_loglevel = FINE
+      </screen>
+    </para>
+  </sect1>
+
+  <sect1 id="restrictions">
+    <title>Restrictions</title>
+    <para>
+      The maximum size of a datagram is specified by the constant 
+      MAX_DGRAM_SIZE; by default it is 8192B and the user should not modify
+      this value as some hosts may not support UDP datagrams larger than 8KB.
+    </para>
+  </sect1>
+  
+</chapter>
+<chapter id="tutorial">
+  <title>How to Write a Simple Python Program with ApMon</title> 
+  <para>   
+    In this section we show how the ApMon API can be used to write a simple
+    program that sends monitoring datagrams. The source code for this short 
+    tutorial (slightly modified)  can be found in the <emphasis>
+    simple_send.py</emphasis> file under the <emphasis>examples/</emphasis>
+    directory.
+  </para>
+  <para>
+    The program generates values for a few parameters and sends them to the 
+    MonALISA destinations specified in the 'dest_2.conf' file; this action is 
+    repeated in  20 iterations.
+  </para>
+  <para>
+    With this example program we'll illustrate the steps that should usually 
+    be taken to write a program with ApMon:
+  </para>
+  <para>
+    1. Import the ApMon module (and possibly other necessary modules):
+    <screen>
+      import apmon
+      import time
+    </screen>
+  </para>
+  <para>
+    2. Initialize ApMon and possibly set some options (in this example, we 
+    disabled the background job/system monitoring and the periodical reloading 
+    of the configuration file, and also set the loglevel). These options could 
+    have also been set from a configuration file.
+    <screen>
+      # Initialize ApMon specifying that it should not send information about the system. 
+      # Note that in this case the background monitoring process isn't stopped, in case you may
+      # want later to monitor a job.
+      apm = apmon.ApMon('dest_2.conf')
+      apm.setLogLevel("INFO");
+      apm.confCheck = False
+      apm.enableBgMonitoring(False)
+    </screen>
+  </para>
+  <para>
+    3. Send the datagrams. We used here two functions: sendParameters, which  
+    specifies the cluster name and the node name (which will be cached in the 
+    ApMon object), and  sendParams, which uses the names that were memorized 
+    at the call of the first function.
+    <screen>
+      for i in range(1,20):
+      # you can put as many pairs of parameter_name, parameter_value as you want
+      # but be careful not to create packets longer than 8K.
+          apm.sendParameters("SimpleCluster", "SimpleNode", {'var_i': i, 'ar_i^2': i*i})
+	  f = 20.0 / i
+	  # send in the same cluster and node as last time
+	  apm.sendParams({'var_f': f, '5_times_f': 5 * f, 'i+f': i + f})
+	  print "simple_send-ing for i=",i 
+	  time.sleep(1)
+    </screen>
+  </para>
+</chapter>
+</book>
+

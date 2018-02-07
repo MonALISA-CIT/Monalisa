@@ -1,0 +1,54 @@
+.normal {
+	Font: 12px;
+	color : Black;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+.attention {
+	Font: 12px;
+	color : #FF3300;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+
+.page_title{
+	Font: bold 24px;
+	color : Black;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+.page_subtitle{
+	Font: bold 18px;
+	color : Black;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+.footer{
+	Font: 12px;
+	color : Gray;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+
+A{
+	color : Blue;
+	text-decoration : underline;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+}
+A:HOVER {
+	color : Red;
+	text-decoration : none;
+	font-family : Verdana, Geneva, Arial, Helvetica, sans-serif;
+	font-size : 12px;
+}
+
+BODY.main{
+	background-image : url(img/ml_main_bg.jpg);
+	background-repeat : no-repeat;
+	background-attachment : fixed;
+}
+
+BODY.menu{
+	background-image : url(img/ml_menu_bg.jpg);
+	background-repeat : no-repeat;
+}

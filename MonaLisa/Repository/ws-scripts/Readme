@@ -1,0 +1,33 @@
+
+This package contains examples of clients for calling "MLWebService" 
+web service.
+
+The clients can interrogate both the MLWebService from the Repository and the 
+MLWebService from the MonALISA service.
+
+The examples were developed using Apache Axis, Apache WSIF and Perl 
+SOAP::Lite modules. 
+The examples developed with Apache Axis are located in the WS-Clients/Java-Axis
+directory, those developed with Apache WSIF are in the WS-Clients/WSIF directory 
+and those developed with Perl SOAP:Lite modules are in the WS-Clients/Perl directory.
+
+Every client example calls a function of the MLWebService and is located in a 
+subdirectory having the name of the called function. The source of every example
+is called "Client" ("Client.java" or "Client.pl"). There are special scripts
+in each directory for automating the installation of used libraries, the generation
+of used classes , the compilation of the classes and the execution of the client.
+
+Installation specifications:
+    First of all, the "install.sh" script must be executed. this script sets the 
+    environment variables for running the examples. It sets JAVA_HOME (java location)
+    and MONALISA_WS (the location of the MLWebService that the user wishes to 
+    interrogate).
+    
+    ( There can be found a MLWebService running at the following location:
+	"http://monalisa-starlight.cern.ch:8080/axis/services/MLWebService" )
+    
+    Then, for every client example, execute its scripts (see Readme from each 
+directory).	
+	
+
+

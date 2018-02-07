@@ -1,0 +1,22 @@
+echo_usage() {
+	echo
+	echo Usage: $0 path_to_yourKeystoreFile aliasName
+	echo
+}
+
+if [ $# -ne 2 ]; then
+
+	echo_usage
+	exit 1
+fi
+
+echo "#############################################################"
+echo
+echo "Generating keys pair TO keystore $1. $2 will be used as alias"
+echo "Be ready to give the PASSWORD for your keystore ( $1 )!!"
+echo "ATTENTION! If the file $1 doesn't exists it will be created!!!"
+echo "ATTENTION! The password provided, in this case, will become the password for your keystore."
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+keytool -genkey -keystore $1 -alias $2 

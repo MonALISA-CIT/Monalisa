@@ -1,0 +1,423 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html>
+
+<head>
+
+	<title>Mona Lisa</title>
+
+	<LINK REL="StyleSheet" TYPE="text/css" HREF="style.css" TITLE="my_css">
+
+</head>
+
+
+
+<body class="main" bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" bgcolor="#FFFFFF" marginheight="0" marginwidth="0" bgproperties="fixed">
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="normal">
+
+<tr>
+
+	<td bgcolor="#FF9C00" class="normal" width="263" height="40" valign="middle" align="left">
+
+		<table cellpadding="0" cellspacing="0" border="0" height="1" width="263" class="normal">
+
+		<tr valign="top">
+
+			<td valign="top"><img src="img/ml_main_top_name_line.png"></td>
+
+		</tr>
+
+		<tr>
+
+			<td><font size="+2"><strong class="page_title">&nbsp; ML Web Service</strong></font></td>
+
+		</tr>
+
+		</table>
+
+	</td>
+
+	<td width="20" height="40" align="left"><img src="img/ml_main_top_corner.gif"></td>
+
+	<td width="90%" height="40">
+
+		<table cellpadding="0" cellspacing="0" border="0" height="40" width="100%" class="normal">
+
+			<tr><td height="22" width="100%" bgcolor="#FF9C00" class="normal">&nbsp;  </td></tr>
+
+			<tr><td height="18" width="100%" class="normal">&nbsp;  </td></tr>
+
+		</table>
+
+	</td>
+
+	<td width="45" height="40" align="right"><img src="img/ml_main_top_icon_bg.gif" width="45" height="40" border="0"></td>
+
+</tr>
+
+</table>
+
+<table border="0" cellpadding="0" cellspacing="0" width="90%" align="center">
+
+<tr>
+
+<td class="normal">
+
+<b><font size="2"><br>
+
+Introduction:</font></b>
+
+<p><font size="2">&nbsp;&nbsp; Web services provide a standard mean of
+
+interoperating between different software applications, running on a variety of
+
+platforms and frameworks.<br>
+
+&nbsp;&nbsp;&nbsp; A Web service is a software system identified by an URI,
+
+whose public interfaces and bindings are defined and described using XML. Its
+
+definition can be discovered by other software systems. These systems may then
+
+interact with the Web service in a manner prescribed by its definition, using
+
+XML based messages conveyed by internet protocols (<a href="http://www.w3.org/2002/ws" target="_blank">http://www.w3.org/2002/ws</a>).</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; The Web service &quot;MLWebService&quot;
+
+provides an interface for publishing the monitoring data using a WSDL/SOAP
+
+technology. In this way, any client can connect and receive selected monitoring
+
+data.</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; &quot;MLWebService&quot; is available in
+
+the Repository, offering the possibility to gather historical data and
+
+configurations of the&nbsp; monitored sites, and, in the near future, it will be
+
+embedded in the&nbsp; MonALISA service itself. The Repository contains data,
+
+gathered using custom <i>predicates </i>and <i>filters</i> from many MonALISA
+
+services.&nbsp;</font></p>
+
+<p><b><font size="2">Service description:</font></b></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; The service offers a single port type with
+
+three operations: &quot;<b>getValues</b>&quot;, &quot;<b>getConfiguration</b>&quot;
+
+and &quot;<b>getLatestConfiguration</b>&quot;.</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; - the <b>&quot;getValues&quot;</b> operation
+
+interrogates the database and gets all the parameter values for the
+
+farm, the cluster, the node and the parameter name specified as arguments. The
+
+time when the parameter(s) was registered in the database&nbsp; must be between
+
+two moments of time (fromTime and toTime) also specified as operation input. The
+
+return type is a complex schema type, an array of results containing all the
+
+values taken from the database.</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; - the&nbsp; <b>&quot;getConfiguration&quot; </b>operation
+
+interrogates the database and gets all configurations of all farms that
+
+were registered in the database between two limits of time (from time and to
+
+time) given as input. The return type is a complex schema type, an array of
+
+configurations that were found in the database that matched the constraints .&nbsp;</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; - the <b>&quot;getLatestConfiguration&quot;</b>
+
+operation interrogates the database and returns the last configuration
+
+received in the database for a given farm. It receives as input a string, the
+
+farm name. It returns a complex schema type that represents the configuration .</font></p>
+
+<p><b><font size="2">Service implementation:</font></b></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; The service application was developed using
+
+Apache Axis (See <a href="http://ws.apache.org/axis" target="_blank">http://ws.apache.org/axis</a>)
+
+.</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp; The interface of the service contains the
+
+following functions:</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+- <i>Result[] getValues (String farmName, String clusterName, String nodeName,
+
+String parameterName, long fromTime, long&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+toTime);</i></font></p>
+
+<p align="left"><i><font size="2" color="#FF0000">&nbsp;</font><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font>
+</i><font size="2">The getValues function can be called in two ways:<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- specifying negative values for times. For example, if&nbsp; the call is <i>getValues(
+&quot;*&quot;, &quot;*&quot;, &quot;*&quot;, &quot;*&quot;,-3600000,0)</i> ,the
+service will return all the values registered in the database in the last hour.<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+- specifying absolute values for time. For example, if the call is <i>getValues
+(&quot;*&quot;, &quot;*&quot;, &quot;*&quot;, &quot;*&quot;, 1060400000000,
+1065000000000), </i>the service will return all the values registered in the
+database with the registration time between the two values specified in
+milliseconds.</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+The <b>Result </b>class is a Bean class and has the following description:</font></p>
+
+<div align="center">
+
+  <center>
+
+  <table width="99%" border="1">
+
+    <tbody>
+
+      <tr>
+
+        <td width="100%">
+
+          <p><font size="2">&nbsp;&nbsp; </font><font size="1"> public class
+
+          Result {<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String farmName;&nbsp; // the farm name that contains the
+
+          parameters&nbsp;<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String clusterName; // the cluster name that contains the
+
+          parameters&nbsp;<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String&nbsp; nodeName ; //the node name that contains the
+
+          parameters&nbsp;<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String[] param_name ; //the parameters names<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private double[] param; // the parameters values<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private long time; //the absolute time in milliseconds when this value was
+
+          registered in the database</font></p>
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          ............ // get/set functions<br>
+
+          &nbsp;&nbsp;&nbsp; }</font></p>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  </center>
+
+</div>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+-<i> WSConf[] getConfiguration (long fromTime, long toTime) ;</i></font></p>
+
+<p><i><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</font>
+</i><font size="2">The times specified for this function are absolute moments of time in
+milliseconds.&nbsp;</font></p>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+The <b>WSConf </b>is a Bean class and has the following description:</font></p>
+
+<div align="center">
+
+  <center>
+
+  <table width="100%" border="1">
+
+    <tbody>
+
+      <tr>
+
+        <td width="100%"><font size="2">&nbsp;&nbsp;&nbsp;&nbsp; </font><font size="1">
+
+          public class WSConf {<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private WSFarm wsFarm; // the farm that had this configuration<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private long confTime; // the time when this configuration was
+
+          registered in the database<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          .............// get/set functions<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</font></td>
+
+      </tr>
+
+      <tr>
+
+        <td width="100%">
+
+          <p><font size="2">&nbsp;&nbsp; </font><font size="1"> // the java
+
+          class that describes a farm<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public class WSFarm {<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String farmName; //the name of the farm<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private WSCluster[] clusterList; // the clusters of this farm</font></p>
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          .......... // get/set functions<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</font></p>
+
+        </td>
+
+      </tr>
+
+      <tr>
+
+        <td width="100%">
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; // the java class
+
+          that describes a cluster<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public class
+
+          WSCluster {<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String clusterName; //the name of the cluster<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private WSNode[] nodeList ; //the nodes contained in this cluster</font></p>
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          .......... // get/set functions<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</font></p>
+
+        </td>
+
+      </tr>
+
+      <tr>
+
+        <td width="100%">
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp; // the java class that
+
+          describes a node<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; public class WSNode {<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private nodeName ; //the node name<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          private String paramList; //the list of parameters for this node</font></p>
+
+          <p><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+          ......... // get/set functions<br>
+
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }</font></p>
+
+        </td>
+
+      </tr>
+
+    </tbody>
+
+  </table>
+
+  </center>
+
+</div>
+
+<p><font size="2">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+- <i>WSConf[] getLatestConfiguration (String farm)</i> - returns the latest
+
+configurations received in the database for all farms (farm=&quot;*&quot;) or
+returns the latest configuration for a specified farm.</font></p>
+
+	 
+
+<p>
+
+</p>
+
+</td>
+
+</tr>
+
+<tr>
+
+<td class="normal">
+
+</td>
+
+</tr>
+
+</table>
+
+</body>
+
+</html>
+

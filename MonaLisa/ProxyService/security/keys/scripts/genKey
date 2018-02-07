@@ -1,0 +1,41 @@
+#!/bin/sh
+
+echo_usage() {
+	echo
+	echo Usage: $0 aliasName
+	echo
+}
+
+if [ $# -ne 1 ]; then
+
+	echo_usage
+	exit 1
+fi
+
+
+PRG="$0"
+
+while [ -h "${PRG}" ]; do
+  ls=`ls -ld "${PRG}"`
+  link=`expr "${ls}" : '.*-> \(.*\)$'`
+  if expr "${link}" : '.*/.*' > /dev/null; then
+    PRG="${link}"
+  else
+    PRG="`dirname ${PRG}`/${link}"
+  fi
+done
+
+# Get standard environment variables
+PRGDIR="`dirname ${PRG}`"
+#. "${PRGDIR}"/../../../conf/set_env
+
+echo "#############################################################"
+echo
+echo "Generating keys pair TO keystore [../Service/MLProxy.ks] . $1 will be used as alias"
+echo "Be ready to give the PASSWORD for your keystore ( MLProxy.ks )!!"
+echo "ATTENTION! If the file [MLService.ks] doesn't exists it will be created!!!"
+echo "ATTENTION! The password provided, in this case, will become the password for your keystore."
+echo "Execution can be stopped using ^C."
+echo
+echo "#############################################################"
+${JAVA_HOME}/bin/keytool -genkey -keystore $PRGDIR/../Service/MLProxy.ks -alias $1 

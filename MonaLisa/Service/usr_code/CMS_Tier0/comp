@@ -1,0 +1,1 @@
+javac -source 1.4 -target 1.4 -classpath .:../../lib/FarmMonitor.jar:../../lib/backport-util-concurrent.jar *.java

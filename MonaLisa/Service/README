@@ -1,0 +1,67 @@
+IMPORTANT! Please read this document before start using MonaLisa.
+
+ Please DO NOT modify the location of this directory. It is assumed to
+be under ${MonaLisa_HOME}/Service. The scripts in CMD directory are
+based on this layout!
+
+* CMD directory you'l find the  scripts for starting/stopping MonaLisa
+a ml_env file for setting the proper environment.
+ 
+* myFarm directory has a default configuration for a farm that monitores 
+localhost . Starting from this you can build your own Farm.
+
+* usr_code contains examples of dynamical loadable modules.
+ 
+* lib contains necesary binaries for MonaLisa to run.
+
+* If you start MonaLisa with autoupdate turned on, you should find another
+directory called TMP_UPDATE. Please do not modify the files in this 
+directory.
+
+****************************
+ How to RUN YOUR OWN SERVICE
+****************************
+
+ 1) make a directory in ${MonaLisa_HOME}/Service/ ( eg called TEST-FARM )
+    $cd ${MonaLisa_HOME}/Service/
+    $mkdir TEST-FARM
+ 2) copy the conf files from TEST to MyFarm ( Your New Farm Directory )
+    $cd TEST-FARM
+    $cp ../myFarm/db.conf.embedded ../myFarm/ml.properties ../myFarm/myFarm.conf
+
+ 3) modify/rename the myFarm.conf file as you wish ( eg test-farm.conf ).
+ 
+ 4) Modify the folowing variables in ml_env under the CMD directory
+ 
+ 5) How to start/stop/restart MonaLisa
+ 
+    * Start
+
+  ${MonaLisa_HOME}/Service/CMD/ML_SER start
+ 
+    * Stop
+
+ ${MonaLisa_HOME}/Service/CMD/ML_SER stop
+
+    * Restart
+
+ ${MonaLisa_HOME}/Service/CMD/ML_SER restart
+
+ You can call ML_SER script from any directory.
+
+
+ 6) AutoUpdate
+
+ If you would like MonaLisa to autoupdate please add this line to your crontab
+
+ $crontab -e
+
+ */15 * * * * <absolute_path_to_your_MonaLisa_HOME>/Service/CMD/CHECK_UPDATE
+
+ in the case above MonaLisa will check for update every 5 minutes. Also set 
+ in CMD/ml_env SHOULD_UPDATE="true"
+
+ To add your own modules see the examples in usr_code.
+
+Please read the User Guide from
+http://monalisa.cacr.caltech.edu/

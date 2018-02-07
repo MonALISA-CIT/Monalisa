@@ -1,0 +1,36 @@
+Requesting a host or service certificate
+----------------------------------------
+
+1) ./genKey alias_example
+
+This will create the keystore (MLService.ks) containing the keypair used in authentication process.
+The parameter 'alias_example' will be used as an alias for the keypair in keystore
+
+!!! When you are prompted to introduce your name fill this field with your host IP such as:
+    host/<your_host_IP_address>
+
+These is necessary in order to pass the authorization check made by the Lookup Service.
+
+
+2) ./certRequest alias_example cert_request.csr
+
+This will generate an certificate signing request from keystore MLService.ks
+The resulting 'cert_request' file must be submitted to us for signing. 
+See http://monalisa.cern.ch/CA/ for details.
+
+3) After receiving the certificate signing response use the following script to import it in your keystore
+
+./importCert CA_name  password_example ca_cert.pem
+./importCert alias_example password_example signed_certificate.pem
+
+
+After these steps the file MLProxy.ks contains your private key along with a signed certificate for the public key.
+
+4). Create a file named MLProxy.password with the keystore password and "chmod" it for your own
+
+echo "password_example" > ../Service/MLProxy.password
+chmod 600 ../Service/MLProxy.password
+
+
+
+

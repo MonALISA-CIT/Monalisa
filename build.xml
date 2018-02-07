@@ -1,0 +1,2010 @@
+<project name="MSRC" default="dist" basedir=".">
+    <echo message="${line.separator}${line.separator} Using java ${java.version} ${line.separator}${line.separator} " />
+    <!-- set global properties for this build -->
+
+    <property name="epg.version" value="9.0.3" />
+    <property name="epg.requpgrade.version" value="8.3+" />
+    <property name="epg.noup.version" value="9.0+" />
+    <buildnumber/>
+    
+    <tstamp>
+        <format property="currentdate" pattern="yyyy-MM-dd" />
+        <format property="extendedcurrentdate" timezone="UTC" pattern="yyyyMMddHHmm" />
+        <format property="normaldate" pattern="yyyy-MM-dd HH:mm" />
+    </tstamp>
+
+    <tstamp>
+        <format property="monalisa.major.version" pattern="yy" />
+        <format property="monalisa.minor.version" pattern="MM" />
+    </tstamp>
+    
+    <!--
+        To append a maintenance version (e.g. two releasese within a month)
+        just uncomment the property below!
+        
+    -->
+    <property name="monalisa.maintenance.version" value="05" />
+    
+    
+    <condition property="monalisa.version.short" value="${monalisa.major.version}.${monalisa.minor.version}.${monalisa.maintenance.version}">
+        <isset property="monalisa.maintenance.version"/>
+    </condition>
+            
+   
+    <property name="monalisa.dir.version" value="${monalisa.major.version}.${monalisa.minor.version}" />
+    <property name="monalisa.version.short" value="${monalisa.major.version}.${monalisa.minor.version}" />
+    <property name="monalisa.version" value="${monalisa.version.short}-b${extendedcurrentdate}" />
+    
+    
+    <property name="updater.version" value="${monalisa.version.short}" />
+    
+    <property name="monalisa.vdate" value="${currentdate}" />
+    <property name="VoModulesDir" value="VoModules-v0.38" />
+    <property name="OsgVoModulesDir" value="OsgVoModules-v0.38" />
+    <property name="PNModulesDir" value="PNModules-v0.22" />
+
+    <property name="monalisa.client.version" value="${monalisa.version.short}-b${extendedcurrentdate}" />
+    <property name="monalisa.client.date" value="${extendedcurrentdate}" />
+
+    <property name="monalisa.servlets.monsit.version" value="1.3.1" />
+    <property name="monalisa.servlets.monsit.date" value="${normaldate}" />
+
+
+    <property name="monalisa.home" value="MonaLisa" />
+    <property name="catalina.home" value="${monalisa.home}/Repository/tomcat" />
+    <property name="lia.home" value="." />
+    <property name="jogl.path" value="${lia.home}/lib/jogl" />
+    <property name="src.dir" value="build/src" />
+    <property name="build.dir" value="build/classes" />
+    <property name="src.from.dir" value="src" />
+    <property name="dist.dir.clients" value="build/dist/Clients" />
+    <property name="dist.dir.service" value="build/dist/Service" />
+    <property name="dist.dir.control" value="build/dist/Control" />
+    <property name="dist.dir.webupdate" value="build/dist/web" />
+    <property name="dist.dir.webupdate.service" value="${dist.dir.webupdate}/MonALISA_Service" />
+    <property name="dist.dir.webupdate.service.current" value="${dist.dir.webupdate.service}/MLService" />
+    <property name="dist.dir.service.current.version" value="MLService_${monalisa.version.short}" />
+    <property name="dist.dir.webupdate.service.current.version" value="${dist.dir.webupdate.service}/${dist.dir.service.current.version}" />
+    <property name="web.app.name" value="GRAPH" />
+    <property name="web.app.path" value="/${web.app.name}" />
+    <property name="wap.app.name" value="wap" />
+    <property name="wap.app.path" value="/${wap.app.name}" />
+    <property name="javadoc.dest.dir" value="${lia.home}/WEBS/WEB/JAVADOC" />
+    <property name="web.dir" value="${lia.home}/WEBS/WEB_GRAPH" />
+    <property name="dist.topo.web.dir" value="${lia.home}/WEBS/WEB_TOPO/WEB-INF/lib" />
+    <property name="dist.monsit.web.dir" value="${lia.home}/WEBS/WEB_MONSIT/WEB-INF/lib" />
+    <property name="wap.dir" value="${lia.home}/WEBS/WEB_WAP" />
+    <property name="axis.dir" value="${lia.home}/WEBS/axis" />
+    <property name="dist.web.dir" value="${web.dir}/WEB-INF/lib" />
+    <property name="dist.wap.dir" value="${wap.dir}/WEB-INF/lib" />
+    <property name="dist.axis.dir" value="${axis.dir}/WEB-INF/lib" />
+    <property name="dist.dir.proxy" value="build/dist/Proxy" />
+    <property name="dist.dir.logger" value="build/dist/Logger" />
+    <property name="dist.dir.OSD" value="build/dist/OSD" />
+    <property name="store.pass" value="monalisa" />
+    <!-- <property name="store.alias" value="ioji" /> -->
+    <property name="store.alias" value="mlsign" />
+    <property name="sclients.update.dir" value="${lia.home}/WEBS/UPDATE/SLIBS_WCLIENTS" />
+    <!--   <property name="keystore" value="${lia.home}/WEBS/UPDATE/KS_SCRIPTS/monalisaWeb.ks" />	-->
+    <property name="keystore" value="${lia.home}/WEBS/UPDATE/KS_SCRIPTS/mlsign.ks" />
+    <property name="source.axis.lib" value="${monalisa.home}/Repository/axis" />
+
+    <property name="deploy.dir" value="build/deploy" />
+    <property name="pathload.app" value="PathloadConfig" />
+    <property name="javadoc.PathloadConfig.dir" value="${deploy.dir}/${pathload.app}/doc" />
+
+    <target name="init">
+        <mkdir dir="${dist.dir.proxy}" />
+        <mkdir dir="${dist.dir.logger}" />
+        <mkdir dir="${dist.dir.OSD}" />
+        <mkdir dir="${dist.dir.OSD}/authz" />
+        <mkdir dir="${dist.dir.OSD}/authz/lib" />
+        <mkdir dir="build/current" />
+        <filter token="version" value="${monalisa.version}" />
+        <filter token="mlversionshort" value="${monalisa.version.short}" />
+        <filter token="mlbuildid" value="${extendedcurrentdate}" />
+        <filter token="updaterVersion" value="${updater.version}" />
+        <filter token="updaterDate" value="b${build.number}" />
+        <filter token="vdate" value="${monalisa.vdate}" />
+        <filter token="ML_VoModulesDir" value="${VoModulesDir}" />
+        <filter token="ML_OsgVoModulesDir" value="${OsgVoModulesDir}" />
+        <filter token="ML_PNModulesDir" value="${PNModulesDir}" />
+        <filter token="clientVersion" value="${monalisa.client.version}" />
+        <filter token="clientDate" value="${extendedcurrentdate}" />
+        <filter token="monsitVersion" value="${monalisa.servlets.monsit.version}" />
+        <filter token="monsitDate" value="${monalisa.servlets.monsit.date}" />
+        <mkdir dir="${src.dir}" />
+        <mkdir dir="${dist.dir.service}" />
+        <mkdir dir="${dist.dir.control}" />
+        <mkdir dir="${javadoc.dest.dir}" />
+        <mkdir dir="${dist.dir.clients}" />
+        <mkdir dir="${dist.axis.dir}" />
+        <mkdir dir="${dist.dir.webupdate.service}" />
+        <mkdir dir="${dist.dir.webupdate.service.current.version}" />
+        <symlink link="${dist.dir.webupdate.service.current}" resource="MLService_${monalisa.version.short}" overwrite="true" />
+
+
+        <copy todir="${dist.dir.webupdate.service.current}" filtering="false" preservelastmodified="true">
+            <fileset dir="${monalisa.home}">
+                <include name="Service/lib/*.jar" />
+                <include name="Service/ml_dl/*.jar" />
+                <include name="Control/lib/*.jar" />
+            </fileset>
+        </copy>
+        <!-- Force version for every compilation -->
+        <copy file="${src.from.dir}/lia/Monitor/Farm/FarmMonitor.java" tofile="${src.dir}/lia/Monitor/Farm/FarmMonitor.java" overwrite="true" verbose="true" filtering="true" />
+        <copy file="${src.from.dir}/lia/Monitor/DataCache/tcpClientWorker.java" tofile="${src.dir}/lia/Monitor/DataCache/tcpClientWorker.java" overwrite="true" verbose="true" filtering="true" />
+        <copy file="${src.from.dir}/lia/Monitor/DataCache/Cache.java" tofile="${src.dir}/lia/Monitor/DataCache/Cache.java" overwrite="true" verbose="true" filtering="true" />
+        <copy file="${src.from.dir}/lia/Monitor/JiniSerFarmMon/RegFarmMonitor.java" tofile="${src.dir}/lia/Monitor/JiniSerFarmMon/RegFarmMonitor.java" overwrite="true" verbose="true" filtering="true" />
+        <copy file="${src.from.dir}/lia/util/update/Updater.java" tofile="${src.dir}/lia/util/update/Updater.java" overwrite="true" verbose="true" filtering="true" />
+
+        <!-- Enjoy the timestamp; Copy the rest -->
+        <copy todir="${src.dir}" filtering="true">
+            <fileset dir="${src.from.dir}">
+                <include name="**/**.java" />
+                <exclude name="**/GlobePan/**.java" />
+            </fileset>
+        </copy>
+        <copy todir="${src.dir}" filtering="false">
+            <fileset dir="${src.from.dir}">
+                <exclude name="**/GlobePan/**.java" />
+            </fileset>
+        </copy>
+        <copy todir="${src.dir}/lia/Monitor/Farm" filtering="false">
+            <fileset dir="${monalisa.home}/Service/CMD">
+                <include name="ML_SER*" />
+                <include name="cmd_run.sh" />
+                <include name="common*" />
+                <include name="mlevo_env" />
+                <include name="CHECK_UPDATE*" />
+            </fileset>
+        </copy>
+        <copy todir="${build.dir}" filtering="false">
+            <fileset dir="${src.dir}">
+                <exclude name="**/**.java" />
+            </fileset>
+        </copy>
+        <copy todir="${dist.dir.service}" filtering="false">
+            <fileset dir="MonaLisa/Service">
+                <include name="EmbeddedStorage/**/*" />
+            </fileset>
+        </copy>
+        <!-- Create the time stamp -->
+        <tstamp />
+    </target>
+
+    <path id="compile.java.classpath">
+        <fileset dir="${catalina.home}/lib">
+            <include name="servlet-api.jar" />
+        </fileset>
+        <fileset dir="${catalina.home}/bin">
+            <include name="bootstrap.jar" />
+        </fileset>
+        <fileset dir="${jogl.path}">
+            <include name="jar/jogl-all.jar" />
+        </fileset>
+        <fileset dir="${monalisa.home}/ProxyService/lib">
+            <include name="apmon.jar" />
+        </fileset>
+        <fileset dir="${dist.axis.dir}">
+            <include name="*.jar" />
+            <exclude name="ML_WS.jar" />
+        </fileset>
+        <fileset dir="${source.axis.lib}">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${lia.home}/lib">
+            <include name="jcommon*.jar" />
+        </fileset>
+        <fileset dir="${dist.web.dir}">
+            <include name="*.jar" />
+            <exclude name="*WEB*.jar" />
+        </fileset>
+        <fileset dir="${lia.home}/lib">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${monalisa.home}/Clients/lib">
+            <include name="postgresql.jar" />
+        </fileset>
+    </path>
+    <path id="compile.web.classpath">
+        <pathelement path="${classpath}" />
+        <!-- Include all elements that Tomcat exposes to applications -->
+        <fileset dir="${catalina.home}/lib">
+            <include name="*.jar" />
+        </fileset>
+        <pathelement location="${catalina.home}/bin/bootstrap.jar" />
+        <fileset dir="${dist.web.dir}">
+            <include name="*.jar" />
+            <exclude name="*WEB*.jar" />
+        </fileset>
+        <fileset dir="${lia.home}/lib">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${source.axis.lib}">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${axis.dir}/WEB-INF/lib">
+            <include name="*.jar" />
+            <exclude name="ML_WS.jar" />
+        </fileset>
+    </path>
+    <path id="javadoc.classpath">
+        <path refid="compile.java.classpath" />
+        <path refid="compile.web.classpath" />
+    </path>
+    <path id="compile.wap">
+        <pathelement path="${classpath}" />
+        <!-- Include all elements that Tomcat exposes to applications -->
+        <fileset dir="${catalina.home}/lib">
+            <include name="*.jar" />
+        </fileset>
+        <fileset dir="${lia.home}/lib">
+            <include name="jini*.jar" />
+            <include name="netx.jar" />
+            <include name="dns*.jar" />
+            <include name="tools.jar" />
+        </fileset>
+        <fileset dir="${dist.wap.dir}">
+            <include name="*.jar" />
+            <exclude name="*WEB*.jar" />
+        </fileset>
+    </path>
+
+    <!-- ================================= 
+          target: compile_topo_ser
+         ================================= -->
+    <target name="compile_topo_ser" description="Compile lia package" depends="init">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/util/topology/*.java" />
+            <include name="lia/util/ApMon/*.java" />
+            <include name="lia/util/security/MLLogin.java" />
+            <include name="lia/web/utils/*.java" />
+            <include name="lia/util/*.java" />
+            <include name="lia/Monitor/modules/*.java" />
+            <include name="lia/util/DynamicThreadPoll/*.java" />
+            <include name="lia/util/net/*.java" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/util/exporters/*.java" />
+            <include name="lia/util/threads/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
+        </javac>
+    </target>
+
+    <!-- ================================= 
+          target: compile_abping_conf_ser
+         ================================= -->
+    <target name="compile_abping_conf_ser" description="Compile lia package" depends="init">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/util/ABPing/*.java" />
+            <include name="lia/util/ApMon/*.java" />
+            <include name="lia/web/utils/*.java" />
+            <include name="lia/util/*.java" />
+            <include name="lia/Monitor/modules/*.java" />
+            <include name="lia/util/DynamicThreadPoll/*.java" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/util/exporters/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
+        </javac>
+    </target>
+
+    <!-- ================================= 
+          target: compile_pathload_conf_web
+         ================================= -->
+    <target name="compile_pathload_conf_web" depends="init" description="Compile the Pathload webconf servlet">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/Pathload/util/*.java" />
+            <include name="lia/util/Pathload/server/*.java" />
+            <include name="lia/util/Pathload/server/manager/*.java" />
+            <include name="lia/util/Pathload/server/servlet/*.java" />
+            <include name="lia/util/Pathload/server/stylesheets/*.java" />
+        </javac>
+    </target>
+
+    <target name="compile_monsit_ser" description="Compile monsit package" depends="init">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/web/servlets/monsit/monsit.java" />
+            <include name="lia/util/ApMon/*.java" />
+            <include name="lia/web/utils/*.java" />
+            <include name="lia/util/*.java" />
+            <include name="lia/util/ntp/*.java" />
+            <include name="lia/util/mail/*.java" />
+            <include name="lia/Monitor/modules/*.java" />
+            <include name="lia/util/DynamicThreadPoll/*.java" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/util/exporters/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
+        </javac>
+        <delete verbose="true">
+            <fileset dir="${build.dir}/lia/Monitor/modules/" includes="monRepository*.class" />
+        </delete>
+    </target>
+    <target name="compile_proxy" description="Compile proxy classes" depends="init">
+        <echo message="${line.separator}Compiling mandatory Java 1.6 classes" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/LightProxyService.java" />
+        </javac>
+        <echo message="${line.separator}Compiling Java 1.6 classes" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/ClientsFarmProxy/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/**/*.java" />
+            <include name="lia/util/UUID.java" />
+            <include name="lia/util/logging/**/*.java" />
+            <include name="lia/util/net/**/*.java" />
+            <include name="lia/Monitor/monitor/**/*.java" />
+        </javac>
+    </target>
+
+    <target name="compile_ser" description="Compile ML Service packages" depends="init">
+        <echo message="${line.separator} MonALISA-Version ${monalisa.version} ${line.separator}${line.separator}${line.separator}" />
+        <echo message="${line.separator} Compiling all sources for Java 6" />
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/ntp/**/*.java" />
+            <include name="lia/app/**/*.java" />
+            <include name="lia/Monitor/Agents/**/*.java" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/Agents/BService/*.java" />
+            <include name="lia/Agents/Server/*.java" />
+            <include name="lia/Agents/jagent/*.java" />
+            <include name="lia/Monitor/modules/**/*.java" />
+            <exclude name="lia/Monitor/modules/monRepos**.java" />
+            <exclude name="lia/Monitor/modules/monClientStats.java" />
+            <exclude name="lia/Monitor/modules/monSite**.java" />
+            <exclude name="lia/Monitor/monitor/OS*.java" />
+            <exclude name="lia/Monitor/monitor/LocalDataFarmClient.java" />
+            <exclude name="lia/Monitor/monitor/LocalDataFarmProvider.java" />
+            <exclude name="lia/Monitor/modules/monSite*.java" />
+            <include name="lia/util/security/**/*.java" />
+            <!--include name="lia/util/geo/*.java" /-->
+            <include name="lia/util/update/**/*.java" />
+            <include name="lia/util/timestamp/**/*.java" />
+            <exclude name="lia/util/update/old/**/*.java" />
+            <exclude name="lia/util/update/Updater.java" />
+            <exclude name="lia/util/update/UpdaterConfig.java" />
+            <include name="lia/Monitor/Store/**/*.java" />
+            <exclude name="lia/Monitor/Store/FarmBan.java" />
+            <include name="lia/Monitor/DataCache/*.java" />
+            <include name="lia/util/UUID.java" />
+            <include name="lia/util/DynamicThreadPoll/*.java" />
+            <include name="lia/util/actions/*.java" />
+            <include name="lia/util/exporters/*.java" />
+            <include name="lia/util/topology/TopologyJiniProxy.java" />
+            <include name="lia/util/logging/**/*.java" />
+            <include name="lia/util/proc/**/*.java" />
+            <include name="lia/util/telnet/**/*.java" />
+            <include name="lia/Monitor/control/ControlI.java" />
+            <exclude name="lia/Monitor/tcpClient/**/*.java" />
+            <include name="lia/Monitor/Farm/**/*.java" />
+            <include name="lia/Monitor/Farm/ABPing/**/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/**/*.java" />
+            <include name="lia/Monitor/Filters/**/*.java" />
+            <include name="lia/ws/**/*.java" />
+            <exclude name="lia/util/actions/**/*.java" />
+            <exclude name="lia/util/MLProperties.java" />
+            <!-- Pathload -->
+            <include name="lia/Monitor/Farm/Pathload/*.java" />
+            <include name="lia/util/Pathload/client/*.java" />
+            <include name="lia/util/Pathload/util/*.java" />
+            <include name="lia/util/ShutdownManager.java" />
+            <exclude name="lia/util/logging/service/**/*.java" />
+            <!--- exclude OS authz-service classes 
+			<exclude name="lia/Monitor/Agents/OpticalPath/comm/authz/**" />
+			<include name="lia/Monitor/Agents/OpticalPath/comm/authz/AuthZRequest.java" />
+			<include name="lia/Monitor/Agents/OpticalPath/comm/authz/AuthZResponse.java" />
+	    -->
+            <include name="lia/util/fdt/**/*.java" />
+        </javac>
+        <echo message="${line.separator} Compiling updater for Java4" />
+        <delete includeemptydirs="true">
+            <fileset dir="${build.dir}" includes="lia/util/update/Updater.class" />
+            <fileset dir="${build.dir}" includes="lia/util/update/old/*.class" />
+        </delete>
+        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.4" target="1.4">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/update/Updater.java" />
+            <include name="lia/util/update/old/**/*.java" />
+        </javac>
+    </target>
+    <target name="compile_osd" description="Compile Optical Switch Daemon Package" depends="init">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/Monitor/Agents/OpticalPath/comm/*.java" />
+            <include name="lia/Monitor/monitor/AppConfig*.java" />
+            <include name="lia/Monitor/monitor/LoggerConfigClass.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/util/DateFileWatchdog.java" />
+            <include name="lia/osdaemon/*.java" />
+        </javac>
+    </target>
+
+    <!-- ================================= 
+          target: compile_authz-service              
+         ================================= -->
+    <target name="compile_authz_ser" depends="init" description="Compiles authorization service used for OS">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/security/authz/AuthZJiniProxy.java" />
+            <include name="lia/Monitor/monitor/GenericMLEntry.java" />
+            <include name="lia/Monitor/monitor/AuthZSI.java" />
+        </javac>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/security/authz/**/*.java" />
+            <exclude name="lia/util/security/authz/AuthZJiniProxy.java" />
+            <include name="lia/util/security/MLLogin.java" />
+            <include name="lia/util/ntp/*.java" />
+            <include name="lia/Monitor/monitor/AppConfig*.java" />
+            <include name="lia/util/DateFileWatchdog.java" />
+        </javac>
+    </target>
+
+    <!-- ================================= 
+          target: compile_mllogger_service              
+         ================================= -->
+    <target name="compile_logger" depends="init" description="Compiles MLLogger service">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/logging/service/MLLoggerJiniProxy.java" />
+            <include name="lia/Monitor/monitor/GenericMLEntry.java" />
+            <include name="lia/Monitor/monitor/MLJiniManagersProvider.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/monitor/DataStore.java" />
+            <include name="lia/Monitor/monitor/TopologySI.java" />
+            <include name="lia/Monitor/monitor/AuthZSI.java" />
+            <include name="lia/Monitor/monitor/tcpConn*.java" />
+            <include name="lia/util/logging/comm/*.java" />
+            <include name="lia/Monitor/monitor/monMessage.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
+            <include name="lia/Monitor/monitor/ABPingEntry.java" />
+            <include name="lia/Monitor/monitor/PathloadDiscoverySI.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.java" />
+            <include name="lia/Monitor/monitor/LoggerConfigClass.java" />
+            <include name="lia/Monitor/monitor/AuthZSI.java" />
+        </javac>
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/logging/service/**/*.java" />
+            <exclude name="lia/util/logging/service/MLLoggerJiniProxy.java" />
+            <include name="lia/util/security/MLLogin.java" />
+            <include name="lia/util/ntp/*.java" />
+            <include name="lia/Monitor/monitor/AppConfig*.java" />
+            <include name="lia/util/DateFileWatchdog.java" />
+        </javac>
+    </target>
+
+    <target name="init_ps" description="Copies picsplitter files">
+        <copy todir="${src.dir}" filtering="true">
+            <fileset dir="${src.from.dir}">
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/JoglPanel.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Globals.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/VectorO.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Shadow.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/SerMonitorBase.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/graphical.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/rcNode.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/GlobeListener.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/AbstractGlobeListener.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/DataGlobals.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/DataRenderer.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/FMath.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/Sun.java" />
+                <include name="lia/util/ntp/NTPClient.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/TextureLoadThread.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/IdleTask.java" />
+                <!--			<include name="" />
+			<include name="" />
+			<include name="" />
+			<include name="" />
+			<include name="" />		-->
+                <include name="lia/util/ntp/NTPDate.java" />
+                <include name="lia/Monitor/monitor/AppConfig*.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/NetResourceClassLoader.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/PicSplitter.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/ChangeRootTexture.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/TextureParams.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Texture.java" />
+                <include name="lia/Monitor/JiniClient/CommonGUI/BackgroundWorker.java" />
+            </fileset>
+        </copy>
+    </target>
+    <target name="compile_ps" description="Compile pic splitter package" depends="init">
+        <echo message="Compile pic splitter's java files in ${src.dir}" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/util/ntp/NTPClient.java" />
+            <include name="lia/util/ntp/NTPDate.java" />
+            <include name="lia/Monitor/monitor/AppConfig*.java" />
+            <include name="lia/util/dataStruct/*.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/NetResourceClassLoader.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/PicSplitter.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/ChangeRootTexture.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/TextureParams.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Texture.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Shadow.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Globals.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/BackgroundWorker.java" />
+        </javac>
+    </target>
+    <target name="compile_client" description="Compile lia package" depends="init">
+        <echo message="Compile *.java in ${src.dir}" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.java.classpath" />
+            <include name="lia/app/*.java" />
+            <include name="lia/app/**/*.java" />
+            <include name="lia/Monitor/monitor/*.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ServiceI.java" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.java" />
+            <include name="lia/Monitor/Agents/OpticalPath/*.java" />
+            <include name="lia/Monitor/Agents/OpticalPath/Lease/LeaseEventListener.java" />
+            <include name="lia/Monitor/Agents/OpticalPath/Admin/OSAdminInterface.java" />
+            <include name="lia/Monitor/Agents/OpticalPath/**/*.java" />
+            <include name="lia/Agents/BService/*.java" />
+            <include name="lia/Agents/Server/*.java" />
+            <include name="lia/Agents/jagent/*.java" />
+            <include name="lia/Monitor/Plot/*.java" />
+            <include name="lia/Monitor/GUIs/*.java" />
+            <include name="lia/Monitor/control/*.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLogin.java" />
+            <include name="lia/Monitor/JiniClient/**/*.java" />
+            <exclude name="lia/Monitor/JiniClient/*/GlobePan/*.java" />
+            <include name="lia/algo/*.java" />
+            <include name="lia/images/*" />
+            <include name="lia/images/menu/small/*" />
+            <include name="lia/images/menu/*" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/plot/images/*" />
+            <!--include name="lia/web/utils/*.java" /-->
+            <include name="lia/modules/monClientStats.java" />
+            <include name="lia/util/StringFactory.java" />
+            <include name="lia/util/JiniConfigProvider.java" />
+            <include name="lia/util/SecureContextExecutor.java" />
+            <include name="lia/util/UUID.java" />
+            <include name="lia/util/DynamicThreadPoll/SchJobInt.java" />
+            <include name="lia/util/DynamicThreadPoll/SchJob.java" />
+            <include name="lia/util/topology/TopologyJiniProxy.java" />
+            <include name="lia/util/DateFileWatchdog.java" />
+            <!--<include name="lia/util/topology/*.java" /> -->
+            <include name="lia/util/security/*.java" />
+            <include name="lia/util/geo/*.java" />
+            <include name="lia/util/mail/*.java" />
+            <include name="lia/util/dataStruct/*.java" />
+            <include name="lia/util/mail/*.java" />
+            <include name="lia/util/net/*.java" />
+            <include name="lia/util/dns/*.java" />
+            <include name="lia/util/Utils.java" />
+            <include name="lia/util/actions/*.java" />
+            <include name="lia/util/StringFactory.java" />
+            <include name="lia/util/DateFileWatchdog*.java" />
+            <include name="lia/util/ApMon/*.java" />
+            <include name="lia/util/logging/**/*.java" />
+            <exclude name="lia/util/logging/service/**/*.java" />
+            <include name="lia/util/threads/**/*.java" />
+            <include name="lia/Monitor/modules/monClientStats.java" />
+            <include name="lia/Monitor/modules/monProcIO.java" />
+            <include name="lia/Monitor/modules/monProcLoad.java" />
+            <include name="lia/Monitor/modules/monProcStat.java" />
+        </javac>
+    </target>
+    <target name="compile_web" description="Compile classes for web" depends="init">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+            <classpath refid="compile.web.classpath" />
+            <include name="lia/Monitor/monitor/AppConfig*.java" />
+            <include name="lia/Monitor/monitor/DataStore.java" />
+            <include name="lia/Monitor/monitor/Gresult.java" />
+            <include name="lia/Monitor/monitor/LocalDataClient.java" />
+            <include name="lia/Monitor/monitor/LocalDataProvider.java" />
+            <include name="lia/Monitor/monitor/MFarm.java" />
+            <include name="lia/Monitor/monitor/MNode.java" />
+            <include name="lia/Monitor/monitor/MCluster.java" />
+            <include name="lia/Monitor/monitor/Result.java" />
+            <include name="lia/Monitor/monitor/monPredicate.java" />
+            <include name="lia/Monitor/monitor/dbStore.java" />
+            <include name="lia/Monitor/Store/*.java" />
+            <include name="lia/Monitor/Store/Fast/*.java" />
+            <include name="lia/Monitor/Store/Fast/Replication/*.java" />
+            <include name="lia/Monitor/DataCache/DataSelect.java" />
+            <include name="lia/web/utils/*.java" />
+            <include name="lia/web/bean/Generic/*.java" />
+            <include name="lia/web/servlets/wap/*.java" />
+            <include name="lia/web/servlets/web/*.java" />
+            <include name="lia/web/servlets/map2d/*.java" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Sphere/*.java" />
+            <include name="lia/ws/*.java" />
+            <include name="lia/util/ntp/*.java" />
+            <include name="lia/util/ApMon/*.java" />
+            <include name="lia/util/StatusPercentage.java" />
+        </javac>
+    </target>
+    <target name="rmic_ser" description="Generates stub(s)" depends="compile_ser">
+        <rmic base="${build.dir}" classname="lia.Monitor.Farm.FarmMonitor" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+        <rmic base="${build.dir}" classname="lia.Monitor.JiniSerFarmMon.RegFarmMonitor" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+        <rmic base="${build.dir}" classname="lia.net.topology.agents.admin.AFOXAdminImpl" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+        <rmic base="${build.dir}" classname="lia.Monitor.Agents.OpticalPath.Admin.OSAdminImpl" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+        <rmic base="${build.dir}" classname="lia.Monitor.Agents.OpticalPath.v2.Admin.OSAdminImpl" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+    <target name="rmic_proxy" description="Generates stub(s)" depends="compile_proxy">
+        <rmic base="${build.dir}" classname="lia.Monitor.ClientsFarmProxy.ProxyService" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+    <target name="rmic_topo_ser" description="Generates stub(s)" depends="compile_topo_ser">
+        <rmic base="${build.dir}" classname="lia.util.topology.TopologyJiniProxy" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+
+    <target name="rmic_authz_ser" description="Generates stub(s) for AuthzService" depends="compile_authz_ser">
+        <rmic base="${build.dir}" classname="lia.util.security.authz.AuthZJiniProxy" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+
+    <target name="rmic_logger" description="Generates stub(s) for MLLoggerService" depends="compile_logger">
+        <rmic base="${build.dir}" classname="lia.util.logging.service.MLLoggerJiniProxy" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+
+    <target name="rmic_reflrouter" description="Generates stub(s) for ReflRouterService" depends="compile_client">
+        <rmic base="${build.dir}" classname="lia.Monitor.JiniClient.ReflRouter.ReflRouterJiniProxy" stubversion="1.2" debug="true" sourcebase="${src.dir}">
+            <classpath refid="compile.java.classpath" />
+        </rmic>
+    </target>
+
+    <target name="dist_epg" depends="init">
+        <echo message="Build epgsqldb embedded DB" />
+
+        <chmod perm="755" file="${dist.dir.service}/EmbeddedStorage/PG/mktgz.sh" />
+
+        <!-- Linux amd64 -->
+        <echo message="Build epgsqldb-linux_amd64.jar" />
+        <exec dir="${dist.dir.service}/EmbeddedStorage/PG" resolveexecutable="true" failonerror="true" failifexecutionfails="true" executable="mktgz.sh">
+            <env key="PGOSName" value="linux" />
+            <env key="PGArch" value="amd64" />
+            <env key="PGVersion" value="${epg.version}" />
+        </exec>
+        <manifest file="${dist.dir.service}/EmbeddedStorage/PG/linux/amd64/MANIFEST.MF" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="EPGVersion" value="${epg.version}" />
+            <attribute name="EPGMinUpgrade-Version" value="${epg.requpgrade.version}" />
+            <attribute name="EPGNoUpgrade-Version" value="${epg.noup.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.webupdate.service.current.version}/Service/lib/epgsqldb-linux_amd64.jar" basedir="${dist.dir.service}/EmbeddedStorage/PG/linux/amd64" manifest="${dist.dir.service}/EmbeddedStorage/PG/linux/amd64/MANIFEST.MF" update="false">
+            <include name="pgsql.tgz" />
+            <include name="install.sh" />
+        </jar>
+        <copy file="${dist.dir.webupdate.service.current.version}/Service/lib/epgsqldb-linux_amd64.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+
+        <!-- Linux i386 -->
+        <echo message="Build epgsqldb-linux_i386.jar" />
+        <exec dir="${dist.dir.service}/EmbeddedStorage/PG" resolveexecutable="true" failonerror="true" failifexecutionfails="true" executable="mktgz.sh">
+            <env key="PGOSName" value="linux" />
+            <env key="PGArch" value="i386" />
+            <env key="PGVersion" value="${epg.version}" />
+        </exec>
+        <manifest file="${dist.dir.service}/EmbeddedStorage/PG/linux/i386/MANIFEST.MF" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="EPGVersion" value="${epg.version}" />
+            <attribute name="EPGMinUpgrade-Version" value="${epg.requpgrade.version}" />
+            <attribute name="EPGNoUpgrade-Version" value="${epg.noup.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.webupdate.service.current.version}/Service/lib/epgsqldb-linux_i386.jar" basedir="${dist.dir.service}/EmbeddedStorage/PG/linux/i386" manifest="${dist.dir.service}/EmbeddedStorage/PG/linux/i386/MANIFEST.MF" update="false">
+            <include name="pgsql.tgz" />
+            <include name="install.sh" />
+        </jar>
+        <copy file="${dist.dir.webupdate.service.current.version}/Service/lib/epgsqldb-linux_i386.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+    </target>
+
+    <target name="dist_updater" depends="dist_ser">
+        <echo message="Build update.jar" />
+        <manifest file="${src.dir}/lia/util/update/Updater.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="MonALISA-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.service}/update.jar" basedir="${build.dir}" manifest="${src.dir}/lia/util/update/Updater.manifest" update="false">
+            <include name="lia/util/*.class" />
+            <include name="lia/util/net/Util.class" />
+            <include name="lia/util/update/**/*.class" />
+            <include name="lia/util/threads/*.class" />
+            <include name="lia/Monitor/monitor/AppConfig*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/*.class" />
+        </jar>
+        <chmod file="${monalisa.home}/Service/lib/update.jar" perm="u+rw" />
+        <copy file="${dist.dir.service}/update.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+        <copy file="${dist.dir.service}/update.jar" todir="${dist.dir.webupdate.service.current}/Service/lib" filtering="false" preservelastmodified="true" />
+    </target>
+    <target name="dist_jini_service_dl" depends="dist_ser">
+        <echo message="Build Farm farm-dl" />
+        <copy file="${lia.home}/lib/sdm-dl.jar" tofile="${dist.dir.service}/farm_mon_dl.jar" filtering="false" />
+        <jar jarfile="${dist.dir.service}/farm_mon_dl.jar" basedir="${build.dir}" update="true">
+            <include name="lia/Monitor/Farm/FarmMonitor_Stub.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/FarmMon*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/RegFarmMonitor_Stub.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/Admin/AFOXAdminImpl_Stub.class" />
+            <include name="lia/net/topology/agents/admin/AFOXAdminImpl_Stub.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/v2/Admin/OSAdminImpl_Stub.class" />
+            <include name="lia/Agents/Server/StationServerInt.class" />
+            <include name="lia/Agents/jagent/AgentInterface.class" />
+            <include name="lia/Agents/BService/BasicServiceInt.class" />
+            <include name="lia/util/security/*.class" />
+            <include name="lia/util/net/*.class" />
+        </jar>
+        <chmod file="${monalisa.home}/Service/ml_dl/farm_mon_dl.jar" perm="u+rw" />
+        <copy file="${dist.dir.service}/farm_mon_dl.jar" todir="${monalisa.home}/Service/ml_dl" filtering="false" preservelastmodified="true" />
+        <copy file="${dist.dir.service}/farm_mon_dl.jar" todir="${dist.dir.webupdate.service.current}/Service/ml_dl" filtering="false" preservelastmodified="true" />
+    </target>
+    <target name="dist_app_ctrl" depends="dist_ser">
+        <echo message="BUILD APP Control jar files" />
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+        <manifest file="${dist.dir.control}/MANIFEST.MF">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="MonALISA-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.control}/apache.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/apache/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/monc.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/monc/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/monalisa.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/monalisa/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/proc.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/proc/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/abing.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/abing/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/abing.jar" basedir="${monalisa.home}/Control/bin" manifest="${dist.dir.control}/MANIFEST.MF" update="true">
+            <include name="abw_rfl" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/iperf.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/iperf/*.class" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/iperf.jar" basedir="${monalisa.home}/Control/bin" manifest="${dist.dir.control}/MANIFEST.MF" update="true">
+            <include name="iperf" />
+        </jar>
+        <jar jarfile="${dist.dir.control}/transfer.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/transfer/*.class" />
+        </jar>
+
+        <!-- Experimental, added by Heri -->
+        <!-- Begin base Pathload app package -->
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+
+        <manifest file="${dist.dir.control}/MANIFEST.MF">
+            <attribute name="Implementation-Version" value="1.3.2-b5-generic" />
+            <attribute name="Build-Date" value="${monalisa.version}" />
+        </manifest>
+        <jar destfile="${dist.dir.control}/pathload.jar" basedir="${build.dir}" manifest="${dist.dir.control}/MANIFEST.MF" update="false">
+            <include name="lia/app/pathload/*.class" />
+        </jar>
+        <!-- End base Pathload app package -->
+        <!-- Begin i386 -->
+        <delete file="${dist.dir.control}/pathload-i386.jar" />
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+
+        <manifest file="${dist.dir.control}/MANIFEST.MF">
+            <attribute name="Implementation-Version" value="1.3.2-b5-i386" />
+            <attribute name="Build-Date" value="${monalisa.version}" />
+        </manifest>
+
+        <jar jarfile="${dist.dir.control}/pathload-i386.jar" basedir="${monalisa.home}/Control/bin/i386" manifest="${dist.dir.control}/MANIFEST.MF" update="true">
+            <include name="pathload_snd" />
+            <include name="pathload_rcv" />
+        </jar>
+        <!-- End i386 -->
+        <!-- Begin amd64 -->
+        <delete file="${dist.dir.control}/pathload-amd64.jar" />
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+
+        <manifest file="${dist.dir.control}/MANIFEST.MF">
+            <attribute name="Implementation-Version" value="1.3.2-b5-amd64" />
+            <attribute name="Build-Date" value="${monalisa.version}" />
+        </manifest>
+
+        <jar jarfile="${dist.dir.control}/pathload-amd64.jar" basedir="${monalisa.home}/Control/bin/amd64" manifest="${dist.dir.control}/MANIFEST.MF" update="true">
+            <include name="pathload_snd" />
+            <include name="pathload_rcv" />
+        </jar>
+        <!-- End amd64 -->
+        <!-- Begin Sparc -->
+        <delete file="${dist.dir.control}/pathload-sparc.jar" />
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+
+        <manifest file="${dist.dir.control}/MANIFEST.MF">
+            <attribute name="Implementation-Version" value="1.3.2-b4-sparc" />
+            <attribute name="Build-Date" value="${monalisa.version}" />
+        </manifest>
+
+        <jar jarfile="${dist.dir.control}/pathload-sparc.jar" basedir="${monalisa.home}/Control/bin/sparc" manifest="${dist.dir.control}/MANIFEST.MF" update="true">
+            <include name="pathload_snd" />
+            <include name="pathload_rcv" />
+        </jar>
+        <!-- End Sparc -->
+        <!-- Begin Cleanup -->
+        <delete file="${dist.dir.control}/MANIFEST.MF" />
+        <!-- End Cleanup -->
+
+        <chmod dir="${monalisa.home}/Control/lib" perm="u+rw" includes="**/*.jar" />
+        <copy todir="${monalisa.home}/Control/lib" filtering="false" preservelastmodified="true">
+            <fileset dir="${dist.dir.control}">
+                <include name="*.jar" />
+            </fileset>
+        </copy>
+        <copy todir="${dist.dir.webupdate.service.current}" filtering="false" preservelastmodified="true">
+            <fileset dir="${monalisa.home}">
+                <include name="Control/lib/*.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="dist_ser_rsync" depends="dist_ser">
+        <exec dir="." resolveexecutable="true" failonerror="true" failifexecutionfails="true" executable="rsync_mlser.sh">
+            <env key="APP_VERSION" value="${monalisa.version.short}" />
+            <env key="APP_BUILD_ID" value="${extendedcurrentdate}" />
+            <env key="APP_NAME" value="MLService" />
+            <env key="APP_STABLE_BUILD" value="false" />
+            <env key="LOCAL_DIR" value="${dist.dir.webupdate.service.current.version}" />
+            <env key="REMOTE_SITES" value="monalisa.cern.ch monalisa.caltech.edu" />
+            <env key="REMOTE_DIR" value="public_html/FARM_ML" />
+            <env key="REMOTE_USER" value="mlupdate" />
+        </exec>
+    </target>
+
+    <target name="dist_ser_rsync_stable" depends="dist_ser">
+        <exec dir="." resolveexecutable="true" failonerror="true" failifexecutionfails="true" executable="rsync_mlser.sh">
+            <env key="APP_VERSION" value="${monalisa.version.short}" />
+            <env key="APP_BUILD_ID" value="${extendedcurrentdate}" />
+            <env key="APP_NAME" value="MLService" />
+            <env key="APP_STABLE_BUILD" value="true" />
+            <env key="LOCAL_DIR" value="${dist.dir.webupdate.service.current.version}" />
+            <env key="REMOTE_SITES" value="monalisa.cern.ch monalisa.caltech.edu" />
+            <env key="REMOTE_DIR" value="public_html/FARM_ML" />
+            <env key="REMOTE_USER" value="mlupdate" />
+        </exec>
+    </target>
+
+    <target name="dist_ser" depends="compile_ser,rmic_ser">
+        <!--echo message="Delete all files in ${dist.dir.service}"/>
+		<delete>
+		<fileset dir="${dist.dir.service}">
+		<include name="**/*.jar"/>
+		</fileset>
+		</delete-->
+        <echo message="BUILD FarmMonitor.jar" />
+        <manifest file="${src.dir}/lia/Monitor/Farm/FarmMonitor.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="MonALISA-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.service}/FarmMonitor.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/Farm/FarmMonitor.manifest" update="false">
+            <include name="com/telescent/**" />
+            <include name="hep/**" />
+            <include name="lia/app/*.class" />
+            <include name="lia/Monitor/Farm/*" />
+            <include name="lia/Monitor/Farm/*.wsdd" />
+            <include name="lia/Monitor/Farm/ABPing/*.class" />
+            <include name="lia/Monitor/Farm/Conf/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/mtools/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/actions/*.class" />
+            <include name="lia/util/timestamp/**/*.class" />
+            <include name="lia/util/process/**/*.class" />
+            <include name="lia/util/ciena/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/net/rmi/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/ciena/**/*.class" />
+            <include name="lia/Monitor/DataCache/*.class" />
+            <!-- include name="lia/Monitor/Plot/*.class" / -->
+            <include name="lia/Monitor/Store/*.class" />
+            <include name="lia/Monitor/Store/EPGUtils/*.class" />
+            <include name="lia/util/os/*.class" />
+            <include name="lia/Monitor/Store/Fast/*.class" />
+            <include name="lia/Monitor/Store/Fast/Replication/*.class" />
+            <include name="lia/web/utils/Formatare.class" />
+            <include name="lia/web/bean/Generic/*.class" />
+            <include name="lia/Monitor/Store/Sql/*.class" />
+            <include name="lia/Monitor/Store/Sql/Pool/*.class" />
+            <include name="lia/Monitor/Store/Sql/Web/*.class" />
+            <include name="lia/Monitor/Filters/*.class" />
+            <include name="lia/Agents/Server/StationServerInt.class" />
+            <include name="lia/Agents/jagent/AgentInterface.class" />
+            <include name="lia/Monitor/Agents/**/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/AgentsPlatform/AgentMessage.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/AgentsPlatform/MSTAgentsMonitorClient.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/AgentsPlatform/MSTAgentsMonitorClient$MapSID.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/AgentsPlatform/MSTAgentsMonitorClient$Refresher.class" />
+            <include name="lia/util/security/*.class" />
+            <include name="lia/net/**/*.class" />
+            <include name="lia/util/security/authz/AuthZRequest.class" />
+            <include name="lia/util/security/authz/AuthZResponse.class" />
+            <include name="lia/util/Base64/*.class" />
+            <include name="lia/util/algo/**/*.class" />
+            <include name="lia/util/proc/**/*.class" />
+            <include name="lia/util/threads/**/*.class" />
+            <include name="lia/util/logging/**/*.class" />
+            <exclude name="lia/util/logging/service/**/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/exporters/*.class" />
+            <include name="lia/ws/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/util/geo/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/util/config/*.class" />
+            <include name="lia/util/telnet/*.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/fdt/**/*.class" />
+            <include name="lia/Monitor/Farm/Transfer/*.class" />
+            <!-- Pathload -->
+            <include name="lia/Monitor/Farm/Pathload/*.class" />
+            <include name="lia/util/Pathload/client/*.class" />
+            <include name="lia/util/Pathload/util/*.class" />
+            <include name="lia/util/ShutdownManager.class" />
+            <include name="lia/web/utils/DoubleFormat.class" />
+
+            <!--
+                ==================================================
+                Exclude whatever is not related with the ML serice
+                ==================================================
+            -->
+            <!-- exclude name="lia/Monitor/monitor/OS*.class" />
+            <exclude name="lia/Monitor/monitor/AppControlClient.class" />
+            <exclude name="lia/Monitor/monitor/LocalDataFarmClient.class" />
+            <exclude name="lia/Monitor/monitor/LocalDataFarmProvider.class" />
+            <exclude name="lia/util/geo/*.class" />
+            <exclude name="lia/Monitor/Store/FarmBan.class" />
+            <exclude name="lia/Monitor/modules/monRepos*.class" />
+            <exclude name="lia/Monitor/modules/monSite*.class" />
+            <exclude name="lia/util/actions/*.class" / -->
+        </jar>
+        <copy file="${dist.dir.service}/FarmMonitor.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+        <copy file="${dist.dir.service}/FarmMonitor.jar" todir="${dist.dir.webupdate.service.current}/Service/lib" filtering="false" preservelastmodified="true" />
+
+        <echo message="BUILD FarmControl.jar" />
+        <manifest file="${src.dir}/lia/Monitor/control/manifest.mf" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="MonALISA-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.service}/FarmControl.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/control/manifest.mf" update="false">
+            <include name="lia/Monitor/control/ControlI.class" />
+            <!-- include name="lia/Monitor/modules/*.class" / -->
+        </jar>
+        <copy file="${dist.dir.service}/FarmControl.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+        <copy file="${dist.dir.service}/FarmControl.jar" todir="${dist.dir.webupdate.service.current}/Service/lib" filtering="false" preservelastmodified="true" />
+
+        <echo message="Build JFarmMonitor.jar" />
+        <manifest file="${src.dir}/lia/Monitor/JiniSerFarmMon/JFarmMonitor.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="MonALISA-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.service}/JFarmMonitor.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniSerFarmMon/JFarmMonitor.manifest" update="false">
+            <include name="lia/Monitor/JiniSerFarmMon/*.class" />
+            <include name="lia/Agents/BService/*.class" />
+        </jar>
+        <copy file="${dist.dir.service}/JFarmMonitor.jar" todir="${monalisa.home}/Service/lib" filtering="false" preservelastmodified="true" />
+        <copy file="${dist.dir.service}/JFarmMonitor.jar" todir="${dist.dir.webupdate.service.current}/Service/lib" filtering="false" preservelastmodified="true" />
+
+    </target>
+
+    <target name="dist_ps" depends="compile_ps">
+        <echo message="Delete previous picsplitter jar in ${dist.dir.clients}" />
+        <delete>
+            <fileset dir="${dist.dir.clients}">
+                <include name="picsplitter.jar" />
+            </fileset>
+        </delete>
+        <echo message="Build picsplitter" />
+        <jar jarfile="${dist.dir.clients}/picsplitter.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/CommonGUI/Jogl/util/picsplitter.manifest" update="false">
+            <include name="lia/util/ntp/NTPDate$NTPThread.class" />
+            <include name="lia/util/ntp/NTPDate.class" />
+            <include name="lia/util/ntp/NTPClient.class" />
+            <include name="lia/Monitor/monitor/AppConfig*.class" />
+            <include name="lia/util/dataStruct/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/NetResourceClassLoader.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/PicSplitter$2.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/PicSplitter$1.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/ChangeRootTexture$1.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/NetResourceClassLoader$1.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/ChangeRootTexture.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/util/PicSplitter.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/TextureParams.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Texture.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Shadow.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Jogl/Globals*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/BackgroundWorker$1.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/BackgroundWorker$BackgroundWorkerThread.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/BackgroundWorker.class" />
+        </jar>
+    </target>
+    <target name="dist_client" depends="compile_client">
+        <echo message="Delete all files in ${dist.dir.clients}" />
+        <delete>
+            <fileset dir="${dist.dir.clients}">
+                <include name="**/*.jar" />
+            </fileset>
+        </delete>
+        <echo message="Build Client-dl" />
+        <copy file="${lia.home}/lib/sdm-dl.jar" tofile="${dist.dir.clients}/client_mon_dl.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/client_mon_dl.jar" todir="${monalisa.home}/Clients/Gui" filtering="false" />
+        <copy file="${dist.dir.clients}/client_mon_dl.jar" todir="${monalisa.home}/Clients/JStoreClient" filtering="false" />
+        <copy file="${dist.dir.clients}/client_mon_dl.jar" todir="${monalisa.home}/Clients/JReflRouter" />
+        <copy file="${dist.dir.clients}/client_mon_dl.jar" todir="${monalisa.home}/Clients/LUSCheck" />
+        <echo message="Build JClient" />
+        <manifest file="${src.dir}/lia/Monitor/JiniClient/Farms/JMonitorClient.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="Version" value="${monalisa.client.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.clients}/JMonitorClient.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/Farms/JMonitorClient.manifest" update="false">
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLogin*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniClient/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonJini/**/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/**/*.class" />
+            <include name="lia/Monitor/JiniClient/Farms/CienaMap/**/*.class" />
+            <include name="lia/Monitor/ciena/tl1/*.class" />
+            <include name="lia/Monitor/ciena/circuits/topo/*.class" />
+            <include name="lia/Monitor/ciena/circuits/topo/tl1/*.class" />
+            <include name="lia/Monitor/ciena/circuits/tl1/*.class" />
+            <include name="lia/Monitor/ciena/osrp/topo/*.class" />
+            <include name="lia/Monitor/ciena/osrp/tl1/*.class" />
+            <include name="lia/Monitor/ciena/PST.class" />
+            <include name="lia/Monitor/JiniClient/Farms/**/*.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/*.class" />
+            <exclude name="lia/Monitor/Agents/OpticalPath/*MLCopy*.class" />
+            <exclude name="lia/Monitor/Agents/OpticalPath/*MLPath*.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/v2/State/*.class" />
+            <exclude name="lia/Monitor/Agents/OpticalPath/v2/State/*FSM*.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/Lease/LeaseEventListener.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/Admin/OSAdminInterface.class" />
+            <exclude name="lia/Monitor/Agents/OpticalPath/MLCopyAgent.class" />
+            <include name="lia/Monitor/tcpClient/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <exclude name="lia/Monitor/monitor/FAgent.class" />
+            <include name="lia/Monitor/control/*.class" />
+            <include name="lia/Monitor/AppControlClient/*" />
+            <include name="lia/Monitor/DataCache/Cache_Stub.class" />
+            <include name="lia/Monitor/GUIs/*.class" />
+            <include name="lia/Monitor/Plot/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/images/*" />
+            <include name="lia/images/menu/*" />
+            <include name="lia/images/menu/small/*" />
+            <include name="lia/images/grids/*" />
+            <include name="lia/images/plot/*" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/plot/images/*" />
+            <include name="lia/images/appControl/*" />
+            <include name="lia/images/joglpanel/**" />
+            <include name="lia/images/osgmap/**" />
+            <include name="lia/images/groups/**" />
+            <include name="lia/util/UUID*.class" />
+            <include name="lia/util/IPU*.class" />
+            <include name="lia/util/JiniConfigProvider*.class" />
+            <include name="lia/util/SecureContextExecutor*.class" />
+            <include name="lia/util/StringFactory*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/dataStruct/*.class" />
+            <include name="lia/util/security/FarmMonitorTrustManager.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/DateFileWatchdog*.class" />
+            <include name="lia/app/AppUtils.class" />
+            <!--include name="lia/util/net/*.class"/-->
+            <include name="lia/util/geo/*.class" />
+            <include name="lia/util/QuotedStringTokenizer.class" />
+            <include name="lia/util/sizeof/Sizeof.class" />
+            <include name="lia/web/utils/ExportClientStatistics.class" />
+            <include name="lia/web/utils/ExportStatistics*.class" />
+            <include name="lia/modules/monClientStats.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJobInt.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/net/topology/*.class" />
+            <include name="lia/net/topology/ciena/*.class" />
+            <include name="lia/net/topology/opticalswitch/*.class" />
+            <include name="lia/net/topology/ciena/*.class" />
+            <include name="lia/net/topology/force10/*.class" />
+            <include name="lia/net/topology/**/*.class" />
+            <include name="lia/util/logging/**/*.class" />
+            <include name="lia/util/Utils*.class" />
+            <include name="lia/util/threads/**/*.class" />
+            <include name="lia/Monitor/modules/monClientStats.class" />
+            <!--            <include name="lia/Monitor/modules/monProcIO*.class" />
+			<include name="lia/Monitor/modules/monProcLoad*.class" />
+			<include name="lia/Monitor/modules/monProcStat.class" /> -->
+        </jar>
+        
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-CERN.jar" filtering="false" overwrite="true"/>
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-CALTECH.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-CACR.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-No3D-CERN.jar" filtering="false" overwrite="true"/>
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-No3D-CALTECH.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-No3D-CACR.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-HI-CERN.jar" filtering="false" overwrite="true"/>
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-HI-CALTECH.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient.jar" tofile="${dist.dir.clients}/JMonitorClient-HI-CACR.jar" filtering="false" />
+        
+        <mkdir dir="${dist.dir.clients}/JNLP-INF"/>
+
+        <!-- CERN JMonitorClient JARs (3D, No3D and HI res)  -->
+        <copy file="resources/jnlp/ML_Client_CERN.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-CERN.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+        
+        <copy file="resources/jnlp/ML_Client_No3D_CERN.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-No3D-CERN.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <copy file="resources/jnlp/ML_Client_HI_CERN.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-HI-CERN.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+            
+        <!-- CALTECH JMonitorClient JARs (3D and No3D) -->
+        <copy file="resources/jnlp/ML_Client_CALTECH.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-CALTECH.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <copy file="resources/jnlp/ML_Client_No3D_CALTECH.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-No3D-CALTECH.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <copy file="resources/jnlp/ML_Client_HI_CALTECH.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-HI-CALTECH.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+        
+        <!-- CACR JMonitorClient JARs (3D and No3D) -->
+        <copy file="resources/jnlp/ML_Client_CACR.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-CACR.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <copy file="resources/jnlp/ML_Client_No3D_CACR.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-No3D-CACR.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <copy file="resources/jnlp/ML_Client_HI_CACR.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/JMonitorClient-HI-CACR.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+        
+        <copy file="${dist.dir.clients}/JMonitorClient-CERN.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-CALTECH.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-CACR.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-No3D-CERN.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-No3D-CALTECH.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-No3D-CACR.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-HI-CERN.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-HI-CALTECH.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/JMonitorClient-HI-CACR.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+            
+        <echo message="Build vrvs3dJClient" />
+        <jar jarfile="${dist.dir.clients}/vrvs3dJMonitorClient.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/VRVS3D/JMonitorClient.manifest" update="false">
+            <include name="lia/Monitor/JiniClient/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonJini/**/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/**/*.class" />
+            <include name="lia/Monitor/JiniClient/VRVS3D/**/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLogin*.class" />
+            <include name="lia/Monitor/tcpClient/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <exclude name="lia/Monitor/monitor/FAgent.class" />
+            <include name="lia/Monitor/control/*.class" />
+            <include name="lia/Monitor/AppControlClient/*" />
+            <include name="lia/Monitor/DataCache/Cache_Stub.class" />
+            <include name="lia/Monitor/GUIs/*.class" />
+            <include name="lia/Monitor/Plot/*.class" />
+            <include name="lia/images/*" />
+            <include name="lia/images/appControl/*" />
+            <include name="lia/images/menu/*" />
+            <include name="lia/images/menu/small/*" />
+            <include name="lia/images/joglpanel/**" />
+            <include name="lia/images/grids/*" />
+            <include name="lia/images/plot/*" />
+            <include name="lia/images/osgmap/**" />
+            <include name="lia/util/UUID*.class" />
+            <include name="lia/util/IPU*.class" />
+            <include name="lia/images/groups/**" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/plot/images/*" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/util/security/FarmMonitorTrustManager.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/Monitor/JiniClient/ReflRouter/*.class" />
+            <include name="lia/app/AppUtils.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/UUID*.class" />
+            <include name="lia/util/Utils.class" />
+            <include name="lia/util/dataStruct/*.class" />
+            <include name="lia/web/utils/ExportClientStatistics.class" />
+            <include name="lia/web/utils/ExportStatistics*.class" />
+            <include name="lia/modules/monClientStats.class" />
+            <include name="lia/util/JiniConfigProvider*.class" />
+            <include name="lia/util/SecureContextExecutor*.class" />
+            <include name="lia/util/StringFactory*.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJobInt.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJob.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/threads/**/*.class" />
+            <include name="lia/net/topology/**/*.class" />
+            <include name="lia/Monitor/modules/monClientStats.class" />
+            <!--            <include name="lia/Monitor/modules/monProcIO*.class" />
+			<include name="lia/Monitor/modules/monProcLoad*.class" />
+			<include name="lia/Monitor/modules/monProcStat.class" /> -->
+        </jar>
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient.jar" tofile="${dist.dir.clients}/vrvs3dJMonitorClient-CERN.jar" filtering="false" overwrite="true"/>
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient.jar" tofile="${dist.dir.clients}/vrvs3dJMonitorClient-CALTECH.jar" filtering="false" />
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient.jar" tofile="${dist.dir.clients}/vrvs3dJMonitorClient-CACR.jar" filtering="false" />
+        
+        <mkdir dir="${dist.dir.clients}/JNLP-INF"/>
+        
+        <!-- CERN vrvs3dJMonitorClient JAR  -->
+        <copy file="resources/jnlp/ML_Client_EVO_CERN.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/vrvs3dJMonitorClient-CERN.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+
+        <!-- CALTECH vrvs3dJMonitorClient JAR  -->
+        <copy file="resources/jnlp/ML_Client_EVO_CALTECH.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/vrvs3dJMonitorClient-CALTECH.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+        
+        <!-- CACR vrvs3dJMonitorClient JAR  -->
+        <copy file="resources/jnlp/ML_Client_EVO_CACR.jnlp" tofile="${dist.dir.clients}/JNLP-INF/APPLICATION.JNLP" filtering="false" overwrite="true"/>
+        <jar destfile="${dist.dir.clients}/vrvs3dJMonitorClient-CACR.jar" update="true" basedir="${dist.dir.clients}">
+            <include name="JNLP-INF/*" />
+        </jar>
+        
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient-CERN.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient-CALTECH.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+        <copy file="${dist.dir.clients}/vrvs3dJMonitorClient-CACR.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+
+        <echo message="Build JStoreClient" />
+        <jar jarfile="${dist.dir.clients}/JStoreClient.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/Store/JStoreClient.manifest" update="false">
+            <include name="lia/Monitor/JiniClient/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonJini/*.class" />
+            <include name="lia/Monitor/JiniClient/Store/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/Store/*.class" />
+            <include name="lia/util/JiniConfigProvider*.class" />
+            <include name="lia/util/SecureContextExecutor*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/util/dns/*.class" />
+            <include name="lia/util/logging/*.class" />
+            <include name="lia/util/StringFactory*.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/threads/**/*.class" />
+            <include name="lia/util/process/*.class" />
+            <include name="lia/Monitor/Store/Fast/*.class" />
+            <include name="lia/Monitor/Store/Fast/Replication/*.class" />
+            <include name="lia/Monitor/tcpClient/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/IpAddrCache*.class" />
+            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/ML*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+        </jar>
+        <copy file="${dist.dir.clients}/JStoreClient.jar" todir="${monalisa.home}/Clients/lib" filtering="false" />
+    </target>
+
+    <!-- ================================= 
+          target: dist_reflrouter
+         ================================= -->
+    <target name="dist_reflrouter" depends="compile_client,rmic_reflrouter">
+        <echo message="Build JReflRouterClient" />
+        <jar jarfile="${dist.dir.clients}/JReflRouterClient.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/ReflRouter/JReflRouterClient.manifest" update="false">
+            <include name="lia/Monitor/JiniClient/*.class" />
+            <include name="lia/Monitor/JiniClient/ReflRouter/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/IpAddrCache*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/DLink*.class" />
+            <include name="lia/Monitor/JiniClient/CommonJini/**/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLogin*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/DataCache/Cache_Stub.class" />
+            <include name="lia/Monitor/tcpClient/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/control/*.class" />
+            <include name="lia/Monitor/modules/monClientStats.class" />
+            <include name="lia/util/UUID*.class" />
+            <include name="lia/util/JiniConfigProvider*.class" />
+            <include name="lia/util/SecureContextExecutor*.class" />
+            <include name="lia/util/security/FarmMonitorTrustManager.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/util/MLProcess*.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJobInt.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJob.class" />
+            <include name="lia/util/DateFileWatchdog*.class" />
+            <include name="lia/util/StringFactory*.class" />
+            <include name="lia/util/security/MLLogin*.class" />
+            <include name="lia/util/logging/**/*.class" />
+            <include name="lia/app/AppUtils.class" />
+            <include name="lia/web/utils/*.class" />
+            <include name="lia/util/Utils*.class" />
+            <include name="lia/util/threads/**/*.class" />
+        </jar>
+        <jar jarfile="${dist.topo.web.dir}/ReflRouter-dl.jar" basedir="${build.dir}" update="true">
+            <include name="lia/Monitor/monitor/GenericMLEntry.class" />
+            <include name="lia/Monitor/monitor/ReflRouterSI.class" />
+            <include name="lia/Monitor/JiniClient/ReflRouter/ReflRouterJiniProxy.class" />
+            <include name="lia/Monitor/JiniClient/ReflRouter/ReflRouterJiniProxy_Stub.class" />
+        </jar>
+        <copy file="${dist.dir.clients}/JReflRouterClient.jar" todir="${monalisa.home}/Clients/lib" />
+        <copy file="${dist.dir.clients}/JReflRouterClient.jar" todir="${lia.home}/WEBS/UPDATE/SLIBS_WCLIENTS/jClient/lib" filtering="false" />
+        <echo message="Obfuscating client" />
+        <exec executable="/bin/sh">
+            <arg value="obfCLI" />
+        </exec>
+        <echo message="Obfuscated jar: ${lia.home}/WEBS/UPDATE/SLIBS_WCLIENTS/JReflRouterClient.jar" />
+    </target>
+
+    <!-- ================================= 
+	      target: dist_LUSCheck
+         ================================= -->
+    <target name="dist_luscheck" depends="compile_client">
+        <echo message="Build LUSCheck" />
+        <jar jarfile="${dist.dir.clients}/JLUSCheckClient.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/JiniClient/luscheck/JLUSCheckClient.manifest" update="false">
+            <include name="lia/Monitor/JiniClient/*.class" />
+            <include name="lia/Monitor/JiniClient/luscheck/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonJini/**/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLogin*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/DataCache/Cache_Stub.class" />
+            <include name="lia/Monitor/tcpClient/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/control/*.class" />
+            <include name="lia/Monitor/modules/monClientStats.class" />
+            <include name="lia/util/JiniConfigProvider*.class" />
+            <include name="lia/util/SecureContextExecutor*.class" />
+            <include name="lia/util/security/FarmMonitorTrustManager.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/util/MLProcess*.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJobInt.class" />
+            <include name="lia/util/DynamicThreadPoll/SchJob.class" />
+            <include name="lia/util/DateFileWatchdog*.class" />
+            <include name="lia/util/StringFactory*.class" />
+            <include name="lia/util/security/MLLogin*.class" />
+            <include name="lia/util/logging/**/*.class" />
+            <include name="lia/util/Utils.class" />
+            <include name="lia/app/AppUtils.class" />
+            <include name="lia/web/utils/*.class" />
+        </jar>
+        <copy file="${dist.dir.clients}/JLUSCheckClient.jar" todir="${monalisa.home}/Clients/lib" />
+        <copy file="${dist.dir.clients}/JLUSCheckClient.jar" todir="${lia.home}/WEBS/UPDATE/SLIBS_WCLIENTS/jClient/lib" filtering="false" />
+    </target>
+
+    <!-- ================================= 
+          target: dist_proxy
+         ================================= -->
+    <target name="dist_proxy" depends="compile_proxy,rmic_proxy">
+        <echo message="Build Proxy Jar" />
+        <manifest file="${src.dir}/lia/Monitor/ClientsFarmProxy/ClientsFarmProxy.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="Proxy-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.proxy}/ClientsFarmProxy.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/ClientsFarmProxy/ClientsFarmProxy.manifest" update="false">
+            <include name="lia/Monitor/ClientsFarmProxy/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/AgentsPlatform/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/Monitor/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/**/*.class" />
+            <include name="lia/util/logging/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/util/exporters/*.class" />
+            <include name="lia/util/threads/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <!-- needed for connections comming from Farms -->
+            <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/util/logging/**/*.class" />
+        </jar>
+        <manifest file="${src.dir}/lia/Monitor/ClientsFarmProxy/ClientsFarmProxy-dl.manifest" mode="update">
+            <attribute name="Built-By" value="${user.name}" />
+            <attribute name="Release-Date" value="${normaldate}" />
+            <attribute name="Proxy-Version" value="${monalisa.version.short}" />
+            <attribute name="Implementation-Version" value="${monalisa.version}" />
+        </manifest>
+        <jar jarfile="${dist.dir.proxy}/ClientsFarmProxy-dl.jar" basedir="${build.dir}" manifest="${src.dir}/lia/Monitor/ClientsFarmProxy/ClientsFarmProxy-dl.manifest" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyService_Stub.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyService.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/LightProxyService.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyPortsEntry.class" />
+        </jar>
+        <copy file="${dist.dir.proxy}/ClientsFarmProxy.jar" todir="${monalisa.home}/ProxyService/lib" filtering="false" />
+        <copy file="${dist.dir.proxy}/ClientsFarmProxy-dl.jar" todir="${monalisa.home}/ProxyService/dl" filtering="false" />
+    </target>
+    <target name="dist_osd" depends="compile_osd">
+        <echo message="Build OS Daemon Jar" />
+        <jar jarfile="${dist.dir.OSD}/OSD.jar" basedir="${build.dir}" manifest="${src.dir}/lia/osdaemon/OSD.manifest" update="false">
+            <include name="lia/osdaemon/*.class" />
+            <include name="hep/**" />
+            <include name="lia/Monitor/monitor/AppConfig*.class" />
+            <include name="lia/Monitor/monitor/LoggerConfigClass.class" />
+            <include name="lia/Monitor/monitor/ABPingEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/monitor/DataStore.class" />
+            <include name="lia/Monitor/monitor/TopologySI.class" />
+            <include name="lia/Monitor/Agents/OpticalPath/comm/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/threads/**/*.class" />
+            <include name="lia/util/security/*.class" />
+            <include name="lia/util/MLProcess.class" />
+            <include name="lia/util/MLProcessWatchdog.class" />
+            <include name="lia/util/logging/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+        </jar>
+        <copy file="${dist.dir.OSD}/OSD.jar" todir="${monalisa.home}/OSD/lib" filtering="false" />
+    </target>
+
+    <!-- ================================= 
+          target: dist_logger              
+         ================================= -->
+    <target name="dist_logger" depends="rmic_logger" description="Build the logger service">
+        <echo message="Build Logger Service Jar" />
+        <jar jarfile="${dist.dir.logger}/MLLoggerService.jar" basedir="${build.dir}" manifest="${src.dir}/lia/util/logging/service/MLLogger.manifest" update="false">
+            <include name="lia/Monitor/monitor/AppConfig*.class" />
+            <include name="lia/Monitor/monitor/MLLoggerSI.class" />
+            <include name="lia/Monitor/monitor/MLJiniManagersProvider.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.class" />
+            <include name="lia/Monitor/monitor/LoggerConfigClass.class" />
+            <include name="lia/Monitor/monitor/DataStore.class" />
+            <include name="lia/Monitor/monitor/tcpConn*.class" />
+            <include name="lia/Monitor/monitor/monMessage.class" />
+            <include name="lia/util/logging/comm/*.class" />
+            <include name="lia/Monitor/monitor/TopologySI.class" />
+            <include name="lia/Monitor/monitor/ABPingEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+            <include name="lia/Monitor/monitor/AuthZSI.class" />
+            <include name="lia/Monitor/monitor/PathloadDiscoverySI.class" />
+            <include name="lia/Monitor/monitor/GenericMLEntry.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/util/logging/**/*.class" />
+            <exclude name="lia/util/logging/service/publishers/**/*.class" />
+            <include name="lia/util/loader/**/*.class" />
+            <include name="lia/util/security/MLLogin.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/MLProc*.class" />
+            <include name="lia/util/DateFileWatchdog*.class" />
+            <include name="lia/util/Utils.class" />
+        </jar>
+
+        <jar jarfile="${dist.dir.logger}/MLLogger-dl.jar" basedir="${build.dir}" update="true">
+            <include name="lia/Monitor/monitor/GenericMLEntry.class" />
+            <include name="lia/Monitor/monitor/MLLoggerSI.class" />
+            <include name="lia/util/logging/service/MLLoggerJiniProxy.class" />
+            <include name="lia/util/logging/service/MLLoggerJiniProxy_Stub.class" />
+        </jar>
+
+        <jar jarfile="${dist.dir.logger}/FileAppender.jar" basedir="${build.dir}" manifest="${src.dir}/lia/util/logging/service/publishers/fileappender/FileAppender.manifest" update="false">
+            <include name="lia/util/logging/service/publishers/fileappender/*.class" />
+        </jar>
+
+        <copy file="${dist.dir.logger}/FileAppender.jar" todir="${monalisa.home}/LoggerService/publishers" filtering="false" />
+        <copy file="${dist.dir.logger}/MLLoggerService.jar" todir="${monalisa.home}/LoggerService/lib" filtering="false" />
+        <copy file="${dist.dir.logger}/MLLogger-dl.jar" todir="${monalisa.home}/LoggerService/dl" filtering="false" />
+    </target>
+
+    <!-- ================================= 
+          target: dist_authz              
+         ================================= -->
+    <target name="dist_authz" depends="rmic_authz_ser" description="Build the authz-service for OS Agents">
+        <echo message="Build OS AuthZ Jar" />
+        <jar jarfile="${dist.dir.OSD}/authz.jar" basedir="${build.dir}" manifest="${src.dir}/lia/util/security/authz/AUTHZ.manifest" update="false">
+            <include name="lia/Monitor/monitor/AppConfig*.class" />
+            <include name="lia/util/security/authz/**/*.class" />
+            <include name="lia/util/security/MLLogin.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/DateFileWatchdog.class" />
+        </jar>
+
+        <jar jarfile="${dist.dir.OSD}/Authz-dl.jar" basedir="${build.dir}" update="true">
+            <include name="lia/Monitor/monitor/GenericMLEntry.class" />
+            <include name="lia/Monitor/monitor/AuthZSI.class" />
+            <include name="lia/util/security/authz/AuthZJiniProxy.class" />
+            <include name="lia/util/security/authz/AuthZJiniProxy_Stub.class" />
+        </jar>
+
+        <copy todir="${monalisa.home}/OSD/authz/" description="Copy the startup script and configuration">
+            <fileset dir="${src.dir}/lia/Monitor/Agents/OpticalPath/comm/authz/run" />
+        </copy>
+
+        <copy file="${dist.dir.OSD}/authz.jar" todir="${monalisa.home}/AuthZService/lib" filtering="false" />
+        <copy file="${lia.home}/lib/Piccolo.jar" todir="${monalisa.home}/AuthZService/lib" filtering="false" />
+        <copy file="${dist.dir.OSD}/Authz-dl.jar" todir="${monalisa.home}/AuthZService/lib" filtering="false" />
+    </target>
+
+    <target name="dist" depends="dist_ser,dist_client,dist_proxy">
+    </target>
+
+    <!-- ================================= 
+          target: dist_topo_web
+         ================================= -->
+    <target name="dist_topo_web" depends="compile_topo_ser,rmic_topo_ser">
+        <jar jarfile="${dist.topo.web.dir}/TOPO_WEB.jar" basedir="${build.dir}" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/security/MLLogin.class" />
+            <include name="lia/util/exporters/*.class" />
+            <include name="lia/util/topology/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/util/threads/*.class" />
+            <include name="lia/web/utils/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+        </jar>
+        <jar jarfile="${dist.topo.web.dir}/Topology-dl.jar" basedir="${build.dir}" update="true">
+            <include name="lia/Monitor/monitor/GenericMLEntry.class" />
+            <include name="lia/Monitor/monitor/TopologySI.class" />
+            <include name="lia/util/topology/TopologyJiniProxy.class" />
+            <include name="lia/util/topology/TopologyJiniProxy_Stub.class" />
+        </jar>
+    </target>
+
+    <!-- ================================= 
+          target: dist_abping_conf_web
+         ================================= -->
+    <target name="dist_abping_conf_web" depends="compile_abping_conf_ser">
+        <jar jarfile="${dist.topo.web.dir}/ABPING_WEB.jar" basedir="${build.dir}" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/security/MLLogin.class" />
+            <include name="lia/util/exporters/*.class" />
+            <include name="lia/util/ABPing/*.class" />
+            <include name="lia/util/net/*.class" />
+            <include name="lia/web/utils/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+        </jar>
+    </target>
+
+    <!-- ================================= 
+		target: dist_pathload_conf_web
+		================================= -->
+    <target name="dist_pathload_conf_web" depends="compile_pathload_conf_web,javadoc_pathload_conf" description="PathloadConfig Web Deployment">
+
+        <mkdir dir="${deploy.dir}" />
+        <mkdir dir="${deploy.dir}/${pathload.app}" />
+        <mkdir dir="${deploy.dir}/${pathload.app}/WEB-INF" />
+        <mkdir dir="${deploy.dir}/${pathload.app}/WEB-INF/classes" />
+
+        <!-- Copy static web files -->
+        <copy todir="${deploy.dir}/${pathload.app}">
+            <fileset dir="WEBS/WEB_PATHLOAD" />
+        </copy>
+
+        <!-- Copy the contents of the build directory -->
+        <copy todir="${deploy.dir}/${pathload.app}/WEB-INF/classes">
+            <fileset dir="${build.dir}">
+                <include name="lia/util/Pathload/util/*.class" />
+                <include name="lia/util/Pathload/server/*.class" />
+                <include name="lia/util/Pathload/server/manager/*.class" />
+                <include name="lia/util/Pathload/server/servlet/*.class" />
+                <include name="lia/util/Pathload/server/stylesheets/**" />
+            </fileset>
+        </copy>
+
+        <!-- Generate context.xml -->
+        <mkdir dir="${deploy.dir}/${pathload.app}/META-INF" />
+        <copy tofile="${deploy.dir}/${pathload.app}/META-INF/context.xml" file="WEBS/WEB_PATHLOAD/WEB-INF/properties/PathloadConfig.xml">
+            <filterset>
+                <filter token="webappDocBase" value="PathloadConfig" />
+                <filter token="webappPath" value="PathloadConfig" />
+            </filterset>
+        </copy>
+
+        <!-- Generate WebArchive File -->
+        <mkdir dir="build/dist/TopoSer" />
+        <jar jarfile="build/dist/TopoSer/${pathload.app}.war" basedir="${deploy.dir}/${pathload.app}" />
+
+        <!-- Delete Temporary Files -->
+        <delete dir="${deploy.dir}" />
+
+        <echo message="Web Archive available in build/dist/TopoSer/${pathload.app}.war" />
+        <echo message="Don't forget you'll need FarmMonitor.jar, MSRC_WEB.jar, dnsjava.jar," />
+        <echo message="TOPO_WEB.jar, Topology-dl.jar, log4j.jar in CATALINA_HOME/common/lib" />
+    </target>
+
+    <!-- ================================= 
+		target: dist_monsit_web
+		================================= -->
+    <target name="dist_monsit_web" depends="compile_monsit_ser">
+        <jar jarfile="${dist.monsit.web.dir}/monsit_base.jar" basedir="${build.dir}" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/web/utils/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/mail/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/util/exporters/*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper*.class" />
+            <include name="lia/Monitor/JiniSerFarmMon/MLJiniHelper*.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceI.class" />
+            <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.class" />
+        </jar>
+        <jar jarfile="${dist.monsit.web.dir}/monsit${monalisa.servlets.monsit.version}.jar" basedir="${build.dir}" update="false">
+            <include name="lia/web/servlets/monsit/*.class" />
+        </jar>
+    </target>
+    <!-- ================================= 
+		target: dist_web
+		================================= -->
+    <target name="dist_web" depends="compile_web">
+        <jar jarfile="${dist.web.dir}/MSRC_WEB.jar" basedir="${build.dir}" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/modules/*.class" />
+            <include name="lia/util/DynamicThreadPoll/*.class" />
+            <include name="lia/util/*.class" />
+            <include name="lia/util/actions/*.class" />
+            <include name="lia/util/ntp/*.class" />
+            <include name="lia/util/ApMon/*.class" />
+            <include name="lia/Monitor/Store/*.class" />
+            <include name="lia/Monitor/Store/EPGUtils/*.class" />
+            <include name="lia/util/os/*.class" />
+            <include name="lia/Monitor/Store/Fast/*.class" />
+            <include name="lia/Monitor/Store/Fast/Replication/*.class" />
+            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/web/bean/Generic/*.class" />
+            <include name="lia/web/servlets/web/*.class" />
+            <include name="lia/web/servlets/map2d/*.class" />
+            <include name="lia/Monitor/JiniClient/CommonGUI/Sphere/*.class" />
+            <include name="lia/web/servlets/wap/*.class" />
+            <include name="lia/web/utils/*.class" />
+        </jar>
+        <jar jarfile="${dist.axis.dir}/ML_WS.jar" basedir="${build.dir}" update="false">
+            <include name="lia/Monitor/monitor/*.class" />
+            <include name="lia/Monitor/Store/*.class" />
+            <include name="lia/Monitor/Store/Fast/*.class" />
+            <include name="lia/Monitor/Store/Fast/Replication/*.class" />
+            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/ws/*.class" />
+        </jar>
+    </target>
+
+    <!-- ================================= 
+		target: others_copy_sign
+		other jars for client build
+		================================= -->
+    <target name="others_copy_sign">
+        <copy file="${monalisa.home}/Clients/lib/plot.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/jfreechart-0.9.15.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/puretls.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/jcommon-0.9.0.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/jini-core.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/jini-ext.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/backport-util-concurrent.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/cog-jglobus.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/cryptix.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/jgsi.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+
+        <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="plot.jar" />
+                <include name="jfreechart-0.9.15.jar" />
+                <include name="jcommon-0.9.0.jar" />
+                <include name="jini-core.jar" />
+                <include name="jini-ext.jar" />
+                <include name="backport-util-concurrent.jar" />
+            </fileset>
+        </signjar>
+        <copy todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="plot.jar" />
+                <include name="jfreechart-0.9.15.jar" />
+                <include name="jcommon-0.9.0.jar" />
+                <include name="jini-core.jar" />
+                <include name="jini-ext.jar" />
+                <include name="backport-util-concurrent.jar" />
+            </fileset>
+        </copy>
+        <copy todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="plot.jar" />
+                <include name="jfreechart-0.9.15.jar" />
+                <include name="jcommon-0.9.0.jar" />
+                <include name="jini-core.jar" />
+                <include name="jini-ext.jar" />
+                <include name="backport-util-concurrent.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ================================= 
+		target: jogl_copy_sign
+		copy and sign jogl library and natives
+		================================= -->
+    <target name="jogl_copy_sign">
+        <copy file="${monalisa.home}/Clients/lib/jogl.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy todir="${sclients.update.dir}/jClient/lib" filtering="false">
+            <fileset dir="${monalisa.home}/Clients/lib">
+                <include name="jogl-natives*.jar" />
+            </fileset>
+        </copy>
+        <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="jogl.jar" />
+                <include name="jogl-natives*.jar" />
+            </fileset>
+        </signjar>
+        <copy todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="jogl.jar" />
+                <include name="jogl-natives*.jar" />
+            </fileset>
+        </copy>
+        <copy todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="jogl.jar" />
+                <include name="jogl-natives*.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ================================= 
+		target: maps_copy_sign
+		sign base maps for all types
+		================================= -->
+    <target name="maps_copy_sign">
+        <copy todir="${sclients.update.dir}/jClient/lib" filtering="false">
+            <fileset dir="${monalisa.home}/Clients/lib/">
+                <include name="map_base*.jar" />
+            </fileset>
+        </copy>
+        <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="map_base*.jar" />
+            </fileset>
+        </signjar>
+        <copy todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="map_base*.jar" />
+            </fileset>
+        </copy>
+        <copy todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="map_base*.jar" />
+            </fileset>
+        </copy>
+    </target>
+
+    <!-- ================================= 
+		target: copy_for_sign
+		================================= -->
+    <target name="copy_for_sign" depends="dist_client">
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-CERN.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-CALTECH.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-CACR.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-No3D-CERN.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-No3D-CALTECH.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-No3D-CACR.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-HI-CERN.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-HI-CALTECH.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/JMonitorClient-HI-CACR.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/vrvs3dJMonitorClient-CERN.jar" todir="${sclients.update.dir}/vrvsjClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/vrvs3dJMonitorClient-CALTECH.jar" todir="${sclients.update.dir}/vrvsjClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/vrvs3dJMonitorClient-CACR.jar" todir="${sclients.update.dir}/vrvsjClient/lib" filtering="false" />
+    </target>
+
+    <!-- ================================= 
+		target: sign
+		signs the client main jars
+		================================= -->
+    <target name="sign" depends="copy_for_sign">
+        <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="JMonitorClient*.jar" />
+            </fileset>
+            <fileset dir="${sclients.update.dir}/vrvsjClient/lib">
+                <include name="vrvs3dJMonitorClient*.jar" />
+            </fileset>
+        </signjar>
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-CERN.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-CALTECH.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-CACR.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-No3D-CERN.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-No3D-CALTECH.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-No3D-CACR.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-HI-CERN.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-HI-CALTECH.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient-HI-CACR.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/vrvsjClient/lib/vrvs3dJMonitorClient-CERN.jar" todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/vrvsjClient/lib/vrvs3dJMonitorClient-CALTECH.jar" todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/vrvsjClient/lib/vrvs3dJMonitorClient-CACR.jar" todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false" />
+        <echo file="${lia.home}/WEBS/WEB/FARM_ML/version" append="false" message="${monalisa.version}" />
+        <echo file="${lia.home}/WEBS/WEB/VRVS_ML/version" append="false" message="${monalisa.version}" />
+    </target>
+
+    <!-- ================================= 
+		target: obf_client
+		obfuscates main client's jars
+		================================= -->
+    <target name="obf_client" depends="copy_for_sign">
+        <echo message="Obfuscating client" />
+        <exec executable="/bin/sh">
+            <arg value="obfCLI" />
+        </exec>
+
+        <move file="WEBS/UPDATE/SLIBS_WCLIENTS/JMonitorClient.jar" tofile="${sclients.update.dir}/jClient/lib/JMonitorClient.jar" />
+        <move file="WEBS/UPDATE/SLIBS_WCLIENTS/vrvs3dJMonitorClient.jar" tofile="${sclients.update.dir}/vrvsjClient/lib/vrvs3dJMonitorClient.jar" />
+        <move file="WEBS/UPDATE/SLIBS_WCLIENTS/JReflRouterClient.jar" tofile="${sclients.update.dir}/jClient/lib/JReflRouterClient.jar" />
+
+        <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
+            <fileset dir="${sclients.update.dir}/jClient/lib">
+                <include name="JMonitorClient*.jar" />
+            </fileset>
+            <fileset dir="${sclients.update.dir}/vrvsjClient/lib">
+                <include name="vrvs3dJMonitorClient.jar" />
+            </fileset>
+            <fileset dir="${sclients.update.dir}">
+                <include name="backport-util-concurrent.jar" />
+                <include name="cog-jglobus.jar" />
+                <include name="cryptix.jar" />
+                <include name="jgsi.jar" />
+                <include name="puretls.jar" />
+            </fileset>
+        </signjar>
+        <copy file="${sclients.update.dir}/jClient/lib/JMonitorClient.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/vrvsjClient/lib/vrvs3dJMonitorClient.jar" todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false" />
+        <copy file="${sclients.update.dir}/jClient/lib/JReflRouterClient.jar" todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false" />
+        <echo file="${lia.home}/WEBS/WEB/FARM_ML/version" append="false" message="${monalisa.version}" />
+        <echo file="${lia.home}/WEBS/WEB/VRVS_ML/version" append="false" message="${monalisa.version}" />
+    </target>
+
+    <target name="javadoc" description="Javadoc for MonALISA" depends="init">
+        <javadoc destdir="${javadoc.dest.dir}" sourcepath="${src.dir}" windowtitle="MonALISA v${monalisa.version} Javadoc" packagenames="lia.*">
+            <classpath refid="javadoc.classpath" />
+        </javadoc>
+    </target>
+
+    <!-- ================================= 
+		target: javadoc_pathload_conf
+	================================= -->
+    <target name="javadoc_pathload_conf" depends="compile_pathload_conf_web" description="Create PathloadConfig API documentation">
+        <mkdir dir="${javadoc.PathloadConfig.dir}" />
+
+        <!-- Generate Javadoc API -->
+        <javadoc sourcepath="${src.dir}" destdir="${javadoc.PathloadConfig.dir}" access="public" author="true" version="true" windowtitle="MonAlisa monPathload API Documentation">
+            <doctitle>
+                <![CDATA[MonAlisa monPathload<br/>API Documentation]]></doctitle>
+            <header>
+                <![CDATA[MonAlisa monPathload<br/>API Documentation]]></header>
+            <classpath refid="javadoc.classpath" />
+
+            <packageset dir="${src.dir}">
+                <include name="lia/app/pathload/**" />
+                <include name="lia/util/Pathload/**" />
+                <include name="lia/Monitor/Farm/Pathload/**" />
+            </packageset>
+
+            <fileset dir="${src.dir}">
+                <include name="lia/Monitor/modules/monPathload.java" />
+            </fileset>
+        </javadoc>
+    </target>
+
+    <target name="clean">
+        <delete includeemptydirs="true">
+            <fileset dir="build" includes="**/*" />
+        </delete>
+        <symlink link="${dist.dir.webupdate.service.current}" action="delete" />
+    </target>
+</project>
