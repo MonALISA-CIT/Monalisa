@@ -582,7 +582,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @param status
 		 * @return boolean
 		 */
-		static boolean isCummulativeStatus(final int status) {
+		static final boolean isCummulativeStatus(final int status) {
 			return (status == JS_STARTED) || (status == JS_SAVED) || (status == JS_SAVED_WARNING) || (status == JS_ASSIGNED) || isFinalStatus(status);
 		}
 
@@ -592,7 +592,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @param status
 		 * @return boolean
 		 */
-		static boolean isFinalStatus(final int status) {
+		static final boolean isFinalStatus(final int status) {
 			return (status == JS_DONE) || (status == JS_DONE_WARNING) || (status == JS_KILLED) || (status == JS_FAILED);
 		}
 
@@ -623,8 +623,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @param status
 		 * @return boolean
 		 */
-		static boolean isActiveJob(final int status) {
-			return (status == JS_STARTED) || (status == JS_RUNNING) || (status == JS_SAVING) || (status == JS_SAVED) || (status == JS_SAVED_WARNING);
+		static final boolean isActiveJob(final int status) {
+			return (status == JS_ASSIGNED) || (status == JS_STARTED) || (status == JS_RUNNING) || (status == JS_SAVING);
 		}
 
 		/**
