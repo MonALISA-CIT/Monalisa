@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.InetAddress;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -98,10 +99,12 @@ public class monJenkins extends monGenericUDP {
 
 	@Override
 	public void notifyData(final int len, final byte[] data, final InetAddress source) {
-		if (data == null || data.length < 4)
+		if (data == null || data.length < 4 || len < 4 || len > data.length)
 			return;
 
-		final BufferedReader br = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(data)));
+		final String content = new String(data, 0, len);
+
+		final BufferedReader br = new BufferedReader(new StringReader(content));
 
 		try {
 			String line;
