@@ -191,7 +191,7 @@ public final class AppConfig implements Observer {
                             "Unable to determine lia.Monitor.ConfigURL property and Application launched via WebStart!");
                 }
             } else {
-                logger.log(Level.INFO, "Normal app config (no webstart)");
+                logger.log(Level.FINE, "Normal app config (no webstart)");
             }
 
             propertiesConfigApp = new Properties();
@@ -302,9 +302,9 @@ public final class AppConfig implements Observer {
                 // DO NOT CHANGE THIS IN NTPDate.currentTimeMillis() !!!! or you will get a very nice
                 // deadlock
                 lastReloaded.set(System.currentTimeMillis());
-                logger.log(Level.INFO, "Properties loaded. Monitoring for changes...");
+                logger.log(Level.FINE, "Properties loaded. Monitoring for changes...");
             } else {
-                logger.log(Level.INFO, "Properties loaded via webstart...");
+                logger.log(Level.FINE, "Properties loaded via webstart...");
             }
             dfw = tmpDFW;
 
