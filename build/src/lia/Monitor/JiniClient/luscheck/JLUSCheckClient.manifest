@@ -1,2 +1,0 @@
-Main-Class: lia.Monitor.JiniClient.luscheck.LUSCheck
-Class-Path: jini-core.jar jini-ext.jar tools.jar backport-util-concurrent.jar

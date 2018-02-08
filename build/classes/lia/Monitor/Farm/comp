@@ -1,2 +1,0 @@
-rm *.class
-javac -classpath $CLASSPATH:$LIA_HOME/lib/GLUE-STD.jar  *.java

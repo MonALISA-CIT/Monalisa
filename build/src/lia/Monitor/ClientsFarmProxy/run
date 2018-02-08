@@ -1,1 +1,0 @@
-java  -Djava.security.policy="policy.all" -Dlia.Monitor.monitor.proxy_home="/home/dl/" -Dlia.Monitor.LUSs=mickyt -Dlia.Monitor.useIPAddress=141.85.99.100 -Dlia.Monitor.Start_JWEB=true  lia.Monitor.ClientsFarmProxy.Service 

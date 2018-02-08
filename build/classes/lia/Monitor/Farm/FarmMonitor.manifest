@@ -1,2 +1,0 @@
-Main-Class: lia.Monitor.Farm.FarmMonitor
-Class-Path: backport-util-concurrent.jar joesnmp-0.3.3.jar snmp-1.4.1.jar axis.jar commons-logging.jar commons-discovery.jar log4j-1.2.8.jar jaxrpc.jar saaj.jar wsdl4j.jar jnet.jar mysql-driver.jar postgresql.jar mckoidb.jar update.jar xmlrpc-1.2-b1.jar jep-2.4.0.jar lazyj.jar json-simple-1.1.1.jar ../../Control/lib/abing.jar ../../Control/lib/pathload.jar

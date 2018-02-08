@@ -1,1 +1,0 @@
-javac -classpath $CLASSPATH:$LIA_HOME/lib/monarc_plot.jar *.java
