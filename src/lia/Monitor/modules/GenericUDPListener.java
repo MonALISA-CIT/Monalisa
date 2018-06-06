@@ -37,7 +37,7 @@ public class GenericUDPListener extends Thread {
     private final byte[] buf = new byte[65535];
     private final GenericUDPNotifier notif;
     private final UDPAccessConf accessConf;
-    private FloodControl floodController;
+    private FloodControl floodController = null;
     private final AtomicBoolean finished = new AtomicBoolean(false);
     private final int port;
     private final InetAddress localAddress;
@@ -74,7 +74,6 @@ public class GenericUDPListener extends Thread {
             this.port = port;
 
             hasToRun.set(true);
-            this.floodController = new FloodControl();
         } finally {
             this.accessConf = conf;
             this.notif = notif;
@@ -112,7 +111,14 @@ public class GenericUDPListener extends Thread {
      * @param rate
      */
     public void setMaxMsgRate(final int rate) {
-        floodController.setMaxMsgRate(rate);
+        if (rate > 0) {
+        	if (floodController == null)
+        		floodController = new FloodControl();
+        	
+        	floodController.setMaxMsgRate(rate);
+        }
+        else
+        	floodController = null;
     }
 
     /**
@@ -180,7 +186,7 @@ public class GenericUDPListener extends Thread {
                 try {
                     socket.receive(packet);
                     final InetAddress address = packet.getAddress();
-                    if (floodController.shouldDrop(address)) {
+                    if (floodController!=null && floodController.shouldDrop(address)) {
                         continue;
                     }
 

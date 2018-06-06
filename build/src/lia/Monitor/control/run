@@ -1,1 +1,0 @@
-java -Djava.security.policy=policy.all  -jar MonitorControl.jar MControl 192.168.13.230

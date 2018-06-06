@@ -28,6 +28,11 @@ public class LoggerConfigClass implements AppConfigChangeListener {
     }
 
     private void reloadConf() {
+    	if (AppConfig.getb("lia.Monitor.monitor.LoggerConfigClass.preconfiguredLogging", false)){
+    		// trust that somebody else handled the logging configuration and don't overwrite it
+    		return;
+    	}
+    	
         Properties props = new Properties();
         try {
             props.putAll(AppConfig.getPropertiesConfigApp());

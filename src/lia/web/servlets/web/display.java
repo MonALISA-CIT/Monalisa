@@ -4422,6 +4422,11 @@ public class display extends CacheServlet {
 
 				hmActualSeries.put(sSumSeriesName, "");
 				vLocalActualSeries.add(sSumSeriesName);
+				
+				final String sDownloadSeries = sPageTitle + "@" + sSumSeriesName;
+
+				if (tsDownloadSeries != null)
+					tsDownloadSeries.add(sDownloadSeries);
 
 				Long lTime;
 				long time;
@@ -4485,6 +4490,18 @@ public class display extends CacheServlet {
 							// disable log when there's at least one value that would mess up the display
 							bLog = false;
 
+						if (tmDownloadData != null) {
+							lTime = Long.valueOf(time / 1000L);
+
+							HashMap<String, Double> hmValues = tmDownloadData.get(lTime);
+							if (hmValues == null) {
+								hmValues = new HashMap<String, Double>();
+								tmDownloadData.put(lTime, hmValues);
+							}
+
+							hmValues.put(sDownloadSeries, Double.valueOf(d));
+						}
+						
 						chartSeries.add(new Second(new Date(time), tz), d);
 						max = d > max ? d : max;
 

@@ -18,6 +18,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import lazyj.Format;
 import lia.Monitor.monitor.AppConfig;
 import lia.Monitor.monitor.MNode;
 import lia.Monitor.monitor.MonModuleInfo;
@@ -62,9 +63,9 @@ public abstract class FDTManagedController extends SchJob implements LisaXDRModu
 
     protected static final String SERVLET_KEY = AppConfig.getProperty("fdt.urlkey", "5s54g^fX");
 
-    protected static final String FDT_CLIENTS_CONF = "/Client?key=" + SERVLET_KEY;
+    protected static final String FDT_CLIENTS_CONF = "/Client?key=" + Format.encode(SERVLET_KEY);
 
-    protected static final String FDT_SERVERS_CONF = "/Server?key=" + SERVLET_KEY;
+    protected static final String FDT_SERVERS_CONF = "/Server?key=" + Format.encode(SERVLET_KEY);
 
     protected static final String FDT_TRACE_CONF = "/Trace";
 

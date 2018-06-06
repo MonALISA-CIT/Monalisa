@@ -1,4 +1,0 @@
-Main-Class: lia.Monitor.JiniClient.Farms.Main
-Class-Path: jini-core.jar jini-ext.jar tools.jar plot.jar jogl.jar backport-util-concurrent.jar cryptix.jar puretls.jar jgsi.jar jce-jdk13.jar cog-jglobus.jar
-Application-Name: MonALISA GUI Client
-Permissions: all-permissions
