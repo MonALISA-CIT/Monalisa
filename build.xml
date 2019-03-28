@@ -421,7 +421,7 @@
             <fileset dir="${build.dir}" includes="lia/util/update/Updater.class" />
             <fileset dir="${build.dir}" includes="lia/util/update/old/*.class" />
         </delete>
-        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.4" target="1.4">
+        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/update/Updater.java" />
             <include name="lia/util/update/old/**/*.java" />
