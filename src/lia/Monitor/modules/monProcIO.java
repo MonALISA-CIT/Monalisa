@@ -420,6 +420,7 @@ public class monProcIO extends monProcReader {
             //
             res.addSet("TOTAL_NET_IN", sumIn);
             res.addSet("TOTAL_NET_OUT", sumOut);
+            res.addSet("TOTAL_NET", sumIn+sumOut);
 
             if ((res.param == null) || (res.param.length == 0) || (res.param_name == null)
                     || (res.param_name.length == 0)) {
