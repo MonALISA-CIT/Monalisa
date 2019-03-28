@@ -18,6 +18,8 @@ import lia.util.ntp.NTPDate;
 
 import com.BajieSoft.HttpSrv.an;
 
+import lazyj.Utils;
+
 /**
  * ABPingFastReply = Available Bandwidth Ping with fast packet reply
  * 
@@ -482,7 +484,7 @@ public class ABPingFastReply {
                         sock.receive(packet);
                         if (logger.isLoggable(Level.FINEST)) {
                             logger.log(Level.FINEST, "Server: received packet from "
-                                    + packet.getAddress().getCanonicalHostName());
+                                    + Utils.getHostName(packet.getAddress().getHostAddress()));
                         }
                         //rbuf = packet.getData(); // is this necessary?
                         if (buf[0] == ECHO_PACKET) {

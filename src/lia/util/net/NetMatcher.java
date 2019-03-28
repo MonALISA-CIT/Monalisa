@@ -31,6 +31,8 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import lazyj.Utils;
+
 /**
  */
 public class NetMatcher {
@@ -279,8 +281,7 @@ class InetNetwork {
      * @return true if contains
      */
     public boolean contains(final InetAddress ip) {
-        return fqdn == null ? network.equals(maskIP(ip, netmask)) : ip.getCanonicalHostName().toLowerCase()
-                .endsWith(fqdn);
+        return fqdn == null ? network.equals(maskIP(ip, netmask)) : Utils.getHostName(ip.getHostAddress()).endsWith(fqdn);
     }
 
     @Override
@@ -333,7 +334,7 @@ class InetNetwork {
             final InetNetwork net = new InetNetwork(addr, mask);
 
             try {
-                net.reverseName = addr.getCanonicalHostName().toLowerCase();
+                net.reverseName = Utils.getHostName(fqdnOrIP);
             } catch (Throwable t) {
                 // ignore
             }
