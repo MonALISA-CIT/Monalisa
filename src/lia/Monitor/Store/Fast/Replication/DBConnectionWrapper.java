@@ -19,6 +19,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import lia.Monitor.monitor.AppConfig;
 import lia.util.MLProperties;
 import lia.web.utils.Formatare;
 
@@ -85,6 +86,8 @@ public class DBConnectionWrapper implements Closeable {
 	 * Cursor type, defaulting to FORWARD_ONLY.
 	 */
 	private int cursorType = ResultSet.TYPE_FORWARD_ONLY;
+	
+	private static final int MAX_CONNECTIONS = AppConfig.geti("lia.Monitor.Store.Fast.Replication.MAX_CONNECTIONS", 100);
 
 	/**
 	 * Create a connection to the database using the parameters in this properties file. The following keys are extracted:<br>
@@ -338,7 +341,7 @@ public class DBConnectionWrapper implements Closeable {
 			synchronized (oConnLock) {
 				final LinkedList<DBConnection> ll = hmConn.get(sConn);
 
-				if (ll.size() < 100) {
+				if (ll.size() < MAX_CONNECTIONS) {
 					this.dbc = new DBConnection(this.dbBackend.getConfig(), sConn);
 					if (this.dbc.canUse()) {
 						this.dbc.use();
