@@ -1795,6 +1795,10 @@
         <copy file="${monalisa.home}/Clients/lib/cog-jglobus.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
         <copy file="${monalisa.home}/Clients/lib/cryptix.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
         <copy file="${monalisa.home}/Clients/lib/jgsi.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xercesImpl-2.11.0.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xalan2-2.7.2.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/serializer-2.7.2.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xml-apis-1.4.01.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
 
         <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
             <fileset dir="${sclients.update.dir}/jClient/lib">
@@ -1804,6 +1808,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </signjar>
         <copy todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false">
@@ -1814,6 +1822,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </copy>
         <copy todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false">
@@ -1824,6 +1836,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </copy>
     </target>
