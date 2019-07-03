@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -44,6 +45,7 @@ import lia.web.utils.DoubleFormat;
 import lia.web.utils.Formatare;
 import lia.web.utils.Page;
 import lia.web.utils.ServletExtension;
+import lia.web.utils.ThreadedPage;
 
 /**
  * This servlet builds nice, colored tables
@@ -116,7 +118,8 @@ public final class stats extends CacheServlet {
 		if (store == null) {
 			try {
 				store = (TransparentStoreFast) TransparentStoreFactory.getStore();
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				System.out.println("Error building store : " + e + " (" + e.getMessage() + ")");
 				bAuthOK = true;
 				return;
@@ -147,7 +150,8 @@ public final class stats extends CacheServlet {
 
 		try {
 			sCSV = buildStatistics(p, prop);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			System.err.println("Exception : " + e + " (" + e.getMessage() + ")");
 			e.printStackTrace();
 		}
@@ -157,7 +161,8 @@ public final class stats extends CacheServlet {
 
 			try {
 				writeResponse(sCSV, request, response, osOut);
-			} catch (final IOException ioe) {
+			}
+			catch (final IOException ioe) {
 				logger.log(Level.WARNING, "Exception writing the response back to the client " + request.getRemoteAddr(), ioe);
 			}
 
@@ -190,7 +195,8 @@ public final class stats extends CacheServlet {
 		int written = -1;
 		try {
 			written = writeResponse(baos.toByteArray(), request, response, osOut);
-		} catch (final IOException ioe) {
+		}
+		catch (final IOException ioe) {
 			logger.log(Level.WARNING, "Exception writing the response back to the client " + request.getRemoteAddr(), ioe);
 		}
 
@@ -404,7 +410,8 @@ public final class stats extends CacheServlet {
 			for (int off = 0; off < offered; off++) {
 				try {
 					results.take();
-				} catch (InterruptedException ie) {
+				}
+				catch (InterruptedException ie) {
 					System.err.println("stats: interrupted while waiting for row " + off + " / " + offered + " to be processed");
 				}
 			}
@@ -592,7 +599,8 @@ public final class stats extends CacheServlet {
 
 						try {
 							fd = func.get(k);
-						} catch (Exception e) {
+						}
+						catch (Exception e) {
 							// ignore
 						}
 
@@ -687,7 +695,8 @@ public final class stats extends CacheServlet {
 
 					try {
 						fd = func.get(k);
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						// ignore
 					}
 
@@ -1061,44 +1070,44 @@ public final class stats extends CacheServlet {
 								}
 
 								switch (m) {
-								case 1: // average
-									if (iCount > 0) {
-										dTotal = dTotal / iCount;
-									}
-									else {
-										dTotal = NO_DATA;
-									}
-									break;
-								case 2: // stddev
-									if (iCount > 1) {
-										dTotal = dTotal / iCount;
-									}
-									else {
-										dTotal = NO_DATA;
-										break;
-									}
-
-									double dSum = 0;
-
-									for (int l = 0; l < v2.size(); l++) {
-										Vector<EvalResult> VR2 = VR1.get(l);
-										EvalResult er = VR2.get(k);
-										if (er.dRez >= 0) {
-											double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
-											dSum += dPatrat;
+									case 1: // average
+										if (iCount > 0) {
+											dTotal = dTotal / iCount;
 										}
-									}
-									dSum /= (iCount - 1);
-									dTotal = Math.sqrt(dSum);
-									break;
-								case 3: // min
-									dTotal = dMin;
-									break;
-								case 4: // max
-									dTotal = dMax;
-									break;
-								default: // 0=total, or anything else
-									break;
+										else {
+											dTotal = NO_DATA;
+										}
+										break;
+									case 2: // stddev
+										if (iCount > 1) {
+											dTotal = dTotal / iCount;
+										}
+										else {
+											dTotal = NO_DATA;
+											break;
+										}
+
+										double dSum = 0;
+
+										for (int l = 0; l < v2.size(); l++) {
+											Vector<EvalResult> VR2 = VR1.get(l);
+											EvalResult er = VR2.get(k);
+											if (er.dRez >= 0) {
+												double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
+												dSum += dPatrat;
+											}
+										}
+										dSum /= (iCount - 1);
+										dTotal = Math.sqrt(dSum);
+										break;
+									case 3: // min
+										dTotal = dMin;
+										break;
+									case 4: // max
+										dTotal = dMax;
+										break;
+									default: // 0=total, or anything else
+										break;
 								}
 
 								if ((dTotal >= 0) || fd.bAllowNegatives) {
@@ -1372,18 +1381,21 @@ public final class stats extends CacheServlet {
 					if (are != null) {
 						try {
 							are.run();
-						} catch (Throwable t) {
+						}
+						catch (Throwable t) {
 							System.err.println("stats.AsyncRowExecutor : evaluation exception : " + t + " (" + t.getMessage() + ")");
 							t.printStackTrace();
 						}
 
 						try {
 							are.done();
-						} catch (Throwable t) {
+						}
+						catch (Throwable t) {
 							// ignore
 						}
 					}
-				} catch (InterruptedException ie) {
+				}
+				catch (InterruptedException ie) {
 					// ignore
 				}
 			}
@@ -1936,7 +1948,8 @@ public final class stats extends CacheServlet {
 					try {
 						final int iColIdx = Integer.parseInt(st.nextToken());
 						sDependsOn.add(Integer.valueOf(Math.abs(iColIdx)));
-					} catch (NumberFormatException nfe) {
+					}
+					catch (NumberFormatException nfe) {
 						// ignore
 					}
 				}
@@ -2035,7 +2048,8 @@ public final class stats extends CacheServlet {
 																					if (iDDotDigits < 0) {
 																						iDDotDigits = 0;
 																					}
-																				} catch (NumberFormatException nfe) {
+																				}
+																				catch (NumberFormatException nfe) {
 																					// ignore
 																				}
 																			}
@@ -2122,7 +2136,8 @@ public final class stats extends CacheServlet {
 																																				try {
 																																					iVersionCount = Integer.parseInt(sNormal
 																																							.substring("version_count=".length()));
-																																				} catch (Exception e) {
+																																				}
+																																				catch (Exception e) {
 																																					iVersionCount = 3; // default if wrongly specified
 																																				}
 																																			}
@@ -2131,7 +2146,8 @@ public final class stats extends CacheServlet {
 																																					try {
 																																						iReasonCut = Integer.parseInt(sNormal
 																																								.substring("reason_cut=".length()));
-																																					} catch (Exception e) {
+																																					}
+																																					catch (Exception e) {
 																																						iReasonCut = 4; // default if wrongly specified
 																																					}
 																																				}
@@ -2159,7 +2175,8 @@ public final class stats extends CacheServlet {
 																																																.length()));
 																																										bFactor = Math.abs(
 																																												dFactor - 1) > 1E-10;
-																																									} catch (Exception e) {
+																																									}
+																																									catch (Exception e) {
 																																										// ignore
 																																									}
 																																								}
@@ -2173,7 +2190,8 @@ public final class stats extends CacheServlet {
 																																																			.length()));
 																																											bFactor = Math.abs(dFactor
 																																													- 1) > 1E-10;
-																																										} catch (Exception e) {
+																																										}
+																																										catch (Exception e) {
 																																											// ignore
 																																										}
 																																									}
@@ -2187,7 +2205,8 @@ public final class stats extends CacheServlet {
 																																																		"substract_from="
 																																																				.length()));
 																																												bSustractFrom = true;
-																																											} catch (Exception e) {
+																																											}
+																																											catch (Exception e) {
 																																												bSustractFrom = false;
 																																											}
 																																										}
@@ -2316,7 +2335,8 @@ public final class stats extends CacheServlet {
 				// convert to double then let the rest of the formatting to take place
 				try {
 					dValue = Double.parseDouble(sVal);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					dValue = NO_DATA;
 				}
 			}
@@ -2414,7 +2434,8 @@ public final class stats extends CacheServlet {
 					else {
 						dValue = NO_DATA;
 					}
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// System.err.println("Exception doing divcol : "+e + "("+e.getMessage()+")");
 					dValue = NO_DATA;
 				}
@@ -2733,7 +2754,8 @@ public final class stats extends CacheServlet {
 				}
 
 				sExpr = Format.replace(sExpr, "#" + iCol, "" + er.dRez);
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				// System.err.println(e+" ("+e.getMessage());
 				// e.printStackTrace();
 				// error parsing, too bad
@@ -2743,7 +2765,8 @@ public final class stats extends CacheServlet {
 
 		try {
 			return Double.parseDouble(JEPHelper.evaluateExpression(sExpr));
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// ignore, fatal
 			// System.err.println(e+" ("+e.getMessage()+")");
 			// e.printStackTrace();
@@ -2861,7 +2884,8 @@ public final class stats extends CacheServlet {
 			// System.err.println("--- toInterval returning "+dInterval);
 
 			return (long) dInterval;
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			// System.err.println("--- toInterval exception : "+e+"("+e.getMessage()+")");
 			return 0;
 		}
@@ -2999,7 +3023,8 @@ public final class stats extends CacheServlet {
 			try {
 				dSum += v.get(i).param[0];
 				lCnt++;
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				System.err.println("EXCEPTION : " + e + " (" + e.getMessage() + ") at element " + i + "/" + v.size() + ": " + v.get(i));
 				continue;
 			}
@@ -3021,7 +3046,8 @@ public final class stats extends CacheServlet {
 		for (int i = v.size() - 1; i >= 0; i--) {
 			try {
 				dSum += v.get(i).param[0];
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				System.err.println("EXCEPTION : " + e + " (" + e.getMessage() + ") at element " + i + "/" + v.size() + ": " + v.get(i));
 				continue;
 			}
@@ -3365,7 +3391,8 @@ public final class stats extends CacheServlet {
 					}
 
 					lResult += Integer.parseInt(stok);
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 			}
@@ -3395,7 +3422,8 @@ public final class stats extends CacheServlet {
 
 			try {
 				iCol = Integer.parseInt(st.nextToken());
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				iCol = -1;
 			}
 
@@ -3523,7 +3551,8 @@ public final class stats extends CacheServlet {
 					Entry e = new Entry(min, sColorMin, max, sColorMax);
 
 					lEntries.add(e);
-				} catch (Throwable e) {
+				}
+				catch (Throwable e) {
 					// ignore
 				}
 			}
@@ -3697,6 +3726,33 @@ public final class stats extends CacheServlet {
 			return Utils.toHex(c);
 		}
 
+	}
+
+	/**
+	 * Override the ThreadedPage method to work with lists of IPs, usually IPv4 and IPv6 of the same machine, and resolve them all to the minimal set of distinct names (or IPs)
+	 * 
+	 * @param ipOrList
+	 * @return the minimal set of hostnames/IPs, comma separated
+	 */
+	public static String getHostName(final String ipOrList) {
+		final StringTokenizer st = new StringTokenizer(ipOrList, ",; \t\r\n");
+
+		final Set<String> names = new LinkedHashSet<String>();
+
+		while (st.hasMoreTokens()) {
+			names.add(ThreadedPage.getHostName(st.nextToken()));
+		}
+
+		final StringBuilder sb = new StringBuilder();
+
+		for (final String name : names) {
+			if (sb.length() > 0)
+				sb.append(", ");
+
+			sb.append(name);
+		}
+
+		return sb.toString();
 	}
 
 	/**
