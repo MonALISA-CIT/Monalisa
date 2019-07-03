@@ -324,7 +324,7 @@ public class Rest extends ServletExtension {
 				else
 					sb.append(',');
 
-				sb.append('"').append(Format.escJS(me.getKey())).append("\":\"").append(Format.escJS(me.getValue())).append('"');
+				sb.append('"').append(Format.escJSON(me.getKey())).append("\":\"").append(Format.escJSON(me.getValue())).append('"');
 			}
 
 			sb.append("}");
