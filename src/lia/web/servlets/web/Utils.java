@@ -326,14 +326,17 @@ public final class Utils {
 				pTemp.putAll(prop);
 
 				prop = pTemp;
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				System.err.println(e + " (" + e.getMessage() + ")");
 				e.printStackTrace();
-			} finally {
+			}
+			finally {
 				if (fis != null)
 					try {
 						fis.close();
-					} catch (final IOException ioe) {
+					}
+					catch (final IOException ioe) {
 						// ignore
 					}
 			}
@@ -449,12 +452,12 @@ public final class Utils {
 			// whatever key was first found will be the only one that will remain in the final data
 			// set
 			while (it.hasNext()) {
-			r = it.next();
+				r = it.next();
 
-			sTempKey = IDGenerator.generateKey(r, 0);
+				sTempKey = IDGenerator.generateKey(r, 0);
 
-			if ((sTempKey != null) && sTempKey.equals(sKey))
-			v.add(r);
+				if ((sTempKey != null) && sTempKey.equals(sKey))
+					v.add(r);
 			}
 		else {
 			// keep only the data that matches the predicates, in the order of the predicates
@@ -650,7 +653,8 @@ public final class Utils {
 
 		try {
 			lDataPoints = Long.parseLong(sPoints);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// not a number, try to figure out the number of points depending on the image size
 
 			final int iSize = ServletExtension.pgeti(prop, "width", 800);
@@ -1210,7 +1214,8 @@ public final class Utils {
 				bFoundZero = bFoundZero || (i == 0);
 
 				groups.add(Integer.valueOf(i));
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				// ignore
 			}
 
@@ -1574,7 +1579,9 @@ public final class Utils {
 
 		final boolean bLogStart = AppConfig.getb("web_log_file.log_start", false);
 
-		if (sServletName.startsWith("START ")) {
+		final boolean isStartStatement = sServletName.startsWith("START ");
+
+		if (isStartStatement) {
 			jspExecutionStarted.put(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
 
 			if (!bLogStart)
@@ -1588,10 +1595,12 @@ public final class Utils {
 
 			final String sIP = request.getRemoteAddr();
 
-			if (sIP.indexOf(':') >= 0)
-				ThreadedPage.incrementIPv6RequestCount();
-			else
-				ThreadedPage.incrementIPv4RequestCount();
+			if (!isStartStatement) {
+				if (sIP.indexOf(':') >= 0)
+					ThreadedPage.incrementIPv6RequestCount();
+				else
+					ThreadedPage.incrementIPv4RequestCount();
+			}
 
 			String sDate;
 
@@ -1618,22 +1627,25 @@ public final class Utils {
 
 			final int port = request.getLocalPort();
 
-			final JSPExecution execution = jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
+			final JSPExecution execution = isStartStatement ? null : jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
 
 			double executionTimeReal = executionTime;
 
 			if (execution != null && sServletName.startsWith(execution.jspName)) {
 				executionTimeReal = execution.toMillis();
 
-				ThreadedPage.addJSPMeasurement(executionTimeReal);
+				if (executionTimeReal >= 0)
+					ThreadedPage.addJSPMeasurement(executionTimeReal);
 			}
 
 			pw.println(sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal));
 
 			pw.flush();
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			// ignore
-		} finally {
+		}
+		finally {
 			if (pw != null)
 				pw.close();
 		}
