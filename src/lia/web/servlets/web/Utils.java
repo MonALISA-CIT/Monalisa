@@ -1525,7 +1525,7 @@ public final class Utils {
 	 * @param request
 	 *            HttpServletRequest to get other information from (referer, browser, http method, requested page)
 	 */
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request) {
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request) {
 		logRequest(sServletName, iSize, request, true);
 	}
 
@@ -1547,9 +1547,9 @@ public final class Utils {
 		}
 	}
 
-	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<Long, JSPExecution>(10000);
+	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<Long, JSPExecution>(AppConfig.geti("lia.web.servlets.web.Utils.max_http_threads", 1000));
 
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters) {
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters) {
 		logRequest(sServletName, iSize, request, incrementCounters, -1);
 	}
 
@@ -1567,8 +1567,7 @@ public final class Utils {
 	 * @param executionTime
 	 *            execution time, in milliseconds
 	 */
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters, final double executionTime) {
-
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters, final double executionTime) {
 		if (incrementCounters && !sServletName.startsWith("START "))
 			ThreadedPage.incrementRequestCount();
 
@@ -1588,11 +1587,7 @@ public final class Utils {
 				return;
 		}
 
-		PrintWriter pw = null;
-
 		try {
-			pw = new PrintWriter(new FileWriter(sLogFile, true));
-
 			final String sIP = request.getRemoteAddr();
 
 			if (!isStartStatement) {
@@ -1638,16 +1633,37 @@ public final class Utils {
 					ThreadedPage.addJSPMeasurement(executionTimeReal);
 			}
 
-			pw.println(sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal));
+			final String line = sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal);
 
-			pw.flush();
+			logLine(sLogFile, line);
 		}
 		catch (final Throwable t) {
-			// ignore
+			logger.log(Level.WARNING, "Exception logging a request", t);
 		}
-		finally {
-			if (pw != null)
-				pw.close();
+	}
+
+	private static PrintWriter logPrintWriter = null;
+	private static int writtenLogLines = 0;
+
+	private static synchronized void logLine(final String sLogFile, final String line) {
+		try {
+			if (logPrintWriter == null) {
+				logPrintWriter = new PrintWriter(new FileWriter(sLogFile, true));
+				writtenLogLines = 0;
+			}
+
+			logPrintWriter.println(line);
+			writtenLogLines++;
+
+			if (writtenLogLines > 10) {
+				logPrintWriter.close();
+				logPrintWriter = null;
+			}
+			else
+				logPrintWriter.flush();
+		}
+		catch (final Throwable t) {
+			logPrintWriter = null;
 		}
 	}
 
