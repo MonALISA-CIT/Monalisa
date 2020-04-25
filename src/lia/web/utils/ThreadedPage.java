@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,6 +23,10 @@ import java.util.TreeSet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.InitialDirContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -134,7 +139,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 			while (true) {
 				try {
 					sleep(1 * 60 * 1000); // save stats every minute
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					// return; // somebody interrupted us ... ok ...
 				}
 
@@ -144,7 +150,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 						pw.println("" + lTotalRequests);
 						pw.flush();
 						pw.close();
-					} catch (final Exception e) {
+					}
+					catch (final Exception e) {
 						System.err.println("WEB: cannot update the repository totals : " + e + " (" + e.getMessage() + ")");
 					}
 			}
@@ -331,7 +338,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 							"<html><head><title>MonALISA Grid Monitoring tool</title></head><body><a href='http://monalisa.caltech.edu/' alt='MonALISA Grid Monitoring tool'>MonALISA home page</a></body></html>");
 					pwOut.flush();
 					pwOut.close();
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					// ignore
 				}
 
@@ -422,9 +430,11 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				try {
 					br = new BufferedReader(new FileReader(sConfDir + "REPOSITORY.start_date"));
 					lFirstRunDate = Long.parseLong(br.readLine());
-				} catch (final RuntimeException re) {
+				}
+				catch (final RuntimeException re) {
 					// ignore
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					lFirstRunDate = NTPDate.currentTimeMillis();
 
 					try {
@@ -432,14 +442,17 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 						pw.println("" + lFirstRunDate);
 						pw.flush();
 						pw.close();
-					} catch (final Exception e2) {
+					}
+					catch (final Exception e2) {
 						System.err.println("WEB: cannot set the repository start date : " + e2 + " (" + e2.getMessage() + ")");
 					}
-				} finally {
+				}
+				finally {
 					if (br != null)
 						try {
 							br.close();
-						} catch (final IOException ioe) {
+						}
+						catch (final IOException ioe) {
 							// ignore
 						}
 				}
@@ -447,15 +460,19 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				try {
 					br = new BufferedReader(new FileReader(sConfDir + "REPOSITORY.total_requests"));
 					lTotalRequests = Long.parseLong(br.readLine());
-				} catch (final RuntimeException re) {
+				}
+				catch (final RuntimeException re) {
 					// ignore
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					lTotalRequests = 0;
-				} finally {
+				}
+				finally {
 					if (br != null)
 						try {
 							br.close();
-						} catch (final IOException ioe) {
+						}
+						catch (final IOException ioe) {
 							// ignore
 						}
 				}
@@ -476,14 +493,16 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 
 						exporter = new ExportStatistics(port);
 					}
-				} catch (final Throwable t) {
+				}
+				catch (final Throwable t) {
 					System.err.println("Cannot initiate ExportStatistics, falling back to Site");
 				}
 
 				if (exporter == null)
 					try {
 						exporter = new ExportSiteStatistics(req.getServerPort());
-					} catch (final Throwable t) {
+					}
+					catch (final Throwable t) {
 						System.err.println("Cannot initiate ExportSiteStatistics either, disabling export: " + t + " (" + t.getMessage() + ")");
 						t.printStackTrace();
 						exporter = new Object();
@@ -513,7 +532,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		while ((!bFinishedOK) && (System.currentTimeMillis() < lMaxAllowedTime))
 			try {
 				Thread.sleep(iSleep);
-			} catch (final InterruptedException e) {
+			}
+			catch (final InterruptedException e) {
 				System.err.println("ThreadedPage: caught (and ignored) interrupted exception in sleep: " + e + " (" + e.getMessage() + ")");
 				e.printStackTrace();
 			}
@@ -521,7 +541,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		if (!bFinishedOK) {
 			try {
 				t.interrupt();
-			} catch (final Throwable tt) {
+			}
+			catch (final Throwable tt) {
 				// ignore
 			}
 
@@ -532,7 +553,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				pwOut.println("<!-- page timeout, getMaxRunTime()= " + getMaxRunTime() + ", lStart=" + lStartTime + ", now=" + System.currentTimeMillis() + ", bFinishedOk = " + bFinishedOK
 						+ ", bShouldExecute = " + bShouldExecute + " -->");
 				pwOut.flush();
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				// ignore
 			}
 		}
@@ -570,7 +592,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		try {
 			osOut = response.getOutputStream();
 			pwOut = new PrintWriter(osOut);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// inore
 		}
 	}
@@ -612,7 +635,7 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 
 	/**
 	 * Inform about a JSP execution where the execution time is known
-	 * 
+	 *
 	 * @param dTime
 	 */
 	public static void addJSPMeasurement(final double dTime) {
@@ -694,25 +717,29 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				execGet();
 			else
 				execPost();
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			System.err.println("ThreadedPage execution exception : " + t + " (" + t.getMessage() + ")");
 			t.printStackTrace();
 			System.err.println("Java memory info: \n" + "  Free memory : " + Runtime.getRuntime().freeMemory() + "\n" + "  Total memory: " + Runtime.getRuntime().totalMemory() + "\n"
 					+ "  Max memory  : " + Runtime.getRuntime().maxMemory());
-		} finally {
+		}
+		finally {
 			updateStats(System.currentTimeMillis() - lStartTime);
 		}
 
 		if (shouldClose()) {
 			try {
 				osOut.flush();
-			} catch (final Exception ioe) {
+			}
+			catch (final Exception ioe) {
 				// ignore
 			}
 
 			try {
 				osOut.close();
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				// ignore
 			}
 		}
@@ -757,12 +784,13 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 	protected final String getHostName() {
 		try {
 			return getHostName(request.getRemoteAddr());
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			return "cannot.find.host.name(" + e + ")";
 		}
 	}
 
-	private static final LRUMap<String, IPCacheEntry> ipCache = new LRUMap<String, IPCacheEntry>(5000);
+	private static final LRUMap<String, IPCacheEntry> ipCache = new LRUMap<String, IPCacheEntry>(AppConfig.geti("lia.web.utils.ThreadedPage.ipCache.size", 10000));
 
 	/**
 	 * Randomizer for expiration times
@@ -813,6 +841,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		synchronized (ipCache) {
 			ipCache.put(sIP, cache);
 		}
+
+		resolveQueue.remove(sIP);
 	}
 
 	/**
@@ -828,7 +858,7 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 	/**
 	 * DNS async resolver queue
 	 */
-	static final LinkedBlockingQueue<String> resolveQueue = new LinkedBlockingQueue<String>();
+	static final LinkedBlockingQueue<String> resolveQueue = new LinkedBlockingQueue<String>(2000);
 
 	private static final class AsyncNameSolver extends Thread {
 		/**
@@ -845,9 +875,12 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				try {
 					final String s = resolveQueue.take();
 
+					setName("lia.web.utils.ThreadedPage.AsyncNameSolver (" + resolveQueue.size() + "): " + s);
+
 					// force name lookup
 					getHostName(s, false);
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					// ignore
 				}
 
@@ -857,6 +890,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 	}
 
 	private static final Thread asyncNameSolver = new AsyncNameSolver();
+
+	private static final boolean useTimeoutResolver = AppConfig.getb("lia.web.utils.ThreadedPage.dns.withTimeout", true);
 
 	static {
 		asyncNameSolver.start();
@@ -884,7 +919,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 			return sName;
 
 		if (bCacheOnly) {
-			resolveQueue.offer(sIP);
+			if (!resolveQueue.contains(sIP))
+				resolveQueue.offer(sIP);
 
 			return sIP;
 		}
@@ -893,7 +929,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 
 		try {
 			addr = InetAddress.getByName(sIP);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// not an IP address
 			return sIP;
 		}
@@ -902,8 +939,9 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 
 		if (!addr.isSiteLocalAddress() && !addr.isLinkLocalAddress() && !addr.isLoopbackAddress()) {
 			try {
-				sHostName = addr.getHostName().toLowerCase();
-			} catch (final Exception e) {
+				sHostName = useTimeoutResolver ? getHostNameWithTimeout(addr) : addr.getHostName();
+			}
+			catch (final Exception e) {
 				// ignore
 			}
 
@@ -915,6 +953,65 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		putCachedHostName(sIP, sHostName);
 
 		return sHostName;
+	}
+
+	private static char[] HEX = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
+	static Properties javaxNamingContext = new Properties();
+
+	static {
+		javaxNamingContext.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");
+		javaxNamingContext.put("com.sun.jndi.dns.timeout.initial", String.valueOf(AppConfig.geti("lia.web.utils.ThreadedPage.dns.initialTimeout", 500)));
+		javaxNamingContext.put("com.sun.jndi.dns.timeout.retries", String.valueOf(AppConfig.geti("lia.web.utils.ThreadedPage.dns.retries", 2)));
+	}
+
+	private static String getHostNameWithTimeout(final InetAddress addr) {
+		final byte[] b = addr.getAddress();
+		final StringBuilder sb = new StringBuilder();
+
+		if (addr instanceof Inet6Address) {
+			for (int i = b.length - 1; i >= 0; i--) {
+				sb.append(HEX[b[i] & 0xF]).append('.');
+				sb.append(HEX[(b[i] & 0xF0) >> 4]).append('.');
+			}
+
+			sb.append("ip6.arpa.");
+		}
+		else {
+			for (int i = b.length - 1; i >= 0; i--)
+				sb.append(b[i] & 0xFF).append('.');
+
+			sb.append("in-addr.arpa.");
+		}
+
+		InitialDirContext idc;
+
+		try {
+			idc = new InitialDirContext(javaxNamingContext);
+		}
+		catch (final NamingException ex) {
+			// ignore, just return null if any error
+			return null;
+		}
+
+		try {
+			final Attributes attrs = idc.getAttributes(sb.toString(), new String[] { "PTR" });
+			final Attribute attr = attrs.get("PTR");
+
+			if (attr != null) {
+				String trimmedFQDN = (String) attr.get(0);
+
+				if (trimmedFQDN.endsWith("."))
+					trimmedFQDN = trimmedFQDN.substring(0, trimmedFQDN.length() - 1);
+
+				return trimmedFQDN;
+			}
+		}
+		catch (final Throwable th) {
+			// ignore, for any error return null
+		}
+
+		return null;
 	}
 
 	/**
@@ -1009,7 +1106,7 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 			if (sName.equals("dont_cache") || sName.equals("submit_plot"))
 				// by default don't pass these irrelevant URL arguments
 				if (!pgetb(prop, sName + ".url.pass", false))
-				continue;
+					continue;
 
 			final TreeSet<String> ts = me.getValue();
 
