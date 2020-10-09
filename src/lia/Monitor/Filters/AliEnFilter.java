@@ -3133,7 +3133,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				else if (pName.equals("ja_id_min"))
 					sjaID = (sjaID == null ? "" : sjaID) + "." + (int) pValue;
 				else if (pName.equals("job_id"))
-					sjobID = "" + (int) pValue;
+					sjobID = String.valueOf((long) pValue);
 				else if (pName.equals("TTL"))
 					this.ttl = (int) pValue;
 			}
@@ -4737,7 +4737,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				orgName = StringFactory.get(orgName);
 
-				final String jobID = Long.toString((long) r.param[jidid]);
+				final String jobID = String.valueOf((long) r.param[jidid]);
 				final int status = (int) r.param[stid];
 				final JobStatusCS jscs = findJobStatusCS(orgName, jobID, true);
 
