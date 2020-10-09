@@ -7172,10 +7172,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	 * @return user name, if known
 	 */
 	static final String getUserName(final String jobId) {
-		final Integer iJobID;
+		final Long iJobID;
 
 		try {
-			iJobID = Integer.valueOf(jobId);
+			iJobID = Long.valueOf(jobId);
 		} catch (final NumberFormatException nfe) {
 			return null;
 		}
