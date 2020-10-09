@@ -1581,7 +1581,7 @@ public final class Utils {
 		final boolean isStartStatement = sServletName.startsWith("START ");
 
 		if (isStartStatement) {
-			jspExecutionStarted.put(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
+			jspExecutionStarted.overwrite(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
 
 			if (!bLogStart)
 				return;
