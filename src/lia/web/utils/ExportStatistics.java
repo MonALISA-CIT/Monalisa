@@ -123,7 +123,7 @@ public class ExportStatistics extends TimerTask {
      */
     protected void init(String sCluster, int repositoryPort, String sExtraNodeString) {
         String sConfig = AppConfig.getProperty("lia.Repository.ApMonExport.ConfigFile",
-                "http://monalisa.caltech.edu/repository.conf");
+                "http://monalisa.cern.ch/repository.conf");
         if ((sConfig == null) || (sConfig.length() <= 0)) {
             System.out.println("NOT Starting ExportStatistics with ApMon! sConfig is NULL");
             return;

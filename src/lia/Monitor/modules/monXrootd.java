@@ -11,6 +11,7 @@ import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import lazyj.Utils;
 import lazyj.cache.ExpirationCache;
 import lia.Monitor.monitor.MNode;
 import lia.Monitor.monitor.MonModuleInfo;
@@ -829,7 +830,7 @@ public class monXrootd extends monGenericUDP {
 		String serverHost = sourceToHostAddress.get(sourceAddress);
 
 		if (serverHost == null) {
-			serverHost = source.getCanonicalHostName();
+			serverHost = Utils.getHostName(sourceAddress);
 
 			if (serverHost != null) {
 				sourceToHostAddress.put(sourceAddress, serverHost, 1000 * 60 * 60);

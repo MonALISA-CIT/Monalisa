@@ -24,6 +24,10 @@
         <jar href="lib/cryptix.jar"/>
         <jar href="lib/jgsi.jar"/>
         <jar href="lib/puretls.jar"/>
+        <jar href="lib/xercesImpl-2.11.0.jar"/>
+        <jar href="lib/xalan2-2.7.2.jar"/>
+        <jar href="lib/serializer-2.7.2.jar"/>
+        <jar href="lib/xml-apis-1.4.01.jar"/>
         <extension name="jce" href="http://monalisa.cern.ch/ml_client/BouncyCastle-JCE.jnlp" />
         <extension name="jogl" href="http://monalisa.cern.ch/jogl/jogl.jnlp" />
         <property name="lia.Monitor.AppConfig.WebStart" value="true"/>

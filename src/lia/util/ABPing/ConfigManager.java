@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import lazyj.Utils;
 import lia.Monitor.monitor.AppConfig;
 
 /**
@@ -192,7 +193,7 @@ public class ConfigManager extends Thread {
 		public PeerInfo(String host) throws IOException{
 			InetAddress ina = InetAddress.getByName(host);
 			ipAddress = ina.getHostAddress();
-			hostName = ina.getCanonicalHostName();
+			hostName = Utils.getHostName(host);
 			if(hostName.equals(ipAddress))
 				hostName = null;
 			farmNames = new Vector();

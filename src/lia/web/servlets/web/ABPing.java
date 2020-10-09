@@ -507,7 +507,7 @@ public class ABPing extends ServletExtension {
 			if (!bFound) {
 				try {
 					InetAddress ia = InetAddress.getByName(src);
-					String sName = ia.getCanonicalHostName();
+					String sName = lazyj.Utils.getHostName(ia.getHostAddress());
 
 					synchronized (hmNames) {
 						if (sName != null && sName.length() > 0)

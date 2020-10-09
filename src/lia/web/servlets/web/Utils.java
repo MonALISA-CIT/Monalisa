@@ -326,14 +326,17 @@ public final class Utils {
 				pTemp.putAll(prop);
 
 				prop = pTemp;
-			} catch (final IOException e) {
+			}
+			catch (final IOException e) {
 				System.err.println(e + " (" + e.getMessage() + ")");
 				e.printStackTrace();
-			} finally {
+			}
+			finally {
 				if (fis != null)
 					try {
 						fis.close();
-					} catch (final IOException ioe) {
+					}
+					catch (final IOException ioe) {
 						// ignore
 					}
 			}
@@ -449,12 +452,12 @@ public final class Utils {
 			// whatever key was first found will be the only one that will remain in the final data
 			// set
 			while (it.hasNext()) {
-			r = it.next();
+				r = it.next();
 
-			sTempKey = IDGenerator.generateKey(r, 0);
+				sTempKey = IDGenerator.generateKey(r, 0);
 
-			if ((sTempKey != null) && sTempKey.equals(sKey))
-			v.add(r);
+				if ((sTempKey != null) && sTempKey.equals(sKey))
+					v.add(r);
 			}
 		else {
 			// keep only the data that matches the predicates, in the order of the predicates
@@ -650,7 +653,8 @@ public final class Utils {
 
 		try {
 			lDataPoints = Long.parseLong(sPoints);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// not a number, try to figure out the number of points depending on the image size
 
 			final int iSize = ServletExtension.pgeti(prop, "width", 800);
@@ -1210,7 +1214,8 @@ public final class Utils {
 				bFoundZero = bFoundZero || (i == 0);
 
 				groups.add(Integer.valueOf(i));
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				// ignore
 			}
 
@@ -1520,7 +1525,7 @@ public final class Utils {
 	 * @param request
 	 *            HttpServletRequest to get other information from (referer, browser, http method, requested page)
 	 */
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request) {
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request) {
 		logRequest(sServletName, iSize, request, true);
 	}
 
@@ -1542,9 +1547,9 @@ public final class Utils {
 		}
 	}
 
-	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<Long, JSPExecution>(10000);
+	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<Long, JSPExecution>(AppConfig.geti("lia.web.servlets.web.Utils.max_http_threads", 1000));
 
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters) {
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters) {
 		logRequest(sServletName, iSize, request, incrementCounters, -1);
 	}
 
@@ -1562,8 +1567,7 @@ public final class Utils {
 	 * @param executionTime
 	 *            execution time, in milliseconds
 	 */
-	public static synchronized void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters, final double executionTime) {
-
+	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters, final double executionTime) {
 		if (incrementCounters && !sServletName.startsWith("START "))
 			ThreadedPage.incrementRequestCount();
 
@@ -1574,24 +1578,24 @@ public final class Utils {
 
 		final boolean bLogStart = AppConfig.getb("web_log_file.log_start", false);
 
-		if (sServletName.startsWith("START ")) {
-			jspExecutionStarted.put(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
+		final boolean isStartStatement = sServletName.startsWith("START ");
+
+		if (isStartStatement) {
+			jspExecutionStarted.overwrite(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
 
 			if (!bLogStart)
 				return;
 		}
 
-		PrintWriter pw = null;
-
 		try {
-			pw = new PrintWriter(new FileWriter(sLogFile, true));
-
 			final String sIP = request.getRemoteAddr();
 
-			if (sIP.indexOf(':') >= 0)
-				ThreadedPage.incrementIPv6RequestCount();
-			else
-				ThreadedPage.incrementIPv4RequestCount();
+			if (!isStartStatement) {
+				if (sIP.indexOf(':') >= 0)
+					ThreadedPage.incrementIPv6RequestCount();
+				else
+					ThreadedPage.incrementIPv4RequestCount();
+			}
 
 			String sDate;
 
@@ -1618,24 +1622,48 @@ public final class Utils {
 
 			final int port = request.getLocalPort();
 
-			final JSPExecution execution = jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
+			final JSPExecution execution = isStartStatement ? null : jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
 
 			double executionTimeReal = executionTime;
 
 			if (execution != null && sServletName.startsWith(execution.jspName)) {
 				executionTimeReal = execution.toMillis();
 
-				ThreadedPage.addJSPMeasurement(executionTimeReal);
+				if (executionTimeReal >= 0)
+					ThreadedPage.addJSPMeasurement(executionTimeReal);
 			}
 
-			pw.println(sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal));
+			final String line = sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal);
 
-			pw.flush();
-		} catch (final Throwable t) {
-			// ignore
-		} finally {
-			if (pw != null)
-				pw.close();
+			logLine(sLogFile, line);
+		}
+		catch (final Throwable t) {
+			logger.log(Level.WARNING, "Exception logging a request", t);
+		}
+	}
+
+	private static PrintWriter logPrintWriter = null;
+	private static int writtenLogLines = 0;
+
+	private static synchronized void logLine(final String sLogFile, final String line) {
+		try {
+			if (logPrintWriter == null) {
+				logPrintWriter = new PrintWriter(new FileWriter(sLogFile, true));
+				writtenLogLines = 0;
+			}
+
+			logPrintWriter.println(line);
+			writtenLogLines++;
+
+			if (writtenLogLines > 10) {
+				logPrintWriter.close();
+				logPrintWriter = null;
+			}
+			else
+				logPrintWriter.flush();
+		}
+		catch (final Throwable t) {
+			logPrintWriter = null;
 		}
 	}
 

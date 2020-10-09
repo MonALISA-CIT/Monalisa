@@ -421,7 +421,7 @@
             <fileset dir="${build.dir}" includes="lia/util/update/Updater.class" />
             <fileset dir="${build.dir}" includes="lia/util/update/old/*.class" />
         </delete>
-        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.4" target="1.4">
+        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/update/Updater.java" />
             <include name="lia/util/update/old/**/*.java" />
@@ -1795,6 +1795,10 @@
         <copy file="${monalisa.home}/Clients/lib/cog-jglobus.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
         <copy file="${monalisa.home}/Clients/lib/cryptix.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
         <copy file="${monalisa.home}/Clients/lib/jgsi.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xercesImpl-2.11.0.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xalan2-2.7.2.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/serializer-2.7.2.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
+        <copy file="${monalisa.home}/Clients/lib/xml-apis-1.4.01.jar" todir="${sclients.update.dir}/jClient/lib" filtering="false" />
 
         <signjar keystore="${keystore}" alias="${store.alias}" storepass="${store.pass}">
             <fileset dir="${sclients.update.dir}/jClient/lib">
@@ -1804,6 +1808,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </signjar>
         <copy todir="${lia.home}/WEBS/WEB/jClient/lib" filtering="false">
@@ -1814,6 +1822,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </copy>
         <copy todir="${lia.home}/WEBS/WEB/vrvsjClient/lib" filtering="false">
@@ -1824,6 +1836,10 @@
                 <include name="jini-core.jar" />
                 <include name="jini-ext.jar" />
                 <include name="backport-util-concurrent.jar" />
+                <include name="xercesImpl-2.11.0.jar" />
+                <include name="xalan2-2.7.2.jar" />
+                <include name="serializer-2.7.2.jar" />
+                <include name="xml-apis-1.4.01.jar" />
             </fileset>
         </copy>
     </target>

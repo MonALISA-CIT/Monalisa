@@ -415,7 +415,11 @@ public class monProcStat extends monProcReader {
                     }
                 }
             }
-            res.addSet(ResTypes[index++], (100.0 * diff[3]) / sum);
+            
+			final double idleCPU = (100.0 * diff[3]) / sum;
+
+			res.addSet(ResTypes[index++], idleCPU);
+			res.addSet("cpu_usage", 100 - idleCPU);
         }
 
         double imp = ((res.time - last_time) / 1000D) * 1024D;
