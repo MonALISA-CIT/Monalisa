@@ -255,7 +255,7 @@
           target: compile_topo_ser
          ================================= -->
     <target name="compile_topo_ser" description="Compile lia package" depends="init">
-        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/monitor/*.java" />
             <include name="lia/util/topology/*.java" />
@@ -280,7 +280,7 @@
           target: compile_abping_conf_ser
          ================================= -->
     <target name="compile_abping_conf_ser" description="Compile lia package" depends="init">
-        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/monitor/*.java" />
             <include name="lia/util/ABPing/*.java" />
@@ -302,7 +302,7 @@
           target: compile_pathload_conf_web
          ================================= -->
     <target name="compile_pathload_conf_web" depends="init" description="Compile the Pathload webconf servlet">
-        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/Pathload/util/*.java" />
             <include name="lia/util/Pathload/server/*.java" />
@@ -313,7 +313,7 @@
     </target>
 
     <target name="compile_monsit_ser" description="Compile monsit package" depends="init">
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/monitor/*.java" />
             <include name="lia/web/servlets/monsit/monsit.java" />
@@ -336,15 +336,15 @@
         </delete>
     </target>
     <target name="compile_proxy" description="Compile proxy classes" depends="init">
-        <echo message="${line.separator}Compiling mandatory Java 1.6 classes" />
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="1.6" target="1.6">
+        <echo message="${line.separator}Compiling mandatory Java 1.8 classes" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/monitor/*.java" />
             <include name="lia/Monitor/ClientsFarmProxy/ProxyServiceEntry.java" />
             <include name="lia/Monitor/ClientsFarmProxy/LightProxyService.java" />
         </javac>
-        <echo message="${line.separator}Compiling Java 1.6 classes" />
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="1.6" target="1.6">
+        <echo message="${line.separator}Compiling Java 1.8 classes" />
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/ClientsFarmProxy/*.java" />
             <include name="lia/Monitor/JiniSerFarmMon/MLLUSHelper.java" />
@@ -358,8 +358,8 @@
 
     <target name="compile_ser" description="Compile ML Service packages" depends="init">
         <echo message="${line.separator} MonALISA-Version ${monalisa.version} ${line.separator}${line.separator}${line.separator}" />
-        <echo message="${line.separator} Compiling all sources for Java 6" />
-        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <echo message="${line.separator} Compiling all sources for Java 8" />
+        <javac includeantruntime="false" srcdir="${src.dir}" includeAntRuntime="false" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/ntp/**/*.java" />
             <include name="lia/app/**/*.java" />
@@ -421,14 +421,14 @@
             <fileset dir="${build.dir}" includes="lia/util/update/Updater.class" />
             <fileset dir="${build.dir}" includes="lia/util/update/old/*.class" />
         </delete>
-        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" sourcepath="" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/update/Updater.java" />
             <include name="lia/util/update/old/**/*.java" />
         </javac>
     </target>
     <target name="compile_osd" description="Compile Optical Switch Daemon Package" depends="init">
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/Monitor/Agents/OpticalPath/comm/*.java" />
             <include name="lia/Monitor/monitor/AppConfig*.java" />
@@ -443,13 +443,13 @@
           target: compile_authz-service              
          ================================= -->
     <target name="compile_authz_ser" depends="init" description="Compiles authorization service used for OS">
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/security/authz/AuthZJiniProxy.java" />
             <include name="lia/Monitor/monitor/GenericMLEntry.java" />
             <include name="lia/Monitor/monitor/AuthZSI.java" />
         </javac>
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/security/authz/**/*.java" />
             <exclude name="lia/util/security/authz/AuthZJiniProxy.java" />
@@ -464,7 +464,7 @@
           target: compile_mllogger_service              
          ================================= -->
     <target name="compile_logger" depends="init" description="Compiles MLLogger service">
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/logging/service/MLLoggerJiniProxy.java" />
             <include name="lia/Monitor/monitor/GenericMLEntry.java" />
@@ -483,7 +483,7 @@
             <include name="lia/Monitor/monitor/LoggerConfigClass.java" />
             <include name="lia/Monitor/monitor/AuthZSI.java" />
         </javac>
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/logging/service/**/*.java" />
             <exclude name="lia/util/logging/service/MLLoggerJiniProxy.java" />
@@ -531,7 +531,7 @@
     </target>
     <target name="compile_ps" description="Compile pic splitter package" depends="init">
         <echo message="Compile pic splitter's java files in ${src.dir}" />
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/util/ntp/NTPClient.java" />
             <include name="lia/util/ntp/NTPDate.java" />
@@ -549,7 +549,7 @@
     </target>
     <target name="compile_client" description="Compile lia package" depends="init">
         <echo message="Compile *.java in ${src.dir}" />
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.java.classpath" />
             <include name="lia/app/*.java" />
             <include name="lia/app/**/*.java" />
@@ -608,7 +608,7 @@
         </javac>
     </target>
     <target name="compile_web" description="Compile classes for web" depends="init">
-        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="1.6" target="1.6">
+        <javac includeantruntime="false" srcdir="${src.dir}" destdir="${build.dir}" nowarn="on" debug="true" optimize="true" source="8" target="8">
             <classpath refid="compile.web.classpath" />
             <include name="lia/Monitor/monitor/AppConfig*.java" />
             <include name="lia/Monitor/monitor/DataStore.java" />
