@@ -85,12 +85,12 @@ public class WNode implements Comparable<WNode> {
 		data = lData;
 		try{
 			LONG = Double.parseDouble(sLONG);
-		}catch(NumberFormatException ex){
+		}catch(@SuppressWarnings("unused") NumberFormatException ex){
 			// skip
 		}
 		try{
 			LAT = Double.parseDouble(sLAT);
-		}catch(NumberFormatException ex){
+		}catch(@SuppressWarnings("unused") NumberFormatException ex){
 			// skip
 		}		
 		

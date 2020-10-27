@@ -86,8 +86,8 @@ public class Rest extends ServletExtension {
 				this.tmax = t2;
 
 				this.timeSet = ((t1 != 0) && (t1 != -1)) || ((t2 != 0) && (t2 != -1));
-			} catch (final NumberFormatException nfe) {
-				// ignore
+			}
+			catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 				this.sParameter = s4;
 				this.sCondition = s5;
 			}
@@ -171,7 +171,7 @@ public class Rest extends ServletExtension {
 		if (o == null)
 			return null;
 
-		final List<Map<String, String>> ret = new ArrayList<Map<String, String>>();
+		final List<Map<String, String>> ret = new ArrayList<>();
 
 		if (o instanceof Result) {
 			final Result r = (Result) o;
@@ -180,7 +180,7 @@ public class Rest extends ServletExtension {
 				if ((verify != null) && !verify.matches(r.param[i]))
 					continue;
 
-				final Map<String, String> m = new LinkedHashMap<String, String>();
+				final Map<String, String> m = new LinkedHashMap<>();
 
 				m.put("Farm", r.FarmName);
 				m.put("Cluster", r.ClusterName);
@@ -200,7 +200,7 @@ public class Rest extends ServletExtension {
 					if ((verify != null) && !verify.matches(r.param[i]))
 						continue;
 
-					final Map<String, String> m = new LinkedHashMap<String, String>();
+					final Map<String, String> m = new LinkedHashMap<>();
 
 					m.put("Farm", r.FarmName);
 					m.put("Cluster", r.ClusterName);
@@ -535,12 +535,12 @@ public class Rest extends ServletExtension {
 		if (this.timeSet)
 			results = Cache.filterByTime(results, pred);
 
-		final Map<String, Map<String, String>> browse = new TreeMap<String, Map<String, String>>();
+		final Map<String, Map<String, String>> browse = new TreeMap<>();
 
 		for (final Object o : results) {
 			String sKey = null;
 
-			final Map<String, String> m = new LinkedHashMap<String, String>();
+			final Map<String, String> m = new LinkedHashMap<>();
 
 			if (o instanceof Result) {
 				final Result r = (Result) o;
@@ -628,7 +628,7 @@ public class Rest extends ServletExtension {
 		System.err.println(rest);
 		System.err.println(Arrays.toString(rest.sParameter.split("[|]")));
 
-		final Vector<TimestampedResult> v = new Vector<TimestampedResult>();
+		final Vector<TimestampedResult> v = new Vector<>();
 
 		final Result r = new Result();
 		r.time = System.currentTimeMillis();

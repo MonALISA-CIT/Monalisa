@@ -92,7 +92,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 			String s;
 			if ((sParam != null) && ((s = request.getParameter(sParam)) != null))
 				return s;
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			System.err.println("gets: Exception: " + e + "(" + e.getMessage() + ")");
 			e.printStackTrace();
 		}
@@ -112,7 +113,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 			final String s = gets(sParam);
 			if (s.length() > 0)
 				return Integer.parseInt(s);
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// ignore;
 		}
 
@@ -131,7 +133,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 			final String s = gets(sParam);
 			if (s.length() > 0)
 				return Long.parseLong(s);
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// ignore
 		}
 
@@ -168,7 +171,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	public float getf(final String sParam, final float defaultVal) {
 		try {
 			return Float.parseFloat(gets(sParam));
-		} catch (final NumberFormatException nfe) {
+		}
+		catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 			return defaultVal;
 		}
 	}
@@ -183,7 +187,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	public double getd(final String sParam, final double defaultVal) {
 		try {
 			return Double.parseDouble(gets(sParam));
-		} catch (final NumberFormatException nfe) {
+		}
+		catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 			return defaultVal;
 		}
 	}
@@ -225,7 +230,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 		try {
 			response.sendRedirect(sURL);
 			return true;
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			return false;
 		}
 	}
@@ -340,7 +346,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 				if (c.getName().equals(sName))
 					return decode(c.getValue());
 			}
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// ignore
 		}
 
@@ -380,7 +387,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 			response.addCookie(c);
 
 			return true;
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			System.err.println("setCookie exception : " + e + " (" + e.getMessage() + ")");
 			return false;
 		}
@@ -420,6 +428,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	 * @throws IOException
 	 */
 	public static int writeResponse(final byte[] vs, final HttpServletRequest request, final HttpServletResponse response, final OutputStream os) throws IOException {
+		@SuppressWarnings("resource")
 		final OutputStream responseOS = os != null ? os : response.getOutputStream();
 
 		final String range = request.getHeader("Range");
@@ -684,7 +693,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 		return pgets(prop, sKey, sDefault, true);
 	}
 
-	private static final ExpirationCache<String, ArrayList<String>> queryCache = new ExpirationCache<String, ArrayList<String>>();
+	private static final ExpirationCache<String, ArrayList<String>> queryCache = new ExpirationCache<>();
 
 	private static final ArrayList<String> getCachedQueryResult(final String sQuery, final boolean bUseQueryCache) {
 		if (bUseQueryCache) {
@@ -694,7 +703,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 				return cached;
 		}
 
-		final ArrayList<String> alValues = new ArrayList<String>();
+		final ArrayList<String> alValues = new ArrayList<>();
 
 		if (!sQuery.toLowerCase().startsWith("select ")) {
 			logger.log(Level.WARNING, "Somebody tried to execute an illegal query: " + sQuery);
@@ -872,7 +881,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 			if (sVal.endsWith(";"))
 				sVal = sVal.substring(0, sVal.length() - 1);
 
-			final TreeMap<String, String> tm = new TreeMap<String, String>(); // it's a sorted map
+			final TreeMap<String, String> tm = new TreeMap<>(); // it's a sorted map
 
 			if (sVal.length() >= 2) {
 				final char c = sVal.charAt(0);
@@ -934,24 +943,24 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 								continue;
 
 					switch (c) {
-					case 'C':
-						s = sClusterName;
-						break;
-					case 'N':
-						s = sNodeName;
-						break;
-					case 'f':
-						s = sParamName;
-						break;
-					case 'v':
-						s = sValue;
-						break;
-					case 't':
-						s = "" + lTime;
-						break;
-					case 'F':
-					default:
-						s = sFarmName;
+						case 'C':
+							s = sClusterName;
+							break;
+						case 'N':
+							s = sNodeName;
+							break;
+						case 'f':
+							s = sParamName;
+							break;
+						case 'v':
+							s = sValue;
+							break;
+						case 't':
+							s = "" + lTime;
+							break;
+						case 'F':
+						default:
+							s = sFarmName;
 					}
 
 					tm.put(s, s);
@@ -1069,7 +1078,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	public static final int pgeti(final Properties prop, final String sKey, final int iDefault) {
 		try {
 			return Integer.parseInt(pgets(prop, sKey));
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			return iDefault;
 		}
 	}
@@ -1085,7 +1095,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	public static final long pgetl(final Properties prop, final String sKey, final long lDefault) {
 		try {
 			return Long.parseLong(pgets(prop, sKey));
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			return lDefault;
 		}
 	}
@@ -1101,7 +1112,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	public static final double pgetd(final Properties prop, final String sKey, final double dDefault) {
 		try {
 			return Double.parseDouble(pgets(prop, sKey));
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			return dDefault;
 		}
 	}
@@ -1120,7 +1132,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 
 		try {
 			return TimeZone.getTimeZone(pgets(prop, "timezone", "GMT"));
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			System.err.println("Exception converting timezone '" + pgets(prop, "timezone", "GMT") + " : " + e + "(" + e.getMessage() + ")");
 			return defaultTimeZone;
 		}
@@ -1174,7 +1187,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 	 * @return list
 	 */
 	public static final Vector<String> toVector(final String sVal) {
-		final Vector<String> v = new Vector<String>();
+		final Vector<String> v = new Vector<>();
 
 		if (sVal == null)
 			return v;
@@ -1265,24 +1278,24 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 		}
 
 		switch (cMod) {
-		case 'Y':
-			lRez *= 365L * 24 * 60 * 60 * 1000;
-			break;
-		case 'M':
-			lRez *= 30L * 24 * 60 * 60 * 1000;
-			break;
-		case 'd':
-			lRez *= 24L * 60 * 60 * 1000;
-			break;
-		case 'h':
-			lRez *= 60 * 60 * 1000;
-			break;
-		case 'm':
-			lRez *= 60 * 1000;
-			break;
-		case 's':
-			lRez *= 1000;
-			break;
+			case 'Y':
+				lRez *= 365L * 24 * 60 * 60 * 1000;
+				break;
+			case 'M':
+				lRez *= 30L * 24 * 60 * 60 * 1000;
+				break;
+			case 'd':
+				lRez *= 24L * 60 * 60 * 1000;
+				break;
+			case 'h':
+				lRez *= 60 * 60 * 1000;
+				break;
+			case 'm':
+				lRez *= 60 * 1000;
+				break;
+			case 's':
+				lRez *= 1000;
+				break;
 		}
 
 		return lRez;
@@ -1452,7 +1465,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 						blue = 255;
 					if (blue < 0)
 						blue = 0;
-				} catch (final Exception e) {
+				}
+				catch (@SuppressWarnings("unused") final Exception e) {
 					return null;
 				}
 			}

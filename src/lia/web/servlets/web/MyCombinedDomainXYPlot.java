@@ -13,10 +13,10 @@ import org.jfree.chart.plot.CombinedDomainXYPlot;
  *
  */
 public class MyCombinedDomainXYPlot extends CombinedDomainXYPlot {
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
 	/**
-	 * 
+	 *
 	 */
 	public MyCombinedDomainXYPlot() {
 		super();
@@ -25,20 +25,20 @@ public class MyCombinedDomainXYPlot extends CombinedDomainXYPlot {
 	/**
 	 * @param va
 	 */
-	public MyCombinedDomainXYPlot(ValueAxis va) {
+	public MyCombinedDomainXYPlot(final ValueAxis va) {
 		super(va);
 	}
 
 	@Override
 	public LegendItemCollection getLegendItems() {
-		HashMap<String, String> hmAlreadyDefined = new HashMap<String, String>();
+		final HashMap<String, String> hmAlreadyDefined = new HashMap<>();
 
-		LegendItemCollection lic = new LegendItemCollection();
+		final LegendItemCollection lic = new LegendItemCollection();
 
-		Iterator<?> it = super.getLegendItems().iterator();
+		final Iterator<?> it = super.getLegendItems().iterator();
 
 		while (it.hasNext()) {
-			LegendItem li = (LegendItem) it.next();
+			final LegendItem li = (LegendItem) it.next();
 
 			if (hmAlreadyDefined.get(li.getLabel()) == null) {
 				lic.add(li);

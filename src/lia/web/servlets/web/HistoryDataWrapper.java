@@ -19,18 +19,18 @@ class HistoryDataWrapper {
 	/**
 	 * series names
 	 */
-	public String[]			series;
+	public String[] series;
 
 	/**
 	 * predicates
 	 */
-	public monPredicate[]	preds;
-	
+	public monPredicate[] preds;
+
 	/**
 	 * selected predicates
 	 */
-	public monPredicate[]	selectedPreds;
-	
+	public monPredicate[] selectedPreds;
+
 	/**
 	 * @param prop
 	 * @param unselectSeries
@@ -38,8 +38,8 @@ class HistoryDataWrapper {
 	 */
 	@SuppressWarnings("null")
 	public HistoryDataWrapper(final Properties prop, final String[] unselectSeries, final HashMap<String, String> hmSeries) {
-		Vector<String> vSeries = ServletExtension.toVector(prop, "series.names", null);
-		Vector<String> vPreds = ServletExtension.toVector(prop, "series.predicates", null);
+		final Vector<String> vSeries = ServletExtension.toVector(prop, "series.names", null);
+		final Vector<String> vPreds = ServletExtension.toVector(prop, "series.predicates", null);
 
 		series = null;
 
@@ -53,17 +53,18 @@ class HistoryDataWrapper {
 				preds[i] = ServletExtension.toPred(vPreds.get(i));
 				series[i] = vSeries.get(i);
 			}
-		} else {
-			String[] vsFarms = Utils.getValues(prop, "Farms");
-			String[] vsClusters = Utils.getValues(prop, "Clusters");
-			String[] vsNodes = Utils.getValues(prop, "Nodes");
-			String[] vsFunctions = Utils.getValues(prop, "Functions");
-			String[] vsFunctionSuff = Utils.getValues(prop, "FuncSuff");
+		}
+		else {
+			final String[] vsFarms = Utils.getValues(prop, "Farms");
+			final String[] vsClusters = Utils.getValues(prop, "Clusters");
+			final String[] vsNodes = Utils.getValues(prop, "Nodes");
+			final String[] vsFunctions = Utils.getValues(prop, "Functions");
+			final String[] vsFunctionSuff = Utils.getValues(prop, "FuncSuff");
 
-			String[] vsWildcards = Utils.getValues(prop, "Wildcards");
+			final String[] vsWildcards = Utils.getValues(prop, "Wildcards");
 
 			int w = -1;
-			
+
 			int len = 0;
 
 			for (i = 0; vsWildcards != null && i < vsWildcards.length; i++) {
@@ -106,8 +107,8 @@ class HistoryDataWrapper {
 				System.err.println("FUNCTIONS : '" + ServletExtension.pgets(prop, "Clusters") + "'");
 				System.err.println("FUNCSUFF : '" + ServletExtension.pgets(prop, "FuncSuff") + "'");
 				System.err.println("WILDCARDS : '" + ServletExtension.pgets(prop, "Wildcards") + "'");
-				
-				System.err.println("Here is the parsed configuration dump:\n"+prop);
+
+				System.err.println("Here is the parsed configuration dump:\n" + prop);
 			}
 
 			preds = new monPredicate[len];
@@ -133,16 +134,17 @@ class HistoryDataWrapper {
 				if (vsWildcards[w].equals("f"))
 					preds[i].parameters = new String[] { vsFunctions[i] + ((vsFunctionSuff != null && vsFunctionSuff.length > 0) ? vsFunctionSuff[0] : "") };
 				else
-					preds[i].parameters = new String[] { (vsFunctions != null && vsFunctions.length > 0) ? (vsFunctions[0] + ((vsFunctionSuff != null && vsFunctionSuff.length > 0) ? vsFunctionSuff[0] : "")) : "*" };
+					preds[i].parameters = new String[] {
+							(vsFunctions != null && vsFunctions.length > 0) ? (vsFunctions[0] + ((vsFunctionSuff != null && vsFunctionSuff.length > 0) ? vsFunctionSuff[0] : "")) : "*" };
 			}
 		}
-		
-		String[] serieso = new String[series.length];
+
+		final String[] serieso = new String[series.length];
 		for (i = 0; i < series.length; i++)
 			serieso[i] = series[i];
 
 		series = Utils.sortSeries(series, prop, unselectSeries, hmSeries);
-		monPredicate[] predsn = new monPredicate[preds.length];
+		final monPredicate[] predsn = new monPredicate[preds.length];
 
 		for (i = 0; i < series.length; i++) {
 			for (int j = 0; j < serieso.length; j++)
@@ -155,21 +157,21 @@ class HistoryDataWrapper {
 		preds = predsn;
 
 		selectedPreds = preds;
-		
-		if (hmSeries.size() > 0){
-			final ArrayList<monPredicate> alSelected = new ArrayList<monPredicate>(hmSeries.size());
-		
-			for (i=0; i<series.length; i++){
+
+		if (hmSeries.size() > 0) {
+			final ArrayList<monPredicate> alSelected = new ArrayList<>(hmSeries.size());
+
+			for (i = 0; i < series.length; i++) {
 				if (hmSeries.containsKey(series[i]))
 					alSelected.add(preds[i]);
 			}
-		
-			if (alSelected.size() > 0){
+
+			if (alSelected.size() > 0) {
 				selectedPreds = new monPredicate[alSelected.size()];
-				for (i=0; i<alSelected.size(); i++)
+				for (i = 0; i < alSelected.size(); i++)
 					selectedPreds[i] = alSelected.get(i);
 			}
-			else{
+			else {
 				hmSeries.clear();
 			}
 		}

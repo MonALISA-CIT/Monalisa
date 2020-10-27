@@ -13,20 +13,20 @@ import org.jfree.data.time.RegularTimePeriod;
  *
  */
 public class MyHour extends Hour {
-	private static final long	serialVersionUID	= 1L;
+	private static final long serialVersionUID = 1L;
 
-	private Day					day;
+	private final Day day;
 
-	private int					hour;
+	private final int hour;
 
-	private int					increment;
+	private final int increment;
 
 	/**
 	 * @param iHour
 	 * @param iDay
 	 * @param iIncrement
 	 */
-	public MyHour(final int iHour, final Day iDay, int iIncrement) {
+	public MyHour(final int iHour, final Day iDay, final int iIncrement) {
 		hour = iHour;
 		day = iDay;
 
@@ -39,7 +39,7 @@ public class MyHour extends Hour {
 	 * @param iIncrement
 	 */
 	@SuppressWarnings("deprecation")
-	public MyHour(final Date time, final TimeZone zone, int iIncrement) {
+	public MyHour(final Date time, final TimeZone zone, final int iIncrement) {
 		final Calendar calendar = Calendar.getInstance(zone);
 		calendar.setTime(time);
 		final int iHour = calendar.get(Calendar.HOUR_OF_DAY);
@@ -52,7 +52,7 @@ public class MyHour extends Hour {
 	/**
 	 * @return first hour
 	 */
-	protected int getFirstHour() {
+	private static int getFirstHour() {
 		return 0;
 	}
 
@@ -68,11 +68,13 @@ public class MyHour extends Hour {
 		final MyHour result;
 		if (hour != getFirstHour()) {
 			result = new MyHour(hour - increment, day, increment);
-		} else {
+		}
+		else {
 			final Day prevDay = (Day) day.previous();
 			if (prevDay != null) {
 				result = new MyHour(getLastHour(), prevDay, increment);
-			} else {
+			}
+			else {
 				result = null;
 			}
 		}
@@ -84,11 +86,13 @@ public class MyHour extends Hour {
 		final MyHour result;
 		if (hour != getLastHour()) {
 			result = new MyHour(hour + increment, day, increment);
-		} else {
+		}
+		else {
 			final Day nextDay = (Day) day.next();
 			if (nextDay != null) {
 				result = new MyHour(getFirstHour(), nextDay, increment);
-			} else {
+			}
+			else {
 				result = null;
 			}
 		}
@@ -185,11 +189,14 @@ public class MyHour extends Hour {
 			if (result == 0) {
 				result = hour - h.getHour();
 			}
-		} else if (o1 instanceof RegularTimePeriod) {
-			result = 0;
-		} else {
-			result = 1;
 		}
+		else
+			if (o1 instanceof RegularTimePeriod) {
+				result = 0;
+			}
+			else {
+				result = 1;
+			}
 
 		return result;
 

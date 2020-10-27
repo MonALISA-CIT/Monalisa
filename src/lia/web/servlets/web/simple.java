@@ -92,7 +92,7 @@ public class simple extends CacheServlet {
 
 		Vector<String> vStrings = toVector(prop, "values", null, true, true);
 
-		Vector<Double> values = new Vector<Double>(vStrings.size());
+		Vector<Double> values = new Vector<>(vStrings.size());
 
 		double dMax = 0;
 
@@ -111,7 +111,7 @@ public class simple extends CacheServlet {
 
 					if (dTemp > dMax)
 						dMax = dTemp;
-				} catch (Exception e2) {
+				} catch (@SuppressWarnings("unused") Exception e2) {
 					// ignore any conversion exception
 				}
 		}
@@ -168,7 +168,7 @@ public class simple extends CacheServlet {
 		try {
 			ChartUtilities.writeChartAsPNG(osOut, chart, width, height);
 			osOut.flush();
-		} catch (IOException e1) {
+		} catch (@SuppressWarnings("unused") IOException e1) {
 			// ignore IO exceptions
 		}
 

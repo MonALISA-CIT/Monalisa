@@ -40,7 +40,7 @@ public class ConditionVerifier implements Condition {
 				
 				return matches(d);
 			}
-			catch (NumberFormatException nfe){
+			catch (@SuppressWarnings("unused") NumberFormatException nfe){
 				return false;
 			}
 		}
@@ -81,7 +81,7 @@ public class ConditionVerifier implements Condition {
 			try{
 				return d == Double.parseDouble(expression);
 			}
-			catch (Exception e){
+			catch (@SuppressWarnings("unused") Exception e){
 				// return false
 			}
 			
@@ -164,8 +164,8 @@ public class ConditionVerifier implements Condition {
 	public ConditionVerifier(final String expression){
 		originalString = expression;
 		
-		positiveConditions = new LinkedList<Condition>();
-		negativeConditions = new LinkedList<Condition>();
+		positiveConditions = new LinkedList<>();
+		negativeConditions = new LinkedList<>();
 		
 		if (originalString.length()==0)
 			return;
@@ -221,7 +221,7 @@ public class ConditionVerifier implements Condition {
 				d1 = Double.parseDouble(s1);
 				ok = true;
 			}
-			catch (NumberFormatException nfe){
+			catch (@SuppressWarnings("unused") NumberFormatException nfe){
 				// ignore
 			}
 			
@@ -229,7 +229,7 @@ public class ConditionVerifier implements Condition {
 				d2 = Double.parseDouble(s2);
 				ok = true;
 			}
-			catch (NumberFormatException nfe){
+			catch (@SuppressWarnings("unused") NumberFormatException nfe){
 				// ignore
 			}
 			

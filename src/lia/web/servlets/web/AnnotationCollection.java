@@ -16,8 +16,8 @@ import lia.web.utils.Annotation;
  */
 public class AnnotationCollection {
 	
-	private HashMap<String, List<Annotation>> hmAnnotations = new HashMap<String, List<Annotation>>();
-	private List<Annotation> lChartAnnotations = new LinkedList<Annotation>();
+	private HashMap<String, List<Annotation>> hmAnnotations = new HashMap<>();
+	private List<Annotation> lChartAnnotations = new LinkedList<>();
 	
 	/**
 	 * @param l
@@ -45,7 +45,7 @@ public class AnnotationCollection {
 					List<Annotation> lAnnotationsPerService = hmAnnotations.get(sService);
 					
 					if (lAnnotationsPerService==null){
-						lAnnotationsPerService = new LinkedList<Annotation>();
+						lAnnotationsPerService = new LinkedList<>();
 						
 						hmAnnotations.put(sService, lAnnotationsPerService);
 					}

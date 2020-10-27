@@ -123,7 +123,7 @@ public class WWmap {
 		graphics.setFont(font);
 		tRect = new Rectangle();
 		iRect = new Rectangle();
-		colorScales = new Hashtable<String, Color>();
+		colorScales = new Hashtable<>();
 
 		colorScales.put("Node_min", getColor(properties, "default.color.min", Color.CYAN));
 		colorScales.put("Node_max", getColor(properties, "default.color.max", Color.BLUE));
@@ -134,7 +134,7 @@ public class WWmap {
 		colorScales.put("Bandwidth_min", getColor(properties, "Bandwidth.color.min", ColorFactory.getColor(255, 255, 0)));
 		colorScales.put("Bandwidth_max", getColor(properties, "Bandwidth.color.max", ColorFactory.getColor(0, 255, 100)));
 
-		valScales = new Hashtable<String, Double>();
+		valScales = new Hashtable<>();
 	}
 
 	private static final Color getColor(Properties prop, String sParam, Color cDefault) {
@@ -142,7 +142,8 @@ public class WWmap {
 			StringTokenizer st = new StringTokenizer(ServletExtension.pgets(prop, sParam));
 
 			return ColorFactory.getColor(Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()), Integer.parseInt(st.nextToken()));
-		} catch (Exception e) {
+		}
+		catch (@SuppressWarnings("unused") Exception e) {
 			return cDefault;
 		}
 	}
@@ -537,7 +538,7 @@ public class WWmap {
 			int y21p = y2p + (int) (w * dir_x);
 			int y22p = y2p - (int) (w * dir_x);
 
-			link.vMap = new Vector<Integer>();
+			link.vMap = new Vector<>();
 			link.vMap.add(Integer.valueOf(x11p));
 			link.vMap.add(Integer.valueOf(y11p));
 			link.vMap.add(Integer.valueOf(x21p));
