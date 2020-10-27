@@ -49,7 +49,7 @@ import lia.web.utils.ThreadedPage;
 
 /**
  * This servlet builds nice, colored tables
- * 
+ *
  * @author costing
  * @since forever
  */
@@ -70,7 +70,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * The default is to cache the tables for 45 seconds
-	 * 
+	 *
 	 * @return 45 seconds (default)
 	 */
 	@Override
@@ -119,23 +119,23 @@ public final class stats extends CacheServlet {
 			try {
 				store = (TransparentStoreFast) TransparentStoreFactory.getStore();
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				System.out.println("Error building store : " + e + " (" + e.getMessage() + ")");
 				bAuthOK = true;
 				return;
 			}
 		}
 
-		Page p = new Page(sResDir + "stats/stats.res");
+		final Page p = new Page(sResDir + "stats/stats.res");
 
-		Properties prop = Utils.getProperties(sConfDir, gets("page"));
+		final Properties prop = Utils.getProperties(sConfDir, gets("page"));
 
 		setLogTiming(prop);
 
 		p.modify("page", gets("page"));
 
 		// URL parameters override everything
-		Enumeration<?> eParams = request.getParameterNames();
+		final Enumeration<?> eParams = request.getParameterNames();
 		while (eParams.hasMoreElements()) {
 			final String sParameter = (String) eParams.nextElement();
 
@@ -151,7 +151,7 @@ public final class stats extends CacheServlet {
 		try {
 			sCSV = buildStatistics(p, prop);
 		}
-		catch (Exception e) {
+		catch (final Exception e) {
 			System.err.println("Exception : " + e + " (" + e.getMessage() + ")");
 			e.printStackTrace();
 		}
@@ -176,7 +176,7 @@ public final class stats extends CacheServlet {
 		}
 
 		if (pgeti(prop, "options", 0) > 0) {
-			Page pOptions = new Page(sResDir + "stats/options.res");
+			final Page pOptions = new Page(sResDir + "stats/options.res");
 
 			display.showOptions(sResDir, prop, pOptions, this);
 
@@ -215,7 +215,7 @@ public final class stats extends CacheServlet {
 
 	private static final String vsTotalsDescr[] = { "Total", "Average", "Std dev", "Min", "Max" };
 
-	private final String buildStatistics(Page p, Properties prop) throws Exception {
+	private final String buildStatistics(final Page p, final Properties prop) throws Exception {
 		return buildStatistics(p, prop, sResDir, pgetb(prop, "dump_csv", false));
 	}
 
@@ -223,7 +223,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * CSV-escaping
-	 * 
+	 *
 	 * @param s
 	 *            string to escape
 	 * @return a string escaped for CSV
@@ -263,7 +263,7 @@ public final class stats extends CacheServlet {
 		long lMaxTime = pgetl(prop, "stats.maxtime", 0) * 60000L;
 
 		if (lMaxTime > lMinTime) {
-			long lTemp = lMaxTime;
+			final long lTemp = lMaxTime;
 			lMaxTime = lMinTime;
 			lMinTime = lTemp;
 		}
@@ -299,7 +299,7 @@ public final class stats extends CacheServlet {
 			ds = new DataSplitter(new Vector<TimestampedResult>(1), lMinTime, lMaxTime);
 		}
 
-		final HashMap<Integer, HashMap<String, String>> hmStrings = new HashMap<Integer, HashMap<String, String>>();
+		final HashMap<Integer, HashMap<String, String>> hmStrings = new HashMap<>();
 
 		final String sDefaultMessageFormat = pgets(prop, "default_message_format", "<a onmouseover=\"return overlib(':FULL_MESSAGE:');\" onmouseout=\"return nd();\">:CUT_MESSAGE:</a>");
 
@@ -319,7 +319,7 @@ public final class stats extends CacheServlet {
 			final Vector<String> descr = toVector(prop, "descr" + i, "descr");
 			final Vector<String> funcDef = toVector(prop, "func" + i, "func");
 			final Vector<String> vd2 = toVector(prop, "pivotdescr" + i + "_2", "pivotdescr_2");
-			final Vector<FunctionDecode> func = new Vector<FunctionDecode>(funcDef.size());
+			final Vector<FunctionDecode> func = new Vector<>(funcDef.size());
 
 			// have a fallback in case there is no title for the whole page
 			if ((sTitle.length() == 0) && (v1.size() > 0)) {
@@ -342,9 +342,9 @@ public final class stats extends CacheServlet {
 			final Vector<String> groups2 = toVector(prop, "groups" + i + "_2", "groups_2");
 			final Vector<String> minmax = toVector(prop, "minmax" + i, "minmax");
 
-			final Vector<Vector<String>> vTotals = new Vector<Vector<String>>();
+			final Vector<Vector<String>> vTotals = new Vector<>();
 
-			for (String vsTotal : vsTotals) {
+			for (final String vsTotal : vsTotals) {
 				final Vector<String> vTemp = toVector(prop, vsTotal + i, vsTotal);
 				vTotals.add(vTemp);
 			}
@@ -363,7 +363,7 @@ public final class stats extends CacheServlet {
 				func.add(fd);
 			}
 
-			final Vector<Vector<Vector<EvalResult>>> VR = new Vector<Vector<Vector<EvalResult>>>();
+			final Vector<Vector<Vector<EvalResult>>> VR = new Vector<>();
 
 			final double vdMax[] = new double[v3.size()];
 			final double vdMin[] = new double[v3.size()];
@@ -379,18 +379,14 @@ public final class stats extends CacheServlet {
 
 			int offered = 0;
 
-			final LinkedBlockingQueue<AsyncRowEval> results = new LinkedBlockingQueue<AsyncRowEval>();
+			final LinkedBlockingQueue<AsyncRowEval> results = new LinkedBlockingQueue<>();
 
-			for (int j = 0; j < v1.size(); j++) {
-				final String s1 = v1.get(j);
-
-				final Vector<Vector<EvalResult>> VR1 = new Vector<Vector<EvalResult>>();
+			for (final String s1 : v1) {
+				final Vector<Vector<EvalResult>> VR1 = new Vector<>();
 				VR.add(VR1);
 
-				for (int k = 0; k < v2.size(); k++) {
-					final String s2 = v2.get(k);
-
-					final Vector<EvalResult> VR2 = new Vector<EvalResult>();
+				for (final String s2 : v2) {
+					final Vector<EvalResult> VR2 = new Vector<>();
 					VR1.add(VR2);
 
 					final AsyncRowEval are = new AsyncRowEval(prop, lMinTime, lMaxTime, ds, hmStrings, i, v3, func, v3.size(), vdMax, vdMin, s1, s2, VR2, results, cacheSnapshot);
@@ -411,14 +407,14 @@ public final class stats extends CacheServlet {
 				try {
 					results.take();
 				}
-				catch (InterruptedException ie) {
+				catch (@SuppressWarnings("unused") final InterruptedException ie) {
 					System.err.println("stats: interrupted while waiting for row " + off + " / " + offered + " to be processed");
 				}
 			}
 
 			logTiming("stats: Async evaluation of rows is over, now filtering");
 
-			final List<ConditionVerifier> conditions = new ArrayList<ConditionVerifier>(v3.size());
+			final List<ConditionVerifier> conditions = new ArrayList<>(v3.size());
 
 			ConditionVerifier condNames = null;
 
@@ -446,7 +442,7 @@ public final class stats extends CacheServlet {
 				}
 			}
 
-			final Set<String> hideRows = new HashSet<String>();
+			final Set<String> hideRows = new HashSet<>();
 
 			if (bAnyCond) {
 				for (int iVR = 0; iVR < VR.size(); iVR++) {
@@ -600,7 +596,7 @@ public final class stats extends CacheServlet {
 						try {
 							fd = func.get(k);
 						}
-						catch (Exception e) {
+						catch (@SuppressWarnings("unused") final Exception e) {
 							// ignore
 						}
 
@@ -696,7 +692,7 @@ public final class stats extends CacheServlet {
 					try {
 						fd = func.get(k);
 					}
-					catch (Exception e) {
+					catch (@SuppressWarnings("unused") final Exception e) {
 						// ignore
 					}
 
@@ -949,7 +945,7 @@ public final class stats extends CacheServlet {
 								}
 
 								if (mmr instanceof MinMaxStrings) {
-									MinMaxStrings mms = (MinMaxStrings) mmr;
+									final MinMaxStrings mms = (MinMaxStrings) mmr;
 
 									mms.setFD(fd);
 									mms.setStrings(hmStrings.get(Integer.valueOf(l)));
@@ -1040,11 +1036,11 @@ public final class stats extends CacheServlet {
 				logTiming("  body done");
 
 				for (int m = 0; m < vTotals.size(); m++) {
-					Vector<String> vTemp = vTotals.get(m);
+					final Vector<String> vTemp = vTotals.get(m);
 
 					if (vTemp.size() > 0) {
 						for (int k = 0; k < v3.size(); k++) {
-							FunctionDecode fd = func.get(k);
+							final FunctionDecode fd = func.get(k);
 
 							if (vTemp.contains("" + k)) {
 
@@ -1058,8 +1054,8 @@ public final class stats extends CacheServlet {
 										continue;
 									}
 
-									Vector<EvalResult> VR2 = VR1.get(l);
-									EvalResult er = VR2.get(k);
+									final Vector<EvalResult> VR2 = VR1.get(l);
+									final EvalResult er = VR2.get(k);
 
 									if ((er.dRez >= 0) || fd.bAllowNegatives) {
 										dTotal += er.dRez;
@@ -1090,10 +1086,10 @@ public final class stats extends CacheServlet {
 										double dSum = 0;
 
 										for (int l = 0; l < v2.size(); l++) {
-											Vector<EvalResult> VR2 = VR1.get(l);
-											EvalResult er = VR2.get(k);
+											final Vector<EvalResult> VR2 = VR1.get(l);
+											final EvalResult er = VR2.get(k);
 											if (er.dRez >= 0) {
-												double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
+												final double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
 												dSum += dPatrat;
 											}
 										}
@@ -1206,8 +1202,8 @@ public final class stats extends CacheServlet {
 
 		@Override
 		public void run() {
-			final Set<Integer> unsolved = new TreeSet<Integer>();
-			final Set<Integer> solved = new HashSet<Integer>();
+			final Set<Integer> unsolved = new TreeSet<>();
+			final Set<Integer> solved = new HashSet<>();
 
 			for (int l = 0; l < v3Size; l++) {
 				unsolved.add(Integer.valueOf(l));
@@ -1248,10 +1244,10 @@ public final class stats extends CacheServlet {
 					}
 
 					if (fd.vInclude != null) {
-						fd.vmpInclude = new Vector<monPredicate>();
+						fd.vmpInclude = new Vector<>();
 
-						for (int ign = 0; ign < fd.vInclude.size(); ign++) {
-							String sPred = fd.vInclude.get(ign);
+						for (final String element : fd.vInclude) {
+							String sPred = element;
 
 							sPred = replace(sPred, "$1", s1);
 							sPred = replace(sPred, "$2", s2);
@@ -1265,10 +1261,10 @@ public final class stats extends CacheServlet {
 					}
 
 					if (fd.vExclude != null) {
-						fd.vmpExclude = new Vector<monPredicate>();
+						fd.vmpExclude = new Vector<>();
 
-						for (int ign = 0; ign < fd.vExclude.size(); ign++) {
-							String sPred = fd.vExclude.get(ign);
+						for (final String element : fd.vExclude) {
+							String sPred = element;
 
 							sPred = replace(sPred, "$1", s1);
 							sPred = replace(sPred, "$2", s2);
@@ -1287,7 +1283,7 @@ public final class stats extends CacheServlet {
 						hmSortStrings = hmStrings.get(Integer.valueOf(l));
 
 						if (hmSortStrings == null) {
-							hmSortStrings = new HashMap<String, String>();
+							hmSortStrings = new HashMap<>();
 							hmStrings.put(Integer.valueOf(l), hmSortStrings);
 						}
 					}
@@ -1344,16 +1340,16 @@ public final class stats extends CacheServlet {
 	/**
 	 * Queue of table rows to process asynchronously
 	 */
-	static final LinkedBlockingQueue<AsyncRowEval> rowProcessingQueue = new LinkedBlockingQueue<AsyncRowEval>();
+	static final LinkedBlockingQueue<AsyncRowEval> rowProcessingQueue = new LinkedBlockingQueue<>();
 
 	/**
 	 * Keep track of the executors
 	 */
-	private static final Vector<AsyncRowExecutor> asyncExecutors = new Vector<AsyncRowExecutor>();
+	private static final Vector<AsyncRowExecutor> asyncExecutors = new Vector<>();
 
 	/**
 	 * Takes one row and evaluates its cells
-	 * 
+	 *
 	 * @author costing
 	 * @since Jul 16, 2009
 	 */
@@ -1361,7 +1357,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Default constructor
-		 * 
+		 *
 		 * @param i
 		 *            executor ID
 		 */
@@ -1382,7 +1378,7 @@ public final class stats extends CacheServlet {
 						try {
 							are.run();
 						}
-						catch (Throwable t) {
+						catch (final Throwable t) {
 							System.err.println("stats.AsyncRowExecutor : evaluation exception : " + t + " (" + t.getMessage() + ")");
 							t.printStackTrace();
 						}
@@ -1390,12 +1386,12 @@ public final class stats extends CacheServlet {
 						try {
 							are.done();
 						}
-						catch (Throwable t) {
+						catch (@SuppressWarnings("unused") final Throwable t) {
 							// ignore
 						}
 					}
 				}
-				catch (InterruptedException ie) {
+				catch (@SuppressWarnings("unused") final InterruptedException ie) {
 					// ignore
 				}
 			}
@@ -1437,9 +1433,7 @@ public final class stats extends CacheServlet {
 	 * Stop the row executors.
 	 */
 	public static final void stopExecutors() {
-		for (int i = 0; i < asyncExecutors.size(); i++) {
-			AsyncRowExecutor are = asyncExecutors.get(i);
-
+		for (final AsyncRowExecutor are : asyncExecutors) {
 			are.signalStop();
 		}
 
@@ -1500,7 +1494,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Simple constructor
-		 * 
+		 *
 		 * @param d
 		 *            value
 		 * @param s
@@ -1508,7 +1502,7 @@ public final class stats extends CacheServlet {
 		 * @param b
 		 *            whether or not we have some value here
 		 */
-		public EvalResult(double d, String s, boolean b) {
+		public EvalResult(final double d, final String s, final boolean b) {
 			dRez = d;
 			sRez = s;
 			bData = b;
@@ -1516,7 +1510,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Debugging method
-		 * 
+		 *
 		 * @return fields dump
 		 */
 		@Override
@@ -1623,7 +1617,7 @@ public final class stats extends CacheServlet {
 		return showDottedDate(d) + " " + showTime(d);
 	}
 
-	private static final String toIP(double d) {
+	private static final String toIP(final double d) {
 		long l = (long) d;
 
 		String sRez = "." + (l % 256);
@@ -1913,7 +1907,7 @@ public final class stats extends CacheServlet {
 		/**
 		 * Set of columns this depends on
 		 */
-		HashSet<Integer> sDependsOn = new HashSet<Integer>();
+		HashSet<Integer> sDependsOn = new HashSet<>();
 
 		/**
 		 * Url to go to when clicking on the cell
@@ -1922,7 +1916,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Parse constructor
-		 * 
+		 *
 		 * @param sFunction
 		 *            configuration option for a field
 		 */
@@ -1949,7 +1943,7 @@ public final class stats extends CacheServlet {
 						final int iColIdx = Integer.parseInt(st.nextToken());
 						sDependsOn.add(Integer.valueOf(Math.abs(iColIdx)));
 					}
-					catch (NumberFormatException nfe) {
+					catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 						// ignore
 					}
 				}
@@ -1982,273 +1976,264 @@ public final class stats extends CacheServlet {
 				final String sNormal = st.nextToken();
 				final String s = sNormal.toLowerCase();
 
-				if (s.equals("b") || s.equals("k") || s.equals("m") || s.equals("g") || s.equals("t") || s.equals("p")) {
-					sSize = s.toUpperCase();
-				}
-				else
-					if (s.equals("rnd")) {
+				switch (s) {
+					case "b":
+					case "k":
+					case "m":
+					case "g":
+					case "t":
+					case "p":
+						sSize = s.toUpperCase();
+						break;
+
+					case "rnd":
 						bRound = true;
-					}
-					else
-						if (s.equals("iz")) {
-							bIgnoreZero = true;
+						break;
+					case "iz":
+						bIgnoreZero = true;
+						break;
+
+					case "ns":
+						bNoSize = true;
+						break;
+
+					case "8":
+						bDiv8 = true;
+						break;
+
+					case "bool":
+						bBoolean = true;
+						break;
+
+					case "bool2":
+						bBoolean2 = true;
+						break;
+
+					case "bool3":
+						bBoolean3 = true;
+						break;
+
+					case "onoff":
+						bOnOff = true;
+						break;
+
+					case "count0":
+						bCountZero = true;
+						break;
+
+					case "sortlen":
+						bSortLen = true;
+						break;
+
+					case "redifzero":
+						bRedIfZero = true;
+						break;
+
+					case "redifnodata":
+						bRedIfNoData = true;
+						break;
+
+					case "dot":
+						bDot = true;
+						break;
+
+					case "time":
+						bTime = true;
+						break;
+
+					case "timestamp":
+						bTimestamp = true;
+						break;
+
+					case "ip":
+						bIP = true;
+						break;
+
+					case "1000":
+						b1000 = true;
+						break;
+
+					case "decode":
+						bDecode = true;
+						break;
+
+					case "multi_avg":
+						bMultiAvg = true;
+						bMultiFirst = false;
+						break;
+
+					case "multi_sum":
+						bMultiAvg = false;
+						bMultiFirst = false;
+						break;
+
+					case "multi_first":
+						bMultiAvg = false;
+						bMultiFirst = true;
+						break;
+
+					case "double":
+						bDouble = true;
+						break;
+
+					case "fallbacktodb":
+						bFallbackToDB = true;
+						break;
+
+					case "zeropointone":
+						b0Point1 = true;
+						break;
+
+					case "allow_negatives":
+						bAllowNegatives = true;
+						break;
+
+					case "email":
+						bEmail = true;
+						break;
+
+					case "status":
+						bStatus = true;
+						if (iReasonCut < 0)
+							iReasonCut = 4;
+						break;
+
+					case "warning":
+						bWarning = true;
+						break;
+
+					case "hide":
+						bHide = true;
+						break;
+
+					case "always_show_unit":
+						bAlwaysShowUnit = true;
+						break;
+
+					case "force_message":
+						bForceMessage = true;
+						break;
+
+					case "resolveip":
+						bResolveIP = true;
+						break;
+
+					default:
+						if (s.startsWith("ddot")) {
+							bDDot = true;
+
+							if (s.length() > 4) {
+								try {
+									iDDotDigits = Integer.parseInt(s.substring(4));
+
+									if (iDDotDigits < 0) {
+										iDDotDigits = 0;
+									}
+								}
+								catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
+									// ignore
+								}
+							}
 						}
-						else
-							if (s.equals("ns")) {
-								bNoSize = true;
+						else {
+							final int equalsIdx = s.indexOf('=');
+
+							if (equalsIdx > 0) {
+								switch (s.substring(0, equalsIdx)) {
+									case "alternate":
+										sAlternate = sNormal.substring("alternate=".length());
+										break;
+
+									case "include":
+										if (vInclude == null)
+											vInclude = new Vector<>();
+
+										vInclude.add(sNormal.substring("include=".length()));
+										break;
+
+									case "exclude":
+										if (vExclude == null)
+											vExclude = new Vector<>();
+
+										vExclude.add(sNormal.substring("exclude=".length()));
+										break;
+
+									case "version":
+										sVersion = sNormal.substring("version=".length());
+										break;
+
+									case "version_count":
+										try {
+											iVersionCount = Integer.parseInt(sNormal.substring("version_count=".length()));
+										}
+										catch (@SuppressWarnings("unused") final Exception e) {
+											iVersionCount = 3; // default if wrongly specified
+										}
+										break;
+
+									case "reason_cut":
+										try {
+											iReasonCut = Integer.parseInt(sNormal.substring("reason_cut=".length()));
+										}
+										catch (@SuppressWarnings("unused") final Exception e) {
+											iReasonCut = 4; // default if wrongly specified
+										}
+										break;
+
+									case "factor":
+										try {
+											dFactor = Double.parseDouble(sNormal.substring("factor=".length()));
+											bFactor = Math.abs(dFactor - 1) > 1E-10;
+										}
+										catch (@SuppressWarnings("unused") final Exception e) {
+											// ignore
+										}
+										break;
+
+									case "divide":
+										try {
+											dFactor = 1d / Double.parseDouble(sNormal.substring("divide=".length()));
+											bFactor = Math.abs(dFactor - 1) > 1E-10;
+										}
+										catch (@SuppressWarnings("unused") final Exception e) {
+											// ignore
+										}
+										break;
+
+									case "substract_from":
+										try {
+											dSubstractFrom = Double.parseDouble(sNormal.substring("substract_from=".length()));
+											bSustractFrom = true;
+										}
+										catch (@SuppressWarnings("unused") final Exception e) {
+											bSustractFrom = false;
+										}
+										break;
+
+									case "url":
+										url = sNormal.substring(4);
+										break;
+
+									default:
+										sPlus += sNormal;
+								}
 							}
 							else
-								if (s.equals("8")) {
-									bDiv8 = true;
-								}
-								else
-									if (s.equals("bool")) {
-										bBoolean = true;
-									}
-									else
-										if (s.equals("bool2")) {
-											bBoolean2 = true;
-										}
-										else
-											if (s.equals("bool3")) {
-												bBoolean3 = true;
-											}
-											else
-												if (s.equals("onoff")) {
-													bOnOff = true;
-												}
-												else
-													if (s.equals("count0")) {
-														bCountZero = true;
-													}
-													else
-														if (s.equals("sortlen")) {
-															bSortLen = true;
-														}
-														else
-															if (s.equals("redifzero")) {
-																bRedIfZero = true;
-															}
-															else
-																if (s.equals("redifnodata")) {
-																	bRedIfNoData = true;
-																}
-																else
-																	if (s.equals("dot")) {
-																		bDot = true;
-																	}
-																	else
-																		if (s.startsWith("ddot")) {
-																			bDDot = true;
-
-																			if (s.length() > 4) {
-																				try {
-																					iDDotDigits = Integer.parseInt(s.substring(4));
-
-																					if (iDDotDigits < 0) {
-																						iDDotDigits = 0;
-																					}
-																				}
-																				catch (NumberFormatException nfe) {
-																					// ignore
-																				}
-																			}
-																		}
-																		else
-																			if (s.equals("time")) {
-																				bTime = true;
-																			}
-																			else
-																				if (s.equals("timestamp")) {
-																					bTimestamp = true;
-																				}
-																				else
-																					if (s.equals("ip")) {
-																						bIP = true;
-																					}
-																					else
-																						if (s.equals("1000")) {
-																							b1000 = true;
-																						}
-																						else
-																							if (s.equals("decode")) {
-																								bDecode = true;
-																							}
-																							else
-																								if (s.equals("multi_avg")) {
-																									bMultiAvg = true;
-																									bMultiFirst = false;
-																								}
-																								else
-																									if (s.equals("multi_sum")) {
-																										bMultiAvg = false;
-																										bMultiFirst = false;
-																									}
-																									else
-																										if (s.equals("multi_first")) {
-																											bMultiFirst = true;
-																											bMultiAvg = false;
-																										}
-																										else
-																											if (s.equals("double")) {
-																												bDouble = true;
-																											}
-																											else
-																												if (s.equals("fallbacktodb")) {
-																													bFallbackToDB = true;
-																												}
-																												else
-																													if (s.equals("zeropointone")) {
-																														b0Point1 = true;
-																													}
-																													else
-																														if (s.equals("allow_negatives")) {
-																															bAllowNegatives = true;
-																														}
-																														else
-																															if (s.startsWith("alternate=")) {
-																																sAlternate = sNormal.substring("alternate=".length());
-
-																																// System.err.println("FD : Alternate predicate is : '"+sAlternate+"'");
-																															}
-																															else
-																																if (s.startsWith("include=")) {
-																																	if (vInclude == null) {
-																																		vInclude = new Vector<String>();
-																																	}
-
-																																	vInclude.add(sNormal.substring("include=".length()));
-																																}
-																																else
-																																	if (s.startsWith("exclude=")) {
-																																		if (vExclude == null) {
-																																			vExclude = new Vector<String>();
-																																		}
-
-																																		vExclude.add(sNormal.substring("exclude=".length()));
-																																	}
-																																	else
-																																		if (s.startsWith("version=")) {
-																																			sVersion = sNormal.substring("version=".length());
-																																		}
-																																		else
-																																			if (s.startsWith("version_count=")) {
-																																				try {
-																																					iVersionCount = Integer.parseInt(sNormal
-																																							.substring("version_count=".length()));
-																																				}
-																																				catch (Exception e) {
-																																					iVersionCount = 3; // default if wrongly specified
-																																				}
-																																			}
-																																			else
-																																				if (s.startsWith("reason_cut=")) {
-																																					try {
-																																						iReasonCut = Integer.parseInt(sNormal
-																																								.substring("reason_cut=".length()));
-																																					}
-																																					catch (Exception e) {
-																																						iReasonCut = 4; // default if wrongly specified
-																																					}
-																																				}
-																																				else
-																																					if (s.startsWith("resolveip")) {
-																																						bResolveIP = true;
-																																					}
-																																					else
-																																						if (s.equals("email")) {
-																																							bEmail = true;
-																																						}
-																																						else
-																																							if (s.equals("status")) {
-																																								bStatus = true;
-																																								if (iReasonCut < 0) {
-																																									iReasonCut = 4;
-																																								}
-																																							}
-																																							else
-																																								if (s.startsWith("factor=")) {
-																																									try {
-																																										dFactor = Double.parseDouble(
-																																												sNormal.substring(
-																																														"factor="
-																																																.length()));
-																																										bFactor = Math.abs(
-																																												dFactor - 1) > 1E-10;
-																																									}
-																																									catch (Exception e) {
-																																										// ignore
-																																									}
-																																								}
-																																								else
-																																									if (s.startsWith("divide=")) {
-																																										try {
-																																											dFactor = 1d
-																																													/ Double.parseDouble(
-																																															sNormal.substring(
-																																																	"divide="
-																																																			.length()));
-																																											bFactor = Math.abs(dFactor
-																																													- 1) > 1E-10;
-																																										}
-																																										catch (Exception e) {
-																																											// ignore
-																																										}
-																																									}
-																																									else
-																																										if (s.startsWith(
-																																												"substract_from=")) {
-																																											try {
-																																												dSubstractFrom = Double
-																																														.parseDouble(
-																																																sNormal.substring(
-																																																		"substract_from="
-																																																				.length()));
-																																												bSustractFrom = true;
-																																											}
-																																											catch (Exception e) {
-																																												bSustractFrom = false;
-																																											}
-																																										}
-																																										else
-																																											if (s.equals("warning")) {
-																																												bWarning = true;
-																																											}
-																																											else
-																																												if (s.equals("hide")) {
-																																													bHide = true;
-																																												}
-																																												else
-																																													if (s.equals(
-																																															"always_show_unit")) {
-																																														bAlwaysShowUnit = true;
-																																													}
-																																													else
-																																														if (s.equals(
-																																																"force_message")) {
-																																															bForceMessage = true;
-																																														}
-																																														else
-																																															if (s.startsWith(
-																																																	"url=")) {
-																																																url = sNormal
-																																																		.substring(
-																																																				4);
-																																															}
-																																															else {
-																																																sPlus += sNormal;
-																																															}
+								sPlus += sNormal;
+						}
+				}
 			}
 
 			sPlus = sPlus.replace('_', ' ');
 		}
+
 	}
 
 	private static final String[] passParameters = new String[] { "compact.min_interval", "history.integrate.timebase", "default.measurement_interval", "totalperminute", "datainbits", "areachart",
 			"compact.displaypoints.areachart", "compact.displaypoints", "compact.disable" };
 
 	private static HashMap<String, String> setProperties(final Properties prop, final int iSeriesNo) {
-		final HashMap<String, String> hmOld = new HashMap<String, String>();
+		final HashMap<String, String> hmOld = new HashMap<>();
 
 		// System.err.println("setProperties("+iSeriesNo+")");
 
@@ -2291,7 +2276,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * Evaluate one cell
-	 * 
+	 *
 	 * @param fd
 	 * @param ds
 	 * @param pred
@@ -2318,7 +2303,7 @@ public final class stats extends CacheServlet {
 			prop.remove(sKey);
 
 			if (fd.bDecode && (sVal != null)) {
-				Object o = Writer.deserializeFromString(sVal);
+				final Object o = Writer.deserializeFromString(sVal);
 				if (o != null) {
 					sVal = o.toString();
 				}
@@ -2336,7 +2321,7 @@ public final class stats extends CacheServlet {
 				try {
 					dValue = Double.parseDouble(sVal);
 				}
-				catch (Exception e) {
+				catch (@SuppressWarnings("unused") final Exception e) {
 					dValue = NO_DATA;
 				}
 			}
@@ -2347,7 +2332,7 @@ public final class stats extends CacheServlet {
 					bData = false;
 				}
 
-				EvalResult er = new EvalResult(sVal != null ? 1 : 0, sVal, bData);
+				final EvalResult er = new EvalResult(sVal != null ? 1 : 0, sVal, bData);
 				er.iType = EvalResult.TYPE_STRING;
 
 				synchronized (hmSortStrings) {
@@ -2363,7 +2348,7 @@ public final class stats extends CacheServlet {
 
 			boolean bData = false;
 
-			Vector<String> vsCols = new Vector<String>();
+			final Vector<String> vsCols = new Vector<>();
 
 			if (fd.sParams != null) {
 				final StringTokenizer st = new StringTokenizer(fd.sParams, ";");
@@ -2435,7 +2420,7 @@ public final class stats extends CacheServlet {
 						dValue = NO_DATA;
 					}
 				}
-				catch (Exception e) {
+				catch (@SuppressWarnings("unused") final Exception e) {
 					// System.err.println("Exception doing divcol : "+e + "("+e.getMessage()+")");
 					dValue = NO_DATA;
 				}
@@ -2452,12 +2437,12 @@ public final class stats extends CacheServlet {
 
 		if (fd.sFunc.equals("avg")) {
 			final Vector<TimestampedResult> v = ds.get(pred);
-			dValue = evalAvg(Utils.toResultVector(v), fd.sParams);
+			dValue = evalAvg(Utils.toResultVector(v));
 		}
 
 		if (fd.sFunc.equals("sum")) {
 			final Vector<TimestampedResult> v = ds.get(pred);
-			dValue = evalSum(Utils.toResultVector(v), fd.sParams);
+			dValue = evalSum(Utils.toResultVector(v));
 		}
 
 		if (fd.sFunc.equals("int")) {
@@ -2697,7 +2682,7 @@ public final class stats extends CacheServlet {
 			}
 		}
 
-		EvalResult er = new EvalResult(dValue, sRez, !sRez.equals("-") || (dValue > 1E-10) || ((dValue >= 0) && fd.bIgnoreZero));
+		final EvalResult er = new EvalResult(dValue, sRez, !sRez.equals("-") || (dValue > 1E-10) || ((dValue >= 0) && fd.bIgnoreZero));
 		er.iType = (fd.bBoolean || fd.bBoolean2 || fd.bOnOff) ? EvalResult.TYPE_BOOL : EvalResult.TYPE_NUMBER;
 
 		if (fd.bStatus || fd.bBoolean3) {
@@ -2720,7 +2705,7 @@ public final class stats extends CacheServlet {
 
 		final char[] p = sParams.toCharArray();
 
-		final ArrayList<Integer> alColumns = new ArrayList<Integer>();
+		final ArrayList<Integer> alColumns = new ArrayList<>();
 
 		for (int i = 0; i < (p.length - 1); i++) {
 			if (p[i] == '#') {
@@ -2755,7 +2740,7 @@ public final class stats extends CacheServlet {
 
 				sExpr = Format.replace(sExpr, "#" + iCol, "" + er.dRez);
 			}
-			catch (Exception e) {
+			catch (@SuppressWarnings("unused") final Exception e) {
 				// System.err.println(e+" ("+e.getMessage());
 				// e.printStackTrace();
 				// error parsing, too bad
@@ -2766,7 +2751,7 @@ public final class stats extends CacheServlet {
 		try {
 			return Double.parseDouble(JEPHelper.evaluateExpression(sExpr));
 		}
-		catch (Exception e) {
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// ignore, fatal
 			// System.err.println(e+" ("+e.getMessage()+")");
 			// e.printStackTrace();
@@ -2777,7 +2762,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * Show a time interval
-	 * 
+	 *
 	 * @param dValue
 	 * @return time interval in human format
 	 */
@@ -2791,11 +2776,11 @@ public final class stats extends CacheServlet {
 			long l = (long) dValue;
 
 			l /= 60;
-			long m = l % 60;
+			final long m = l % 60;
 			l /= 60;
-			long h = l % 24;
+			final long h = l % 24;
 			l /= 24;
-			long d = l;
+			final long d = l;
 
 			if (d > 0) {
 				sRez = d + "d " + h + ":" + showZero(m);
@@ -2812,7 +2797,7 @@ public final class stats extends CacheServlet {
 		return sRez;
 	}
 
-	private static final String showZero(long i) {
+	private static final String showZero(final long i) {
 		return (((i < 10) && (i >= 0)) ? "0" : "") + i;
 	}
 
@@ -2822,7 +2807,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * Convert a string into a time interval
-	 * 
+	 *
 	 * @param sTimeParam
 	 *            nice time specification (5m, 1h ...)
 	 * @return the interval, in millis
@@ -2841,7 +2826,7 @@ public final class stats extends CacheServlet {
 		// System.err.println("--- toInterval("+sTime+")");
 
 		for (int i = sTime.length() - 1; i >= 0; i--) {
-			char c = sTime.charAt(i);
+			final char c = sTime.charAt(i);
 
 			if ((c >= 'a') && (c <= 'z')) {
 				sUnit = c + sUnit;
@@ -2885,7 +2870,7 @@ public final class stats extends CacheServlet {
 
 			return (long) dInterval;
 		}
-		catch (Exception e) {
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// System.err.println("--- toInterval exception : "+e+"("+e.getMessage()+")");
 			return 0;
 		}
@@ -2899,8 +2884,8 @@ public final class stats extends CacheServlet {
 
 		// include all extra values
 		if (fd.vmpInclude != null) {
-			for (int i = 0; i < fd.vmpInclude.size(); i++) {
-				v.addAll(filterByTime(Cache.getObjectsFromHash(cacheSnapshot, fd.vmpInclude.get(i), null, false), pred));
+			for (final monPredicate element : fd.vmpInclude) {
+				v.addAll(filterByTime(Cache.getObjectsFromHash(cacheSnapshot, element, null, false), pred));
 			}
 		}
 
@@ -2909,18 +2894,18 @@ public final class stats extends CacheServlet {
 			Vector<TimestampedResult> vTemp = ds.get(pred);
 
 			if ((vTemp != null) && (vTemp.size() > 0)) {
-				final ArrayList<TimestampedResult> al = new ArrayList<TimestampedResult>(1);
+				final ArrayList<TimestampedResult> al = new ArrayList<>(1);
 				al.add(vTemp.lastElement());
 				v.addAll(filterByTime(al, pred));
 			}
 
 			// and its alternatives
 			if (fd.vmpInclude != null) {
-				for (int i = 0; i < fd.vmpInclude.size(); i++) {
-					vTemp = ds.get(fd.vmpInclude.get(i));
+				for (final monPredicate element : fd.vmpInclude) {
+					vTemp = ds.get(element);
 
 					if ((vTemp != null) && (vTemp.size() > 0)) {
-						final ArrayList<TimestampedResult> al = new ArrayList<TimestampedResult>(1);
+						final ArrayList<TimestampedResult> al = new ArrayList<>(1);
 						al.add(vTemp.lastElement());
 						v.addAll(filterByTime(al, pred));
 					}
@@ -2940,9 +2925,7 @@ public final class stats extends CacheServlet {
 
 		// exclude explicitly specified values
 		if (fd.vmpExclude != null) {
-			for (int i = 0; i < fd.vmpExclude.size(); i++) {
-				final monPredicate mpExclude = fd.vmpExclude.get(i);
-
+			for (final monPredicate mpExclude : fd.vmpExclude) {
 				it = v.iterator();
 
 				while (it.hasNext()) {
@@ -2959,7 +2942,7 @@ public final class stats extends CacheServlet {
 
 		if (v.size() > 1) {
 			it = v.iterator();
-			final Set<String> ids = new HashSet<String>(v.size());
+			final Set<String> ids = new HashSet<>(v.size());
 
 			while (it.hasNext()) {
 				final String sKey = IDGenerator.generateKey(it.next(), 0);
@@ -2991,9 +2974,7 @@ public final class stats extends CacheServlet {
 
 		int iCount = 0;
 
-		for (int i = 0; i < v.size(); i++) {
-			final Object o = v.get(i);
-
+		for (final TimestampedResult o : v) {
 			if ((o != null) && (o instanceof Result)) {
 				dVal += ((Result) o).param[0];
 				iCount++;
@@ -3011,7 +2992,7 @@ public final class stats extends CacheServlet {
 		return dVal;
 	}
 
-	private static final double evalAvg(final Vector<Result> v, final String sOpts) {
+	private static final double evalAvg(final Vector<Result> v) {
 		if ((v == null) || (v.size() <= 0)) {
 			return NO_DATA;
 		}
@@ -3024,7 +3005,7 @@ public final class stats extends CacheServlet {
 				dSum += v.get(i).param[0];
 				lCnt++;
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				System.err.println("EXCEPTION : " + e + " (" + e.getMessage() + ") at element " + i + "/" + v.size() + ": " + v.get(i));
 				continue;
 			}
@@ -3037,7 +3018,7 @@ public final class stats extends CacheServlet {
 		return NO_DATA;
 	}
 
-	private static final double evalSum(final Vector<Result> v, final String sOpts) {
+	private static final double evalSum(final Vector<Result> v) {
 		if ((v == null) || (v.size() <= 0)) {
 			return NO_DATA;
 		}
@@ -3047,7 +3028,7 @@ public final class stats extends CacheServlet {
 			try {
 				dSum += v.get(i).param[0];
 			}
-			catch (Exception e) {
+			catch (final Exception e) {
 				System.err.println("EXCEPTION : " + e + " (" + e.getMessage() + ") at element " + i + "/" + v.size() + ": " + v.get(i));
 				continue;
 			}
@@ -3058,7 +3039,7 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * How much time to allow this servlet to produce the output ?
-	 * 
+	 *
 	 * @return answer : 10 minutes
 	 */
 	@Override
@@ -3070,7 +3051,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Get the color for a given object
-		 * 
+		 *
 		 * @param o
 		 * @return the color in hex string format
 		 */
@@ -3147,19 +3128,19 @@ public final class stats extends CacheServlet {
 				return sColorSingleData;
 			}
 
-			Vector<String> v = new Vector<String>();
+			final Vector<String> v = new Vector<>();
 			v.addAll(hmStrings.keySet());
 
 			Collections.sort(v, this);
 
-			Vector<String> vClase = new Vector<String>();
+			final Vector<String> vClase = new Vector<>();
 
 			String so = v.get(0);
 
 			vClase.add(so);
 
 			for (int j = 1; j < v.size(); j++) {
-				String st = v.get(j);
+				final String st = v.get(j);
 
 				if (compare(so, st) != 0) {
 					vClase.add(st);
@@ -3168,10 +3149,10 @@ public final class stats extends CacheServlet {
 			}
 
 			for (int j = 0; j < vClase.size(); j++) {
-				String sv = vClase.get(j);
+				final String sv = vClase.get(j);
 
 				if (compare(sv, s) == 0) {
-					StringBuilder sbRez = new StringBuilder(6);
+					final StringBuilder sbRez = new StringBuilder(6);
 
 					for (int i = 0; i < 3; i++) {
 						int iColor;
@@ -3240,7 +3221,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Constructor
-		 * 
+		 *
 		 * @param sMin
 		 *            color for the smallest value
 		 * @param sMax
@@ -3267,7 +3248,7 @@ public final class stats extends CacheServlet {
 
 		/**
 		 * Migration function
-		 * 
+		 *
 		 * @return the Strings colorer
 		 */
 		public MinMaxStrings getStringVersion() {
@@ -3285,7 +3266,7 @@ public final class stats extends CacheServlet {
 				return sColorNoData;
 			}
 
-			double dValParam = ((Number) o).doubleValue();
+			final double dValParam = ((Number) o).doubleValue();
 
 			if (dValParam == NO_DATA) {
 				// System.err.println("Returning color for no data because value is NO_DATA ("+sColorNoData+")");
@@ -3321,7 +3302,7 @@ public final class stats extends CacheServlet {
 				dVal /= 2;
 			}
 
-			StringBuilder sbRez = new StringBuilder(6);
+			final StringBuilder sbRez = new StringBuilder(6);
 
 			for (int i = 0; i < 3; i++) {
 				int iColor;
@@ -3342,21 +3323,21 @@ public final class stats extends CacheServlet {
 		/**
 		 * @param max
 		 */
-		public void setMax(double max) {
+		public void setMax(final double max) {
 			dMaxSet = max;
 		}
 
 		/**
 		 * @param min
 		 */
-		public void setMin(double min) {
+		public void setMin(final double min) {
 			dMinSet = min;
 		}
 	}
 
 	/**
 	 * Parse the version string and return the numeric value
-	 * 
+	 *
 	 * @param s
 	 *            version string
 	 * @param sTokenSeparator
@@ -3392,7 +3373,7 @@ public final class stats extends CacheServlet {
 
 					lResult += Integer.parseInt(stok);
 				}
-				catch (Exception e) {
+				catch (@SuppressWarnings("unused") final Exception e) {
 					// ignore
 				}
 			}
@@ -3413,9 +3394,7 @@ public final class stats extends CacheServlet {
 		final String sDefaultColorMin = pgets(prop, "default.color.min", pgets(prop, "default.color", ""));
 		final String sDefaultColorMax = pgets(prop, "default.color.max", pgets(prop, "default.color", ""));
 
-		for (int j = 0; j < minmax.size(); j++) {
-			final String s = minmax.get(j);
-
+		for (final String s : minmax) {
 			final StringTokenizer st = new StringTokenizer(s, " ");
 
 			int iCol;
@@ -3423,7 +3402,7 @@ public final class stats extends CacheServlet {
 			try {
 				iCol = Integer.parseInt(st.nextToken());
 			}
-			catch (Exception e) {
+			catch (@SuppressWarnings("unused") final Exception e) {
 				iCol = -1;
 			}
 
@@ -3435,9 +3414,9 @@ public final class stats extends CacheServlet {
 			String sMax = (st.hasMoreTokens() ? st.nextToken() : null);
 
 			if ((sMin != null) && sMin.startsWith("auto")) {
-				String sKey = descr.get(iCol) + ".color";
+				final String sKey = descr.get(iCol) + ".color";
 
-				String sTemp = pgets(prop, sKey + ".min", sDefaultColorMin.length() > 0 ? sDefaultColorMin : pgets(prop, sKey));
+				final String sTemp = pgets(prop, sKey + ".min", sDefaultColorMin.length() > 0 ? sDefaultColorMin : pgets(prop, sKey));
 
 				if (sTemp.length() > 0) {
 					sMin = sTemp;
@@ -3453,9 +3432,9 @@ public final class stats extends CacheServlet {
 			}
 
 			if ((sMax != null) && sMax.startsWith("auto")) {
-				String sKey = descr.get(iCol) + ".color";
+				final String sKey = descr.get(iCol) + ".color";
 
-				String sTemp = pgets(prop, sKey + ".max", sDefaultColorMax.length() > 0 ? sDefaultColorMax : pgets(prop, sKey));
+				final String sTemp = pgets(prop, sKey + ".max", sDefaultColorMax.length() > 0 ? sDefaultColorMax : pgets(prop, sKey));
 
 				if (sTemp.length() > 0) {
 					sMax = sTemp;
@@ -3470,8 +3449,8 @@ public final class stats extends CacheServlet {
 				}
 			}
 
-			String sColorNoData = st.hasMoreTokens() ? st.nextToken() : null;
-			String sColorSingleData = st.hasMoreTokens() ? st.nextToken() : null;
+			final String sColorNoData = st.hasMoreTokens() ? st.nextToken() : null;
+			final String sColorSingleData = st.hasMoreTokens() ? st.nextToken() : null;
 
 			MinMaxRec mmrTemp;
 
@@ -3518,7 +3497,7 @@ public final class stats extends CacheServlet {
 
 		private String sColorNoData;
 
-		private final ArrayList<Entry> lEntries = new ArrayList<Entry>();
+		private final ArrayList<Entry> lEntries = new ArrayList<>();
 
 		private double dAbsMin;
 		private double dAbsMax;
@@ -3539,20 +3518,20 @@ public final class stats extends CacheServlet {
 			sColorSingleData = sSingleData != null ? sSingleData : "FFFFFF";
 			sColorNoData = sNoData != null ? sNoData : "FFFFFF";
 
-			StringTokenizer st = new StringTokenizer(sDef, "^|");
+			final StringTokenizer st = new StringTokenizer(sDef, "^|");
 
 			while (st.hasMoreTokens()) {
 				try {
-					double min = Double.parseDouble(st.nextToken());
-					String sColorMin = st.nextToken();
-					double max = Double.parseDouble(st.nextToken());
-					String sColorMax = st.nextToken();
+					final double min = Double.parseDouble(st.nextToken());
+					final String sColorMin = st.nextToken();
+					final double max = Double.parseDouble(st.nextToken());
+					final String sColorMax = st.nextToken();
 
-					Entry e = new Entry(min, sColorMin, max, sColorMax);
+					final Entry e = new Entry(min, sColorMin, max, sColorMax);
 
 					lEntries.add(e);
 				}
-				catch (Throwable e) {
+				catch (@SuppressWarnings("unused") final Throwable e) {
 					// ignore
 				}
 			}
@@ -3620,7 +3599,7 @@ public final class stats extends CacheServlet {
 			}
 
 			for (int i = 0; i < lEntries.size(); i++) {
-				Entry e = lEntries.get(i);
+				final Entry e = lEntries.get(i);
 
 				if ((d <= e.max) || (i == (lEntries.size() - 1))) {
 					return e.mms.getColor(Double.valueOf(d));
@@ -3635,7 +3614,7 @@ public final class stats extends CacheServlet {
 	private static Vector<monPredicate> getIDs(final Properties prop, final long lMinTime, final long lMaxTime) {
 		final int iPages = pgeti(prop, "pages", 0);
 
-		final Vector<monPredicate> vPreds = new Vector<monPredicate>();
+		final Vector<monPredicate> vPreds = new Vector<>();
 
 		for (int i = 0; i < iPages; i++) {
 			final Vector<String> v1 = toVector(prop, "pivot" + i + "_1", "pivot_1");
@@ -3730,14 +3709,14 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * Override the ThreadedPage method to work with lists of IPs, usually IPv4 and IPv6 of the same machine, and resolve them all to the minimal set of distinct names (or IPs)
-	 * 
+	 *
 	 * @param ipOrList
 	 * @return the minimal set of hostnames/IPs, comma separated
 	 */
 	public static String getHostName(final String ipOrList) {
 		final StringTokenizer st = new StringTokenizer(ipOrList, ",; \t\r\n");
 
-		final Set<String> names = new LinkedHashSet<String>();
+		final Set<String> names = new LinkedHashSet<>();
 
 		while (st.hasMoreTokens()) {
 			names.add(ThreadedPage.getHostName(st.nextToken()));
@@ -3757,24 +3736,24 @@ public final class stats extends CacheServlet {
 
 	/**
 	 * Debug method
-	 * 
+	 *
 	 * @param args
 	 */
-	public static void main(String args[]) {
-		MinMaxSimple mmr = new MinMaxSimple("77FF77", "FF5555", null, null);
+	public static void main(final String args[]) {
+		final MinMaxSimple mmr = new MinMaxSimple("77FF77", "FF5555", null, null);
 
 		mmr.setMin(0);
 		mmr.setMax(500);
 
 		System.err.println(mmr.getColor(Double.valueOf(850)));
 
-		MinMaxComplex mmc = new MinMaxComplex("complexgradientabs", "0^FF0000^40^FFAAAA|40^FFAAAA^50^FFFFAA|50^FFFFAA^60^AAFFAA|60^AAFFAA^100^00FF00", "111111", "222222");
+		final MinMaxComplex mmc = new MinMaxComplex("complexgradientabs", "0^FF0000^40^FFAAAA|40^FFAAAA^50^FFFFAA|50^FFFFAA^60^AAFFAA|60^AAFFAA^100^00FF00", "111111", "222222");
 
 		for (double d = 0; d <= 100; d += 5) {
 			System.err.println(d + " - " + mmc.getColor(Double.valueOf(d)));
 		}
 
-		MinMaxStaticStringColors strings = new MinMaxStaticStringColors(new Properties());
+		final MinMaxStaticStringColors strings = new MinMaxStaticStringColors(new Properties());
 
 		System.err.println("INFN = " + strings.getColor("INFN"));
 		System.err.println("<void> = " + strings.getColor(""));
