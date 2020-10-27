@@ -15,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
@@ -186,10 +187,19 @@ public final class Utils {
 	 */
 	public static final long TIME_MINUTE = 1000 * 60;
 
+	/**
+	 * @param seriesName
+	 * @return the paint for the given series name
+	 */
 	public static Paint getDefaultPaint(final String seriesName) {
 		return getDefaultPaint(seriesName, DEFAULT_PAINT_SEQUENCE);
 	}
 
+	/**
+	 * @param seriesName
+	 * @param paintSequence
+	 * @return from a set of available paints, get one for the given series, always the same one based on the hashCode of the series name
+	 */
 	public static Paint getDefaultPaint(final String seriesName, final Paint[] paintSequence) {
 		int colorIndex = seriesName.hashCode();
 
@@ -273,14 +283,14 @@ public final class Utils {
 	public static Properties getProperties(final String sConfDir, final String sFileName, final Properties pOld, final boolean includeDefault) {
 		Properties prop = new Properties();
 
-		final Vector<String> vFiles = new Vector<String>();
+		final Vector<String> vFiles = new Vector<>();
 
 		String sFile = sFileName;
 
 		final Object o = prop.getProperty("include");
 		prop.setProperty("include", (o != null ? o.toString() + " " : "") + sFile + (includeDefault ? " global" : ""));
 
-		final Vector<String> vIncludes = new Vector<String>();
+		final Vector<String> vIncludes = new Vector<>();
 
 		final StringTokenizer st = new StringTokenizer(prop.getProperty("include"), ";, \t");
 		while (st.hasMoreTokens()) {
@@ -299,14 +309,11 @@ public final class Utils {
 
 			vFiles.add(sFile);
 
-			FileInputStream fis = null;
+			final String sFullFileName = sConfDir + sFile + ".properties";
 
-			try {
-				final String sFullFileName = sConfDir + sFile + ".properties";
+			final Properties pTemp = new Properties();
 
-				final Properties pTemp = new Properties();
-
-				fis = new FileInputStream(sFullFileName);
+			try (FileInputStream fis = new FileInputStream(sFullFileName)) {
 
 				pTemp.load(fis);
 
@@ -330,15 +337,6 @@ public final class Utils {
 			catch (final IOException e) {
 				System.err.println(e + " (" + e.getMessage() + ")");
 				e.printStackTrace();
-			}
-			finally {
-				if (fis != null)
-					try {
-						fis.close();
-					}
-					catch (final IOException ioe) {
-						// ignore
-					}
 			}
 		}
 
@@ -394,7 +392,7 @@ public final class Utils {
 	 * @return the cleaned data series
 	 */
 	public static Vector<Result> filterMultipleSeries(final Vector<Result> vOrig, final Properties prop, final String sSeriesName, final boolean replaceInitialData) {
-		final Vector<Result> v = new Vector<Result>();
+		final Vector<Result> v = new Vector<>();
 
 		if (ServletExtension.pgetb(prop, "multiple_series.allow", false) || (vOrig == null) || (vOrig.size() <= 1))
 			return vOrig;
@@ -430,7 +428,7 @@ public final class Utils {
 		if ((sMultipleSeriesPredicates != null) && (sMultipleSeriesPredicates.length() > 0)) {
 			bMultipleSeriesAny = false;
 
-			vPredicates = new Vector<monPredicate>();
+			vPredicates = new Vector<>();
 
 			final StringTokenizer st = new StringTokenizer(sMultipleSeriesPredicates, ",");
 
@@ -514,7 +512,7 @@ public final class Utils {
 		if ((vOrig == null) || (vOrig.size() == 0))
 			return vOrig;
 
-		final Vector<Result> v = new Vector<Result>(nrValues);
+		final Vector<Result> v = new Vector<>(nrValues);
 
 		final Result rStamp = vOrig.get(0);
 
@@ -654,7 +652,7 @@ public final class Utils {
 		try {
 			lDataPoints = Long.parseLong(sPoints);
 		}
-		catch (final Exception e) {
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// not a number, try to figure out the number of points depending on the image size
 
 			final int iSize = ServletExtension.pgeti(prop, "width", 800);
@@ -709,7 +707,7 @@ public final class Utils {
 		if (v == null)
 			return null;
 
-		final Vector<Result> ret = new Vector<Result>(v.size());
+		final Vector<Result> ret = new Vector<>(v.size());
 
 		for (final Object o : v)
 			if (o instanceof Result)
@@ -740,7 +738,7 @@ public final class Utils {
 		if (vOrig == null)
 			return null;
 
-		final Vector<Result> v = new Vector<Result>(vOrig.size());
+		final Vector<Result> v = new Vector<>(vOrig.size());
 
 		if (vOrig.size() == 0)
 			return v;
@@ -820,7 +818,7 @@ public final class Utils {
 		if (vOrig == null)
 			return null;
 
-		final Vector<Result> v = new Vector<Result>(vOrig.size());
+		final Vector<Result> v = new Vector<>(vOrig.size());
 
 		if (vOrig.size() == 0)
 			return v;
@@ -887,7 +885,7 @@ public final class Utils {
 		if ((series == null) || (series.length == 0))
 			return new String[0];
 
-		final Vector<String> v = new Vector<String>();
+		final Vector<String> v = new Vector<>();
 
 		final boolean bSortDisplay = ServletExtension.pgetb(prop, "sort", true);
 		final boolean bSortBySuffix = ServletExtension.pgetb(prop, "sort.bysuffix", false);
@@ -1111,7 +1109,7 @@ public final class Utils {
 	 * @return a Vector with the histogram bins, one for each interval where is some data
 	 */
 	public static final Vector<Result> histogramData(final Vector<?> vOrig, final long lInterval, final boolean bIntegrated) {
-		final Vector<Result> v = new Vector<Result>();
+		final Vector<Result> v = new Vector<>();
 
 		Result rOld = null;
 		int iValues = 0;
@@ -1194,7 +1192,7 @@ public final class Utils {
 		if (ServletExtension.pgetb(prop, "annotation.disabled", false))
 			return null;
 
-		final Set<Integer> groups = new TreeSet<Integer>();
+		final Set<Integer> groups = new TreeSet<>();
 
 		final String sGroups = ServletExtension.pgets(prop, "annotation.groups", "");
 
@@ -1215,7 +1213,7 @@ public final class Utils {
 
 				groups.add(Integer.valueOf(i));
 			}
-			catch (final Exception e) {
+			catch (@SuppressWarnings("unused") final Exception e) {
 				// ignore
 			}
 
@@ -1231,7 +1229,7 @@ public final class Utils {
 
 		Iterator<Annotation> it = lAnnotations.iterator();
 
-		final List<Annotation> alSelected = new ArrayList<Annotation>();
+		final List<Annotation> alSelected = new ArrayList<>();
 
 		// determine which are chart-wide and which are series-wide
 		while (it.hasNext()) {
@@ -1516,6 +1514,28 @@ public final class Utils {
 	private static final SimpleDateFormat apacheTimeFormat = new SimpleDateFormat("dd/MMM/yyyy:HH:mm:ss ZZ");
 
 	/**
+	 * @param sServletName full path to the servlet/JSP that is executed
+	 * @param content content to write, should be the entire content of that is returned to the client for the accounting to be correct
+	 * @param request client information will be extracted from here
+	 * @param os response output stream to write to. Can be <code>null</code> to simply log the content size, without writing it to the client
+	 * @return the same content that was written
+	 */
+	public static String printAndLogRequest(final String sServletName, final String content, final HttpServletRequest request, final Writer os) {
+		if (os != null) {
+			try {
+				os.write(content);
+			}
+			catch (final IOException ioe) {
+				logger.log(Level.WARNING, "Could not write content back to the client", ioe);
+			}
+		}
+
+		logRequest(sServletName, content.length(), request);
+
+		return content;
+	}
+
+	/**
 	 * Log a request to a servlet in the Apache log format for later analysis with standard software (awstats / webalizer etc)
 	 *
 	 * @param sServletName
@@ -1523,7 +1543,7 @@ public final class Utils {
 	 * @param iSize
 	 *            size of the response, in bytes
 	 * @param request
-	 *            HttpServletRequest to get other information from (referer, browser, http method, requested page)
+	 *            HttpServletRequest to get other information from (referrer, browser, http method, requested page)
 	 */
 	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request) {
 		logRequest(sServletName, iSize, request, true);
@@ -1547,8 +1567,20 @@ public final class Utils {
 		}
 	}
 
-	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<Long, JSPExecution>(AppConfig.geti("lia.web.servlets.web.Utils.max_http_threads", 1000));
+	private static ExpirationCache<Long, JSPExecution> jspExecutionStarted = new ExpirationCache<>(AppConfig.geti("lia.web.servlets.web.Utils.max_http_threads", 1000));
 
+	/**
+	 * Log a request to a servlet in the Apache log format for later analysis with standard software (awstats / webalizer etc)
+	 *
+	 * @param sServletName
+	 *            the servlet that was executed
+	 * @param iSize
+	 *            size of the response, in bytes
+	 * @param request
+	 *            HttpServletRequest to get other information from (referrer, browser, http method, requested page)
+	 * @param incrementCounters
+	 *            flag to increment or not the counters (see {@link ThreadedPage#incrementRequestCount()}
+	 */
 	public static void logRequest(final String sServletName, final int iSize, final HttpServletRequest request, final boolean incrementCounters) {
 		logRequest(sServletName, iSize, request, incrementCounters, -1);
 	}
@@ -1561,7 +1593,7 @@ public final class Utils {
 	 * @param iSize
 	 *            size of the response, in bytes
 	 * @param request
-	 *            HttpServletRequest to get other information from (referer, browser, http method, requested page)
+	 *            HttpServletRequest to get other information from (referrer, browser, http method, requested page)
 	 * @param incrementCounters
 	 *            flag to increment or not the counters (see {@link ThreadedPage#incrementRequestCount()}
 	 * @param executionTime
@@ -1662,7 +1694,7 @@ public final class Utils {
 			else
 				logPrintWriter.flush();
 		}
-		catch (final Throwable t) {
+		catch (@SuppressWarnings("unused") final Throwable t) {
 			logPrintWriter = null;
 		}
 	}
