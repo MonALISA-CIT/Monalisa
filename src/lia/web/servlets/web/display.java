@@ -170,12 +170,12 @@ public class display extends CacheServlet {
 	/**
 	 * Repository version
 	 */
-	public static final String sRepositoryVersion = "1.4.3";
+	public static final String sRepositoryVersion = "1.4.4";
 
 	/**
 	 * Date of last significant change
 	 */
-	public static final String sRepositoryDate = "2016.11.04";
+	public static final String sRepositoryDate = "2020.10.27";
 
 	/**
 	 * Wrapper HTML for the actual content (header, menu ...)
@@ -254,7 +254,8 @@ public class display extends CacheServlet {
 					long lHistIntervalMin = pgeti(prop, "interval.min", 3600000);
 					try {
 						lHistIntervalMin = Long.parseLong((String) sess.getAttribute("interval.min"));
-					} catch (@SuppressWarnings("unused") final Exception e) {
+					}
+					catch (@SuppressWarnings("unused") final Exception e) {
 						// ignore parse exception, keep previous value
 					}
 
@@ -263,7 +264,8 @@ public class display extends CacheServlet {
 					long lHistIntervalMax = pgeti(prop, "interval.max", 0);
 					try {
 						lHistIntervalMax = Long.parseLong((String) sess.getAttribute("interval.max"));
-					} catch (@SuppressWarnings("unused") final Exception e) {
+					}
+					catch (@SuppressWarnings("unused") final Exception e) {
 						// ignore parse exception, keep previous value
 					}
 					lHistIntervalMax = getl("interval.max", lHistIntervalMax);
@@ -297,9 +299,11 @@ public class display extends CacheServlet {
 
 					return diff;
 				}
-			} catch (final RuntimeException re) {
+			}
+			catch (@SuppressWarnings("unused") final RuntimeException re) {
 				// ignore
-			} catch (final Exception e) {
+			}
+			catch (@SuppressWarnings("unused") final Exception e) {
 				// ignore everything
 			}
 
@@ -412,7 +416,8 @@ public class display extends CacheServlet {
 
 			try {
 				new File(sFile).delete();
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				System.err.println("Error deleting: '" + sFile + "': " + e + " (" + e.getMessage() + ")");
 			}
 			// should delete the image from disk
@@ -464,7 +469,7 @@ public class display extends CacheServlet {
 	/**
 	 * Images that are to be deleted later
 	 */
-	static final LinkedList<DisplayStructure> llTempStructures = new LinkedList<DisplayStructure>();
+	static final LinkedList<DisplayStructure> llTempStructures = new LinkedList<>();
 
 	/**
 	 * Iterate through the cookies and override the properties with the values of the special cookies.
@@ -481,7 +486,7 @@ public class display extends CacheServlet {
 	private static HashMap<String, String> setCookieParameters(final HttpServletRequest _request, final Properties prop) {
 		final Cookie[] cookies = _request.getCookies();
 
-		final HashMap<String, String> hmCookies = new HashMap<String, String>();
+		final HashMap<String, String> hmCookies = new HashMap<>();
 
 		for (int i = 0; (cookies != null) && (i < cookies.length); i++) {
 			final Cookie c = cookies[i];
@@ -554,7 +559,8 @@ public class display extends CacheServlet {
 
 				try {
 					Thread.sleep(1000 * 30);
-				} catch (final InterruptedException e) {
+				}
+				catch (@SuppressWarnings("unused") final InterruptedException e) {
 					return;
 				}
 			}
@@ -573,8 +579,6 @@ public class display extends CacheServlet {
 		baos = new ByteArrayOutputStream();
 
 		pMaster = new Page(baos, sResDir + "masterpage/masterpage.res");
-
-		sStatistics = "";
 	}
 
 	/**
@@ -692,7 +696,8 @@ public class display extends CacheServlet {
 				RequestWrapper.setCacheTimeout(response, 60 * 60 * 24 * 7);
 
 				ServletUtilities.sendTempFile(request.getParameter("image"), response);
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				System.out.println("Error showing image : " + e + " (" + e.getMessage() + ")");
 			}
 
@@ -725,10 +730,12 @@ public class display extends CacheServlet {
 					response.setContentType("text/html");
 					final byte[] content = (bStatistics ? ds.sStatistics : ds.sSeries).getBytes();
 					response.setContentLength(content.length);
+					@SuppressWarnings("resource")
 					final OutputStream os = response.getOutputStream();
 					os.write(content);
 					os.flush();
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					System.err.println("Cannot write the temporary strings on the output stream : " + e + " (" + e.getMessage() + ")");
 				}
 
@@ -747,7 +754,8 @@ public class display extends CacheServlet {
 		if (store == null)
 			try {
 				store = (TransparentStoreFast) TransparentStoreFactory.getStore();
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				System.out.println("Error building store : " + e + " (" + e.getMessage() + ")");
 				bAuthOK = true;
 				return;
@@ -825,7 +833,8 @@ public class display extends CacheServlet {
 
 			if (pgetb(prop, "allow.set.height", true) && (gets("height").length() == 0))
 				prop.setProperty("height", sY);
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			// it means that something is wrong with the size specification
 
 			if (logTiming())
@@ -861,7 +870,7 @@ public class display extends CacheServlet {
 			return;
 		}
 
-		final HashMap<String, String> hmSeries = new HashMap<String, String>();
+		final HashMap<String, String> hmSeries = new HashMap<>();
 
 		final String[] vsSeries = request.getParameterValues("plot_series");
 
@@ -879,9 +888,9 @@ public class display extends CacheServlet {
 				default_paint_sequence[i] = getColor(vsColors[i], (Color) Utils.DEFAULT_PAINT_SEQUENCE[i % Utils.DEFAULT_PAINT_SEQUENCE.length]);
 		}
 
-		hmActualSeries = new HashMap<String, String>();
-		vTotalSeries = new Vector<String>();
-		vIndividualSeries = new Vector<Vector<String>>();
+		hmActualSeries = new HashMap<>();
+		vTotalSeries = new Vector<>();
+		vIndividualSeries = new Vector<>();
 
 		final String kind = pgets(prop, "page", "rt").toLowerCase();
 
@@ -890,8 +899,8 @@ public class display extends CacheServlet {
 		final boolean download = (gets("download_data_csv").length() > 0) || (gets("download_data_html").length() > 0);
 
 		if (download) {
-			tmDownloadData = new TreeMap<Long, HashMap<String, Double>>();
-			tsDownloadSeries = new TreeSet<String>();
+			tmDownloadData = new TreeMap<>();
+			tsDownloadSeries = new TreeSet<>();
 		}
 
 		try {
@@ -922,7 +931,8 @@ public class display extends CacheServlet {
 									p.append(buildPiePage(prop, hmSeries));
 								else
 									p.append(buildRealTimePage(prop, hmSeries));
-		} catch (final Throwable e) {
+		}
+		catch (final Throwable e) {
 			System.out.println("Caught exception while building the '" + kind + "' page : " + e + " (" + e.getMessage() + ")");
 			e.printStackTrace(System.err);
 			System.err.println("Java memory info: \n" + "  Free memory : " + Runtime.getRuntime().freeMemory() + "\n" + "  Total memory: " + Runtime.getRuntime().totalMemory() + "\n"
@@ -1021,7 +1031,8 @@ public class display extends CacheServlet {
 
 		try {
 			written = writeResponse(baos.toByteArray(), request, response, osOut);
-		} catch (final IOException ioe) {
+		}
+		catch (final IOException ioe) {
 			logger.log(Level.WARNING, "Exception writing the response back to the client " + request.getRemoteAddr(), ioe);
 		}
 
@@ -1203,7 +1214,7 @@ public class display extends CacheServlet {
 	 * @return a DataSplitter with the values taken from monitor_ids table
 	 */
 	private final static DataSplitter getDBLast(final Vector<monPredicate> vPreds) {
-		final HashSet<Integer> hsIDs = new HashSet<Integer>();
+		final HashSet<Integer> hsIDs = new HashSet<>();
 
 		for (int i = 0; i < vPreds.size(); i++)
 			hsIDs.addAll(IDGenerator.getIDs(vPreds.get(i)));
@@ -1453,11 +1464,11 @@ public class display extends CacheServlet {
 
 		double dMaxValue = -1;
 
-		final HashMap<String, String> hmDataRows = new HashMap<String, String>();
-		final HashMap<String, String> hmDataColumns = new HashMap<String, String>();
+		final HashMap<String, String> hmDataRows = new HashMap<>();
+		final HashMap<String, String> hmDataColumns = new HashMap<>();
 
-		final HashMap<String, String> hmNonZeroRows = new HashMap<String, String>();
-		final HashMap<String, String> hmNonZeroColumns = new HashMap<String, String>();
+		final HashMap<String, String> hmNonZeroRows = new HashMap<>();
+		final HashMap<String, String> hmNonZeroColumns = new HashMap<>();
 
 		final boolean bSpiderWebPlot = pgetb(prop, "spider_web_plot", false);
 
@@ -1472,7 +1483,7 @@ public class display extends CacheServlet {
 		if (bHistoryChart)
 			lCompactInterval = Utils.getCompactInterval(prop, lIntervalMin, lIntervalMax);
 
-		final Vector<String> vLocalActualSeries = new Vector<String>();
+		final Vector<String> vLocalActualSeries = new Vector<>();
 
 		boolean bFound = false;
 		for (i = 0; i < series.length; i++)
@@ -1489,7 +1500,7 @@ public class display extends CacheServlet {
 		if (bHistoryChart) {
 			// get the history data in one shot
 
-			final Vector<monPredicate> vPreds = new Vector<monPredicate>();
+			final Vector<monPredicate> vPreds = new Vector<>();
 
 			for (i = 0; i < series.length; i++)
 				for (int j = 0; j < vsMultiSeries.length; j++) {
@@ -1743,7 +1754,8 @@ public class display extends CacheServlet {
 				if (hmNonZeroColumns.get(s) == null) {
 					try {
 						categoryDataset.removeColumn(s);
-					} catch (final Exception e) {
+					}
+					catch (final Exception e) {
 						log("display#getCategoryPlot: cannot remove all-zero data series '" + s + "'", e);
 					}
 
@@ -1782,7 +1794,8 @@ public class display extends CacheServlet {
 					if (hmDataColumns.get(s) == null) {
 						try {
 							categoryDataset.removeColumn(s);
-						} catch (final Exception e) {
+						}
+						catch (final Exception e) {
 							log("display#getCategoryPlot: cannot remove data series '" + s + "'", e);
 						}
 
@@ -2158,7 +2171,8 @@ public class display extends CacheServlet {
 				if (hmActualSeries.get(s) == null)
 					try {
 						cd.removeColumn(s);
-					} catch (final Exception e) {
+					}
+					catch (final Exception e) {
 						log("display#buildCategoryChart: Cannot remove data series '" + s + "'", e);
 					}
 			}
@@ -2196,7 +2210,7 @@ public class display extends CacheServlet {
 
 		final JFreeChart chart = new JFreeChart(sChartTitle, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
-		// then customise it a little...
+		// then customize it a little...
 		setChartProperties(chart, prop);
 
 		if (!pgetb(prop, "legend", true))
@@ -2217,7 +2231,8 @@ public class display extends CacheServlet {
 
 		try {
 			saveImage(chart, prop, iDefaultHeight, iDefaultWidth, p, getCacheTimeout());
-		} catch (final Exception e) {
+		}
+		catch (@SuppressWarnings("unused") final Exception e) {
 			// ignore
 		}
 
@@ -2286,9 +2301,9 @@ public class display extends CacheServlet {
 				((CombinedDomainCategoryPlot) parent).setGap(gap);
 		}
 
-		final List<CategoryPlot> lCategs = new LinkedList<CategoryPlot>();
+		final List<CategoryPlot> lCategs = new LinkedList<>();
 
-		final HashMap<String, String> hmModules = new HashMap<String, String>();
+		final HashMap<String, String> hmModules = new HashMap<>();
 
 		if ((vsModules != null) && (vsModules.length > 0))
 			for (final String vsModule : vsModules)
@@ -2316,9 +2331,9 @@ public class display extends CacheServlet {
 
 		final boolean bColapsedLegend = pgetb(prop, "colapsedlegend", true);
 
-		final HashMap<String, String> hmLegends = new HashMap<String, String>();
+		final HashMap<String, String> hmLegends = new HashMap<>();
 
-		final HashMap<String, String> hmSeriesOrig = new HashMap<String, String>(hmSeries);
+		final HashMap<String, String> hmSeriesOrig = new HashMap<>(hmSeries);
 
 		hmSeries.clear();
 
@@ -2326,7 +2341,7 @@ public class display extends CacheServlet {
 			try {
 				final Properties p2 = Utils.getProperties(sConfDir, vsCharts[i], prop, false);
 
-				final HashMap<String, String> hmTemp = new HashMap<String, String>(hmSeriesOrig);
+				final HashMap<String, String> hmTemp = new HashMap<>(hmSeriesOrig);
 
 				final CategoryPlot cp = (CategoryPlot) getCategoryPlot(p2, hmTemp, bColapsedLegend ? hmLegends : new HashMap<String, String>(), bRange, bVertical);
 
@@ -2361,9 +2376,11 @@ public class display extends CacheServlet {
 
 				if (hmModules.get(vsCharts[i]) != null)
 					lCategs.add(cp);
-			} catch (final RuntimeException re) {
+			}
+			catch (final RuntimeException re) {
 				System.err.println("RuntimeException building one of the charts: " + re + " (" + re.getMessage() + ")");
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				System.err.println("Other Exception building one of the charts: " + e + " (" + e.getMessage() + ")");
 			}
 
@@ -2380,7 +2397,8 @@ public class display extends CacheServlet {
 				if (hmActualSeries.get(s) == null)
 					try {
 						cd.removeColumn(s);
-					} catch (final Exception e) {
+					}
+					catch (final Exception e) {
 						log("display#buildCombinedBar: cannot remove data series '" + s + "'", e);
 					}
 			}
@@ -2429,7 +2447,8 @@ public class display extends CacheServlet {
 
 		try {
 			saveImage(chart, prop, height, width, p, getCacheTimeout());
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			e.printStackTrace();
 		}
 
@@ -2571,7 +2590,8 @@ public class display extends CacheServlet {
 			for (int i = 0; i < iCount; i++) {
 				try {
 					dWeights[i] = Double.parseDouble(vsPercents[i]);
-				} catch (final Exception e) {
+				}
+				catch (@SuppressWarnings("unused") final Exception e) {
 					dWeights[i] = 50;
 				}
 
@@ -2639,7 +2659,7 @@ public class display extends CacheServlet {
 
 		final Iterator<String> it = _vTotalSeries.iterator();
 
-		final TreeMap<String, List<String>> separateGroups = new TreeMap<String, List<String>>();
+		final TreeMap<String, List<String>> separateGroups = new TreeMap<>();
 
 		for (int i = 0; i < pgeti(prop, "separate.groups", 0); i++) {
 			final String groupname = i + ":" + pgets(prop, "separate.group." + i + ".name");
@@ -2647,7 +2667,7 @@ public class display extends CacheServlet {
 			separateGroups.put(groupname, toVector(prop, "separate.group." + i + ".members", null));
 		}
 
-		final TreeMap<String, StringBuilder> groups = new TreeMap<String, StringBuilder>();
+		final TreeMap<String, StringBuilder> groups = new TreeMap<>();
 
 		while (it.hasNext()) {
 			final String sName = it.next();
@@ -2929,14 +2949,13 @@ public class display extends CacheServlet {
 
 		try {
 			saveImage(chart, prop, height, width, p, getCacheTimeout());
-		} catch (final Exception e) {
+		}
+		catch (final Exception e) {
 			e.printStackTrace();
 		}
 
-		final HttpSession sess = request.getSession(true);
-
-		setOption("int", p, sess, prop);
-		setOption("sum", p, sess, prop);
+		setOption("int", p, prop);
+		setOption("sum", p, prop);
 
 		if (logTiming())
 			logTiming("buildHistoryPage: complete");
@@ -3077,16 +3096,16 @@ public class display extends CacheServlet {
 
 		boolean bSum = bSecondAxis && (pgeti(prop, "sum", 0) == 1);
 
-		final TreeMap<RegularTimePeriod, HashMap<String, Double>> tmSum = bSum ? new TreeMap<RegularTimePeriod, HashMap<String, Double>>() : null;
+		final TreeMap<RegularTimePeriod, HashMap<String, Double>> tmSum = bSum ? new TreeMap<>() : null;
 
 		// the second axis, if any
 		final TimeSeriesCollection tsc = bSecondAxis ? new TimeSeriesCollection() : null;
 
-		final ArrayList<Paint> alPaintSeries = new ArrayList<Paint>(hdw.series.length);
-		final ArrayList<Shape> alShapeSeries = new ArrayList<Shape>(hdw.series.length);
+		final ArrayList<Paint> alPaintSeries = new ArrayList<>(hdw.series.length);
+		final ArrayList<Shape> alShapeSeries = new ArrayList<>(hdw.series.length);
 
-		final Vector<String> vActualLocalSeries = new Vector<String>();
-		final Vector<String> vActualLocalAliases = new Vector<String>();
+		final Vector<String> vActualLocalSeries = new Vector<>();
+		final Vector<String> vActualLocalAliases = new Vector<>();
 
 		long lMinTime = 0;
 		long lMaxTime = 0;
@@ -3219,14 +3238,14 @@ public class display extends CacheServlet {
 
 					HashMap<String, Double> hmValues = tmDownloadData.get(lTime);
 					if (hmValues == null) {
-						hmValues = new HashMap<String, Double>();
+						hmValues = new HashMap<>();
 						tmDownloadData.put(lTime, hmValues);
 					}
 
 					hmValues.put(sDownloadSeries, Double.valueOf(dVal));
 				}
 
-				if (bSecondAxis) {
+				if (ts != null) {
 					// this value doesn't need timezone, it's included in the original RTP after which this one is created
 					rtp = new Minute(new Date(rtp.getFirstMillisecond() + ((rtp.getLastMillisecond() - rtp.getFirstMillisecond()) / 2)));
 
@@ -3237,16 +3256,17 @@ public class display extends CacheServlet {
 						// if the series already contains data for this time interval then an exception will be thrown
 						// if not then we can put this value for the sum series
 
-						if (bSum) {
+						if (tmSum != null) {
 							HashMap<String, Double> hmTemp = tmSum.get(rtp);
 							if (hmTemp == null) {
-								hmTemp = new HashMap<String, Double>();
+								hmTemp = new HashMap<>();
 								tmSum.put(rtp, hmTemp);
 							}
 
 							hmTemp.put(hdw.series[k], Double.valueOf(er.param[0]));
 						}
-					} catch (final Exception e) {
+					}
+					catch (@SuppressWarnings("unused") final Exception e) {
 						// System.err.println("Histogram add secondary axis data : exception : "+e+" ("+e.getMessage()+")");
 					}
 				}
@@ -3254,7 +3274,7 @@ public class display extends CacheServlet {
 
 			alPaintSeries.add(getPaint(prop, hdw.series[k]));
 
-			if (bSecondAxis) {
+			if (tsc != null) {
 				tsc.addSeries(ts);
 				alShapeSeries.add(getShape(prop, hdw.series[k]));
 			}
@@ -3264,7 +3284,7 @@ public class display extends CacheServlet {
 		if (hmActualSeries.size() < 2)
 			bSum = false;
 
-		if (bSum && (tmSum.size() > 0) && (hmActualSeries.size() > 1)) {
+		if (bSum && tmSum != null && tsc != null && (tmSum.size() > 0) && (hmActualSeries.size() > 1)) {
 			final TimeSeries tmp = new TimeSeries("SUM", Minute.class);
 
 			final Iterator<Map.Entry<RegularTimePeriod, HashMap<String, Double>>> it = tmSum.entrySet().iterator();
@@ -3541,8 +3561,6 @@ public class display extends CacheServlet {
 	 */
 	long lChartsMaxTime = 0;
 
-	private String sStatistics;
-
 	private static boolean arrayContains(final String[] array, final String key) {
 		if ((array == null) || (array.length == 0))
 			return false;
@@ -3562,10 +3580,9 @@ public class display extends CacheServlet {
 		final int iErr = pgeti(prop, "err", 1);
 
 		final boolean bIgnoreZero = pgetb(prop, "ignorezero", false);
-		final HttpSession sess = request.getSession(true);
 
-		boolean bSum = getOption("sum", sess, prop);
-		final boolean bInt = getOption("int", sess, prop);
+		boolean bSum = getOption("sum", prop);
+		final boolean bInt = getOption("int", prop);
 
 		int i;
 
@@ -3646,8 +3663,8 @@ public class display extends CacheServlet {
 
 		double dSumMin = 0, dSumMax = 0, dSumLast = 0, dSumAvg = 0, dSumTotal = 0;
 
-		final HashMap<Long, Double> hmSum = bSum ? new HashMap<Long, Double>() : null;
-		final HashMap<Long, HashMap<String, Double>> hmSumSeen = bSum ? new HashMap<Long, HashMap<String, Double>>() : null;
+		final HashMap<Long, Double> hmSum = bSum ? new HashMap<>() : null;
+		final HashMap<Long, HashMap<String, Double>> hmSumSeen = bSum ? new HashMap<>() : null;
 
 		final long skipNull = pgeti(prop, "skipnull", 0);
 
@@ -3688,7 +3705,7 @@ public class display extends CacheServlet {
 
 		final AnnotationCollection ac = Utils.getAnnotationCollection(prop, lMinTime, lMaxTime);
 
-		final List<Vector<Result>> vsData = new ArrayList<Vector<Result>>(hdw.series.length);
+		final List<Vector<Result>> vsData = new ArrayList<>(hdw.series.length);
 
 		boolean bLog = (iLog == 1) && (pgetb(prop, "disablelog", false) == false);
 
@@ -3803,7 +3820,7 @@ public class display extends CacheServlet {
 
 					avg += dVal;
 
-					if (bSum) {
+					if (hmSumSeen != null) {
 						Long lTime = Long.valueOf((now - er.time) / lCompactInterval);
 
 						HashMap<String, Double> hmSeen = hmSumSeen.get(lTime);
@@ -3816,11 +3833,11 @@ public class display extends CacheServlet {
 						}
 
 						if (hmSeen == null) {
-							hmSeen = new HashMap<String, Double>();
+							hmSeen = new HashMap<>();
 							hmSumSeen.put(lTime, hmSeen);
 						}
 
-						if (!hmSeen.containsKey(sKey)) {
+						if (!hmSeen.containsKey(sKey) && hmSum != null) {
 							// System.err.println(" Sum : add to "+lTime);
 
 							hmSeen.put(sKey, Double.valueOf(dVal));
@@ -3989,11 +4006,8 @@ public class display extends CacheServlet {
 			final String sTemp = pStats.toString();
 			p.append("statistics", sTemp);
 
-			sStatistics += sTemp;
-
 			if (pgetb(prop, "stats_per_row", false)) {
 				p.append("statistics", "</tr><tr>");
-				sStatistics += "</tr><tr>";
 			}
 		}
 
@@ -4004,7 +4018,7 @@ public class display extends CacheServlet {
 
 		double min = Double.MAX_VALUE, max = -Double.MAX_VALUE;
 
-		final Vector<String> vLocalActualSeries = new Vector<String>();
+		final Vector<String> vLocalActualSeries = new Vector<>();
 
 		long lSkipInterval = lCompactInterval;
 
@@ -4037,10 +4051,10 @@ public class display extends CacheServlet {
 
 		final boolean bShowSeriesAnnotations = pgetb(prop, "annotation.show_series_texts", pgetb(prop, "annotation.show_text", true));
 
-		final List<XYPointerAnnotation> lChartAnnotations = new LinkedList<XYPointerAnnotation>();
+		final List<XYPointerAnnotation> lChartAnnotations = new LinkedList<>();
 
-		final HashSet<Annotation> hsShownAnnotationsStart = new HashSet<Annotation>();
-		final HashSet<Annotation> hsShownAnnotationsEnd = new HashSet<Annotation>();
+		final HashSet<Annotation> hsShownAnnotationsStart = new HashSet<>();
+		final HashSet<Annotation> hsShownAnnotationsEnd = new HashSet<>();
 
 		if (lDataMaxTime <= 0)
 			lDataMaxTime = lMaxTime;
@@ -4094,8 +4108,8 @@ public class display extends CacheServlet {
 				Annotation aNextEnd = null;
 
 				if (bShowSeriesAnnotations && ((lSeriesAnnotations = ac.getSeriesAnnotations(hdw.series[i])) != null) && (lSeriesAnnotations.size() > 0)) {
-					llAnnotationStarts = new LinkedList<Annotation>();
-					llAnnotationEnds = new LinkedList<Annotation>();
+					llAnnotationStarts = new LinkedList<>();
+					llAnnotationEnds = new LinkedList<>();
 
 					final Iterator<Annotation> it = lSeriesAnnotations.iterator();
 
@@ -4140,7 +4154,7 @@ public class display extends CacheServlet {
 
 						HashMap<String, Double> hmValues = tmDownloadData.get(lTime);
 						if (hmValues == null) {
-							hmValues = new HashMap<String, Double>();
+							hmValues = new HashMap<>();
 							tmDownloadData.put(lTime, hmValues);
 						}
 
@@ -4240,13 +4254,15 @@ public class display extends CacheServlet {
 								// we have a gap in a point series, just add some null values after the first value and before the last value
 								try {
 									chartSeries.add(new Second(new Date(lastMatchTime + 1002), tz), null);
-								} catch (final Exception e) {
+								}
+								catch (@SuppressWarnings("unused") final Exception e) {
 									// ignore
 								}
 
 								try {
 									chartSeries.add(new Second(new Date(er.time - 1002), tz), null);
-								} catch (final Exception e) {
+								}
+								catch (@SuppressWarnings("unused") final Exception e) {
 									// ignore
 								}
 							}
@@ -4411,9 +4427,9 @@ public class display extends CacheServlet {
 
 		final String sSumSeriesName = bAverage ? "AVG" : "SUM";
 
-		if (bSum && (hmSum.size() > 0))
+		if (hmSum != null && (hmSum.size() > 0))
 			try {
-				final Vector<Long> vTimes = new Vector<Long>();
+				final Vector<Long> vTimes = new Vector<>();
 				vTimes.addAll(hmSum.keySet());
 				Collections.sort(vTimes);
 				Collections.reverse(vTimes);
@@ -4422,7 +4438,7 @@ public class display extends CacheServlet {
 
 				hmActualSeries.put(sSumSeriesName, "");
 				vLocalActualSeries.add(sSumSeriesName);
-				
+
 				final String sDownloadSeries = sPageTitle + "@" + sSumSeriesName;
 
 				if (tsDownloadSeries != null)
@@ -4440,7 +4456,7 @@ public class display extends CacheServlet {
 					iEnd = vTimes.size();
 				}
 
-				final HashMap<String, Double> hmLastValues = new HashMap<String, Double>();
+				final HashMap<String, Double> hmLastValues = new HashMap<>();
 
 				final boolean bSumGaps = pgetb(prop, "sum.gaps", false);
 
@@ -4452,7 +4468,7 @@ public class display extends CacheServlet {
 					if (dVal != null) {
 						d = dVal.doubleValue();
 
-						if (bAverage) {
+						if (bAverage && hmSumSeen != null) {
 							final HashMap<String, Double> hmSumFrom = hmSumSeen.get(lTime);
 
 							if ((hmSumFrom != null) && (hmSumFrom.size() > 0))
@@ -4463,7 +4479,7 @@ public class display extends CacheServlet {
 							}
 						}
 
-						if (bIntegrateData) {
+						if (bIntegrateData && hmSumSeen != null) {
 							final HashMap<String, Double> hmOriginalValues = hmSumSeen.get(lTime);
 
 							final Iterator<Map.Entry<String, Double>> it = hmLastValues.entrySet().iterator();
@@ -4495,13 +4511,13 @@ public class display extends CacheServlet {
 
 							HashMap<String, Double> hmValues = tmDownloadData.get(lTime);
 							if (hmValues == null) {
-								hmValues = new HashMap<String, Double>();
+								hmValues = new HashMap<>();
 								tmDownloadData.put(lTime, hmValues);
 							}
 
 							hmValues.put(sDownloadSeries, Double.valueOf(d));
 						}
-						
+
 						chartSeries.add(new Second(new Date(time), tz), d);
 						max = d > max ? d : max;
 
@@ -4527,7 +4543,8 @@ public class display extends CacheServlet {
 
 				cd.add(tsc);
 				cd.add(xysc);
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				System.err.println(t + " (" + t.getMessage() + ")");
 				t.printStackTrace();
 			}
@@ -4594,7 +4611,7 @@ public class display extends CacheServlet {
 		if (pgetb(prop, "urls.enabled", true)) {
 			xyug = new MyXYURLGenerator(prop);
 
-			final Vector<String> v = new Vector<String>(vLocalActualSeries.size() * 2);
+			final Vector<String> v = new Vector<>(vLocalActualSeries.size() * 2);
 			for (int l = 0; l < vLocalActualSeries.size(); l++) {
 				v.add(vLocalActualSeries.get(l));
 				v.add(vLocalActualSeries.get(l));
@@ -4808,7 +4825,7 @@ public class display extends CacheServlet {
 			final String[] vsCharts = Utils.getValues(prop, "charts");
 			final String[] vsChartDescr = Utils.getValues(prop, "charts.descr");
 
-			final HashMap<String, String> hmModules = new HashMap<String, String>();
+			final HashMap<String, String> hmModules = new HashMap<>();
 
 			if ((vsModules != null) && (vsModules.length > 0))
 				for (final String vsModule : vsModules)
@@ -4836,11 +4853,11 @@ public class display extends CacheServlet {
 			if (gap != -1)
 				cdxyp.setGap(gap);
 
-			final HashMap<String, String> hmSeriesOrig = new HashMap<String, String>(hmSeries);
+			final HashMap<String, String> hmSeriesOrig = new HashMap<>(hmSeries);
 
 			hmSeries.clear();
 
-			final ArrayList<XYPlot> alCharts = new ArrayList<XYPlot>();
+			final ArrayList<XYPlot> alCharts = new ArrayList<>();
 
 			for (int i = 0; (vsCharts != null) && (i < vsCharts.length); i++)
 				if (hmModules.get(vsCharts[i]) != null)
@@ -4852,7 +4869,7 @@ public class display extends CacheServlet {
 
 						XYPlot xyp;
 
-						final HashMap<String, String> hmTemp = new HashMap<String, String>(hmSeriesOrig);
+						final HashMap<String, String> hmTemp = new HashMap<>(hmSeriesOrig);
 
 						if (pgetb(prop, "histogram_chart", false) == false)
 							xyp = buildHistoryPlot(p2, hmTemp, p, prop);
@@ -4863,7 +4880,8 @@ public class display extends CacheServlet {
 
 						// if no selected series is found in any of the subcharts then assume everything is selected
 						hmSeries.putAll(hmTemp);
-					} catch (final Throwable t) {
+					}
+					catch (final Throwable t) {
 						System.err.println("Cannot add subchart : " + t.getMessage());
 						t.printStackTrace();
 					}
@@ -4963,20 +4981,20 @@ public class display extends CacheServlet {
 
 			try {
 				saveImage(chart, prop, height, width, p, getCacheTimeout());
-			} catch (final Exception e) {
+			}
+			catch (final Exception e) {
 				e.printStackTrace();
 			}
 
-			final HttpSession sess = request.getSession(true);
-
-			setOption("int", p, sess, prop);
-			setOption("sum", p, sess, prop);
+			setOption("int", p, prop);
+			setOption("sum", p, prop);
 
 			if (logTiming())
 				logTiming("buildCombinedHistoryPage: finish");
 
 			return p;
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			System.err.println(t + " : " + t.getMessage());
 			t.printStackTrace();
 			return null;
@@ -5072,12 +5090,12 @@ public class display extends CacheServlet {
 			p.comment("com_interval", false);
 	}
 
-	private static boolean getOption(final String s, final HttpSession sess, final Properties prop) {
+	private static boolean getOption(final String s, final Properties prop) {
 		return pgetb(prop, "display" + s, false) && pgetb(prop, s, false);
 	}
 
-	private static void setOption(final String s, final Page p, final HttpSession sess, final Properties prop) {
-		final boolean b = getOption(s, sess, prop);
+	private static void setOption(final String s, final Page p, final Properties prop) {
+		final boolean b = getOption(s, prop);
 
 		boolean bActive = pgetb(prop, "display" + s, false);
 
@@ -5226,7 +5244,8 @@ public class display extends CacheServlet {
 			if (sFormat.length() > 0)
 				try {
 					((DateAxis) axis).setDateFormatOverride(new SimpleDateFormat(sFormat));
-				} catch (final Exception e) {
+				}
+				catch (final Exception e) {
 					System.err.println(e.toString());
 					e.printStackTrace();
 				}
@@ -5334,22 +5353,22 @@ public class display extends CacheServlet {
 					r = (ExtendedResult) vs.get(i);
 
 					switch (iFunc) {
-					case 0: // average
-					case 1: // sum
-					case 4: // int
-						dVal += r.param[0];
-						break;
-					case 2: // min
-						dVal = ((dVal > r.min) || (dVal < 1E-10)) ? r.min : dVal;
-						break;
-					case 5: // min 0
-						dVal = ((dVal > r.min) || (dVal < 0)) ? r.min : dVal;
-						break;
-					case 3: // max
-						dVal = (dVal < r.max) ? r.max : dVal;
-						break;
-					default:
-						break;
+						case 0: // average
+						case 1: // sum
+						case 4: // int
+							dVal += r.param[0];
+							break;
+						case 2: // min
+							dVal = ((dVal > r.min) || (dVal < 1E-10)) ? r.min : dVal;
+							break;
+						case 5: // min 0
+							dVal = ((dVal > r.min) || (dVal < 0)) ? r.min : dVal;
+							break;
+						case 3: // max
+							dVal = (dVal < r.max) ? r.max : dVal;
+							break;
+						default:
+							break;
 					}
 				}
 
@@ -5425,10 +5444,10 @@ public class display extends CacheServlet {
 
 		final String sDefaultPred = pgets(prop, "default.pred");
 
-		final Vector<Paint> vColors = new Vector<Paint>();
+		final Vector<Paint> vColors = new Vector<>();
 
-		final Vector<String> vExplodeSeries = new Vector<String>();
-		final Vector<Double> vExplodePercents = new Vector<Double>();
+		final Vector<String> vExplodeSeries = new Vector<>();
+		final Vector<Double> vExplodePercents = new Vector<>();
 
 		DataSplitter dsplit = null;
 
@@ -5446,7 +5465,7 @@ public class display extends CacheServlet {
 		long lCompactInterval = 0;
 
 		final Iterator<String> it = hmSeries.keySet().iterator();
-		final Vector<String> vRemove = new Vector<String>();
+		final Vector<String> vRemove = new Vector<>();
 
 		while (it.hasNext()) {
 			final String sKey = it.next();
@@ -5458,7 +5477,7 @@ public class display extends CacheServlet {
 		for (int i = 0; i < vRemove.size(); i++)
 			hmSeries.remove(vRemove.get(i));
 
-		final HashMap<String, monPredicate> hmPreds = new HashMap<String, monPredicate>();
+		final HashMap<String, monPredicate> hmPreds = new HashMap<>();
 
 		// build the predicates to select the data
 		for (int i = 0; i < vSeries.size(); i++) {
@@ -5504,7 +5523,7 @@ public class display extends CacheServlet {
 
 				lCompactInterval = Utils.getCompactInterval(prop, lIntervalMin, lIntervalMax);
 
-				final Vector<monPredicate> vPreds = new Vector<monPredicate>(hmPreds.values());
+				final Vector<monPredicate> vPreds = new Vector<>(hmPreds.values());
 
 				if (sFunction.equals("dblast"))
 					dsplit = getDBLast(vPreds);
@@ -5520,7 +5539,7 @@ public class display extends CacheServlet {
 
 		final String sPageTitle = pgets(prop, "title");
 
-		final HashMap<String, Double> downloadData = new HashMap<String, Double>();
+		final HashMap<String, Double> downloadData = new HashMap<>();
 
 		for (int i = 0; i < vSeries.size(); i++) {
 			final String sName = vSeries.get(i);
@@ -5637,7 +5656,7 @@ public class display extends CacheServlet {
 
 		p.modify("page", gets("page"));
 
-		final Vector<String> vOptionNames = new Vector<String>();
+		final Vector<String> vOptionNames = new Vector<>();
 
 		for (int i = 0; i < pgeti(prop, "options", -1); i++)
 			if (pgets(prop, "option_" + i + ".name").length() > 0)
@@ -5664,7 +5683,8 @@ public class display extends CacheServlet {
 			final Page pSeparate = new Page(sResDir + "display/hist_separate.res");
 
 			displayCategories(vTotalSeries, prop, p, pSeries, pSeparate, hmSeries, hmActualSeries);
-		} catch (final Exception ex) {
+		}
+		catch (final Exception ex) {
 			ex.printStackTrace();
 		}
 
@@ -5695,35 +5715,35 @@ public class display extends CacheServlet {
 	 */
 	public static final Shape getShape(final char c) {
 		switch (c) {
-		case '^':
-			return Utils.SHAPE_TRI_UP;
-		case 'v':
-			return Utils.SHAPE_TRI_DW;
-		case '|':
-			return Utils.SHAPE_LINE;
-		case '-':
-			return Utils.SHAPE_TICK;
-		case '_':
-			return Utils.SHAPE_LONGTICK;
-		case '#':
-			return Utils.SHAPE_RECT;
-		case '+':
-			return Utils.SHAPE_MEDRECT;
-		case '=':
-			return Utils.SHAPE_BIGRECT;
-		case '.':
-			return Utils.SHAPE_POINT;
-		case '*':
-			return Utils.SHAPE_STAR;
-		case 'O':
-			return Utils.SHAPE_BIGCIRCLE;
-		case '0':
-			return Utils.SHAPE_MEDCIRCLE;
-		case 'o':
-			return Utils.SHAPE_CIRCLE;
-		case '@':
-		default:
-			return Utils.SHAPE_SMALLCIRCLE;
+			case '^':
+				return Utils.SHAPE_TRI_UP;
+			case 'v':
+				return Utils.SHAPE_TRI_DW;
+			case '|':
+				return Utils.SHAPE_LINE;
+			case '-':
+				return Utils.SHAPE_TICK;
+			case '_':
+				return Utils.SHAPE_LONGTICK;
+			case '#':
+				return Utils.SHAPE_RECT;
+			case '+':
+				return Utils.SHAPE_MEDRECT;
+			case '=':
+				return Utils.SHAPE_BIGRECT;
+			case '.':
+				return Utils.SHAPE_POINT;
+			case '*':
+				return Utils.SHAPE_STAR;
+			case 'O':
+				return Utils.SHAPE_BIGCIRCLE;
+			case '0':
+				return Utils.SHAPE_MEDCIRCLE;
+			case 'o':
+				return Utils.SHAPE_CIRCLE;
+			case '@':
+			default:
+				return Utils.SHAPE_SMALLCIRCLE;
 		}
 	}
 
@@ -5747,7 +5767,7 @@ public class display extends CacheServlet {
 		if (!pgetb(prop, "legend.display_custom_shapes", true))
 			return Utils.ML_DEFAULT_SHAPES;
 
-		final Vector<Shape> vShapeSeries = new Vector<Shape>();
+		final Vector<Shape> vShapeSeries = new Vector<>();
 
 		for (int i = 0; i < vIndividualSeries.size(); i++) {
 			final Vector<String> vLocalActualSeries = vIndividualSeries.get(i);
@@ -5803,7 +5823,7 @@ public class display extends CacheServlet {
 	}
 
 	private Paint[] getPaintSeries(final Properties prop) {
-		final Vector<Paint> vPaintSeries = new Vector<Paint>();
+		final Vector<Paint> vPaintSeries = new Vector<>();
 
 		final String sPageType = pgets(prop, "page", "rt").toLowerCase();
 		final String sKind = pgets(prop, "kind", "rt").toLowerCase();
