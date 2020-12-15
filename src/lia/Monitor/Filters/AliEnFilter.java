@@ -6983,10 +6983,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		if (logger.isLoggable(Level.FINEST)) {
 			final StringBuilder sb = new StringBuilder();
-			for (final Serializable serializable : rez) {
-				final Result r = (Result) serializable;
-				sb.append(r.toString() + "\n");
-			}
+			for (final Serializable serializable : rez)
+				sb.append(serializable.toString() + "\n");
+			
 			logger.log(Level.FINEST, "Summarised results are: " + sb.toString());
 		}
 
