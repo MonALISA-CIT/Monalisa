@@ -43,7 +43,7 @@ public final class MLExecutorsFactory {
 	/**
 	 * Default timeout for both core and extra threads in both scheduled executors and cached thread pools
 	 */
-	public static final long DEFAULT_TIMEOUT_MINUTES = 1;
+	public static final long DEFAULT_TIMEOUT_MINUTES = 5;
 
 	static {
 		reloadExecutorsParam();
