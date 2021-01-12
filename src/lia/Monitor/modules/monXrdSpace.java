@@ -25,298 +25,298 @@ import lia.util.ntp.NTPDate;
  * @since 2007-02-22
  */
 public class monXrdSpace extends cmdExec implements MonitoringModule {
-    /** Logger used by this class */
-    private static final Logger logger = Logger.getLogger(monXrdSpace.class.getCanonicalName());
+	/** Logger used by this class */
+	private static final Logger logger = Logger.getLogger(monXrdSpace.class.getCanonicalName());
 
-    private static final long serialVersionUID = 1;
+	private static final long serialVersionUID = 1;
 
-    private MonModuleInfo mmi = null;
+	private MonModuleInfo mmi = null;
 
-    private MNode mn = null;
+	private MNode mn = null;
 
-    private final long lLastCall = 0;
+	private final long lLastCall = 0;
 
-    private final String[] resTypes = new String[0];
+	private final String[] resTypes = new String[0];
 
-    private String sCommand = "xrd";
+	private String sCommand = "xrdfs";
 
-    private int xrootdRedirectorPort = 1095;
+	private int xrootdRedirectorPort = 1095;
 
-    /**
-     * default constructor for the module
-     */
-    public monXrdSpace() {
-        super("monAPCUPS");
-        info.ResTypes = resTypes;
-        isRepetitive = true;
-    }
+	/**
+	 * default constructor for the module
+	 */
+	public monXrdSpace() {
+		super("monXrdSpace");
+		info.ResTypes = resTypes;
+		isRepetitive = true;
+	}
 
-    /**
-     * Initialize data structures
-     * @param node ML node
-     * @param args arguments
-     * @return module informations
-     */
-    @Override
-    public MonModuleInfo init(final MNode node, final String args) {
-        mn = node;
+	/**
+	 * Initialize data structures
+	 * 
+	 * @param node
+	 *            ML node
+	 * @param args
+	 *            arguments
+	 * @return module informations
+	 */
+	@Override
+	public MonModuleInfo init(final MNode node, final String args) {
+		mn = node;
 
-        mmi = new MonModuleInfo();
-        mmi.setName("monXrdSpace");
-        mmi.setState(0);
+		mmi = new MonModuleInfo();
+		mmi.setName("monXrdSpace");
+		mmi.setState(0);
 
-        mmi.lastMeasurement = lLastCall;
+		mmi.lastMeasurement = lLastCall;
 
-        if ((args != null) && (args.length() > 0)) {
-            final StringTokenizer st = new StringTokenizer(args);
+		if ((args != null) && (args.length() > 0)) {
+			final StringTokenizer st = new StringTokenizer(args);
 
-            while (st.hasMoreTokens()) {
-                final String tok = st.nextToken();
+			while (st.hasMoreTokens()) {
+				final String tok = st.nextToken();
 
-                try {
-                    final int port = Integer.parseInt(tok);
+				try {
+					final int port = Integer.parseInt(tok);
 
-                    xrootdRedirectorPort = port;
-                } catch (final NumberFormatException nfe) {
-                    sCommand = tok;
-                }
-            }
-        }
+					xrootdRedirectorPort = port;
+				}
+				catch (final NumberFormatException nfe) {
+					sCommand = tok;
+				}
+			}
+		}
 
-        return info;
-    }
+		return info;
+	}
 
-    /**
-     * This is a dynamic module so this will return an empty array
-     * @return empty array
-     */
-    @Override
-    public String[] ResTypes() {
-        return resTypes;
-    }
+	/**
+	 * This is a dynamic module so this will return an empty array
+	 * 
+	 * @return empty array
+	 */
+	@Override
+	public String[] ResTypes() {
+		return resTypes;
+	}
 
-    /**
-     * Operating system on which this module can run.
-     * 
-     * @return Obviously "Linux"
-     */
-    @Override
-    public String getOsName() {
-        return "Linux";
-    }
+	/**
+	 * Operating system on which this module can run.
+	 * 
+	 * @return Obviously "Linux"
+	 */
+	@Override
+	public String getOsName() {
+		return "Linux";
+	}
 
-    /**
-     * Called periodically to get data from the sensors.
-     * 
-     * @return a Vector with the results of the processing
-     * @throws Exception if there was an error processing the output of the sensors command
-     */
-    @Override
-    public Object doProcess() throws Exception {
-        final long ls = NTPDate.currentTimeMillis();
+	/**
+	 * Called periodically to get data from the sensors.
+	 * 
+	 * @return a Vector with the results of the processing
+	 * @throws Exception
+	 *             if there was an error processing the output of the sensors command
+	 */
+	@Override
+	public Object doProcess() throws Exception {
+		final long ls = NTPDate.currentTimeMillis();
 
-        Result r = new Result();
-        final eResult er = new eResult();
+		Result r = new Result();
+		final eResult er = new eResult();
 
-        er.FarmName = r.FarmName = getFarmName();
-        er.ClusterName = r.ClusterName = getClusterName();
-        er.NodeName = r.NodeName = mn.getName();
-        er.Module = r.Module = mmi.getName();
-        er.time = r.time = ls;
+		er.FarmName = r.FarmName = getFarmName();
+		er.ClusterName = r.ClusterName = getClusterName();
+		er.NodeName = r.NodeName = mn.getName();
+		er.Module = r.Module = mmi.getName();
+		er.time = r.time = ls;
 
-        final String versionCommand = sCommand + " -DITransactionTimeout 60 -DIRequestTimeout 60 127.0.0.1:"
-                + xrootdRedirectorPort + " query 1 /dummy";
+		final String versionCommand = sCommand + " " + mn.getName() + (mn.getName().contains(":") ? "" : ":" + xrootdRedirectorPort) + " query config version";
 
-        final BufferedReader br = procOutput(versionCommand, 75000);
+		String version = null;
 
-        String version = null;
+		try (BufferedReader br = procOutput(versionCommand, 75000)) {
+			if (br == null) {
+				logger.log(Level.WARNING, "Cannot run '" + sCommand + "'.\nFor details increase debug level of lia.Monitor.monitor.cmdExec to FINER");
+			}
+			else {
+				String line = br.readLine();
 
-        if (br == null) {
-            logger.log(Level.WARNING, "Cannot run '" + sCommand
-                    + "'.\nFor details increase debug level of lia.Monitor.monitor.cmdExec to FINER");
-        } else {
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    if (!line.startsWith("<statistics")) {
-                        continue;
-                    }
+				if (line != null) {
+					line = line.trim();
+					if (!line.equals("version") && !line.startsWith("["))
+						if (line.startsWith("v"))
+							version = "Xrootd " + line;
+						else
+							if (line.startsWith("dCache "))
+								version = "dCache " + line.substring(line.indexOf(' ') + 1).trim();
+							else
+								version = line;
+				}
+			}
+		}
+		finally {
+			cleanup();
+		}
 
-                    final StringTokenizer st = new StringTokenizer(line, " \t\"");
+		if (version != null) {
+			er.addSet("xrootd_version", version);
 
-                    while (st.hasMoreTokens()) {
-                        if (st.nextToken().equals("ver=") && st.hasMoreTokens()) {
-                            version = st.nextToken();
-                            break;
-                        }
-                    }
-                }
+			final String command = sCommand + " " + mn.getName() + (mn.getName().contains(":") ? "" : ":" + xrootdRedirectorPort) + " spaceinfo /";
 
-                br.close();
-            } finally {
-                cleanup();
-            }
-        }
+			final StringBuilder sb = new StringBuilder(command).append('\n');
 
-        if (version != null) {
-            er.addSet("xrootd_version", version);
+			try (BufferedReader br2 = procOutput(command, 1000 * 1000)) {
 
-            final String command = sCommand + " -DITransactionTimeout 900 -DIRequestTimeout 900 127.0.0.1:"
-                    + xrootdRedirectorPort + " queryspace /";
+				if (br2 == null) {
+					logger.log(Level.WARNING, "Cannot run '" + command + "'.\nFor details increase debug level of lia.Monitor.monitor.cmdExec to FINER");
+				}
+				else {
+					String line = null;
 
-            final StringBuilder sb = new StringBuilder(command).append('\n');
+					double total = -1;
+					double free = -1;
 
-            final BufferedReader br2 = procOutput(command, 1000 * 1000);
+					while ((line = br2.readLine()) != null) {
+						sb.append(line).append('\n');
 
-            if (br2 == null) {
-                logger.log(Level.WARNING, "Cannot run '" + command
-                        + "'.\nFor details increase debug level of lia.Monitor.monitor.cmdExec to FINER");
-            } else {
-                try {
-                    String line = null;
+						if (line.length() == 0) {
+							continue;
+						}
 
-                    double total = -1;
-                    double free = -1;
+						final int idx = line.indexOf(':');
 
-                    while ((line = br2.readLine()) != null) {
-                        sb.append(line).append('\n');
+						if (idx < 0) {
+							continue;
+						}
 
-                        if (line.length() == 0) {
-                            continue;
-                        }
+						final String key = line.substring(0, idx).trim();
 
-                        final int idx = line.indexOf(':');
+						if (key.equals("Total") || key.equals("Free") || key.equals("Largest chunk")) {
+							final double value = Double.parseDouble(line.substring(idx + 1).trim());
 
-                        if (idx < 0) {
-                            continue;
-                        }
+							if (key.equals("Total")) {
+								r.addSet("space_total", value);
+								total = value;
+							}
+							else
+								if (key.equals("Free")) {
+									r.addSet("space_free", value);
+									free = value;
+								}
+								else {
+									r.addSet("space_largestfreechunk", value);
+								}
+						}
+					}
 
-                        final String key = line.substring(0, idx).trim();
+					if ((total <= 0) || (free <= 0) || (free > total)) {
+						sb.append("\n\nPATH: ").append(System.getenv("PATH")).append("\nLD_LIBRARY_PATH: ").append(System.getenv("LD_LIBRARY_PATH"));
 
-                        if (key.equals("Total") || key.equals("Free") || key.equals("Largest chunk")) {
-                            final double value = Double.parseDouble(line.substring(idx + 1).trim());
+						logger.log(Level.WARNING, "xrd output was not ok:\nFull command: " + sb.toString());
 
-                            if (key.equals("Total")) {
-                                r.addSet("space_total", value);
-                                total = value;
-                            } else if (key.equals("Free")) {
-                                r.addSet("space_free", value);
-                                free = value;
-                            } else {
-                                r.addSet("space_largestfreechunk", value);
-                            }
-                        }
-                    }
+						r = null;
+					}
 
-                    if ((total <= 0) || (free <= 0) || (free > total)) {
-                        sb.append("\n\nPATH: ").append(System.getenv("PATH")).append("\nLD_LIBRARY_PATH: ")
-                                .append(System.getenv("LD_LIBRARY_PATH"));
+					br2.close();
+				}
+			}
+			finally {
+				cleanup();
+			}
+		}
 
-                        logger.log(Level.WARNING, "xrd output was not ok:\nFull command: " + sb.toString());
+		final Vector<Object> vReturn = new Vector<>();
 
-                        r = null;
-                    }
+		if (((r == null) || (r.param == null) || (r.param.length == 0)) && ((er.param == null) || (er.param.length == 0))) {
+			throw new IOException("Command failed to produce any relevant output: " + versionCommand);
+		}
 
-                    br2.close();
-                } finally {
-                    cleanup();
-                }
-            }
-        }
+		if ((r != null) && (r.param != null) && (r.param.length > 0)) {
+			vReturn.add(r);
+		}
 
-        final Vector<Object> vReturn = new Vector<Object>();
+		if ((er.param != null) && (er.param.length > 0)) {
+			vReturn.add(er);
+		}
 
-        if (((r == null) || (r.param == null) || (r.param.length == 0))
-                && ((er.param == null) || (er.param.length == 0))) {
-            throw new IOException("Command failed to produce any relevant output: " + versionCommand);
-        }
+		return vReturn;
+	}
 
-        if ((r != null) && (r.param != null) && (r.param.length > 0)) {
-            vReturn.add(r);
-        }
+	/**
+	 * Node name
+	 * 
+	 * @return node name
+	 */
+	@Override
+	public MNode getNode() {
+		return mn;
+	}
 
-        if ((er.param != null) && (er.param.length > 0)) {
-            vReturn.add(er);
-        }
+	/**
+	 * Cluster name
+	 * 
+	 * @return cluster name
+	 */
+	@Override
+	public String getClusterName() {
+		return mn.getClusterName();
+	}
 
-        return vReturn;
-    }
+	/**
+	 * Farm name
+	 * 
+	 * @return farm name
+	 */
+	@Override
+	public String getFarmName() {
+		return mn.getFarmName();
+	}
 
-    /**
-     * Node name
-     * 
-     * @return node name
-     */
-    @Override
-    public MNode getNode() {
-        return mn;
-    }
+	/**
+	 * Of course this module is repetitive :)
+	 * 
+	 * @return true
+	 */
+	@Override
+	public boolean isRepetitive() {
+		return true;
+	}
 
-    /**
-     * Cluster name
-     * 
-     * @return cluster name
-     */
-    @Override
-    public String getClusterName() {
-        return mn.getClusterName();
-    }
+	/**
+	 * Task name
+	 * 
+	 * @return task name
+	 */
+	@Override
+	public String getTaskName() {
+		return mmi.getName();
+	}
 
-    /**
-     * Farm name
-     * 
-     * @return farm name
-     */
-    @Override
-    public String getFarmName() {
-        return mn.getFarmName();
-    }
+	/**
+	 * Module info
+	 * 
+	 * @return info
+	 */
+	@Override
+	public MonModuleInfo getInfo() {
+		return mmi;
+	}
 
-    /**
-     * Of course this module is repetitive :)
-     * 
-     * @return true
-     */
-    @Override
-    public boolean isRepetitive() {
-        return true;
-    }
+	/**
+	 * Debug method
+	 * 
+	 * @param args
+	 *            command line arguments
+	 * @throws Exception
+	 */
+	public static void main(final String args[]) throws Exception {
+		final MFarm f = new MFarm("myFarm");
+		final MCluster c = new MCluster("ALICE::ISS::FILE", f);
+		final MNode n = new MNode("storage02.spacescience.ro:1094", c, f);
 
-    /**
-     * Task name
-     * 
-     * @return task name
-     */
-    @Override
-    public String getTaskName() {
-        return mmi.getName();
-    }
+		final monXrdSpace m = new monXrdSpace();
+		m.init(n, (args != null) && (args.length > 0) ? args[0] : null);
 
-    /**
-     * Module info
-     * 
-     * @return info
-     */
-    @Override
-    public MonModuleInfo getInfo() {
-        return mmi;
-    }
-
-    /**
-     * Debug method
-     * 
-     * @param args command line arguments
-     * @throws Exception 
-     */
-    public static void main(final String args[]) throws Exception {
-        final MFarm f = new MFarm("myFarm");
-        final MCluster c = new MCluster("VO::TEST::SE", f);
-        final MNode n = new MNode("localhost", c, f);
-
-        final monXrdSpace m = new monXrdSpace();
-        m.init(n, (args != null) && (args.length > 0) ? args[0] : null);
-
-        Utils.dumpResults(m.doProcess());
-    }
-
+		Utils.dumpResults(m.doProcess());
+	}
 }
