@@ -44,7 +44,7 @@ import net.jini.lookup.ServiceDiscoveryManager;
 public class SearchDaemon extends Thread implements XDRMessageNotifier {
 
     private static final Logger logger = Logger.getLogger(SearchDaemon.class.getName());
-    private static final String default_LUDs = "monalisa.cacr.caltech.edu,monalisa.cern.ch";
+    private static final String default_LUDs = "monalisa.cern.ch";
 
     private static final Object sync = new Object();
     private static SearchDaemon _thisInstance = null;

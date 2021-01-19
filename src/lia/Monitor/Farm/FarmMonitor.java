@@ -2575,9 +2575,9 @@ public class FarmMonitor extends RangePortUnicastRemoteObject implements Monitor
             vrvsUpdateURL = null;
             try {
                 vrvsUpdateURL = AppConfig.getProperty("lia.Monitor.Farm.vrvsUpdateURL",
-                        "http://monalisa.cacr.caltech.edu/VRVS_UPDATE");
+                        "http://monalisa.cern.ch/VRVS_UPDATE");
             } catch (Throwable t) {
-                vrvsUpdateURL = "http://monalisa.cacr.caltech.edu/VRVS_UPDATE";
+                vrvsUpdateURL = "http://monalisa.cern.ch/VRVS_UPDATE";
             }
 
             notifyConfigeResults = false;

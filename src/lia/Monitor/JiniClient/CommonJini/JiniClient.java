@@ -55,7 +55,7 @@ import net.jini.lookup.ServiceDiscoveryManager;
 
 public abstract class JiniClient extends Thread implements AppConfigChangeListener {
 
-    private static final String default_LUDs = "monalisa.cacr.caltech.edu,monalisa.cern.ch";
+    private static final String default_LUDs = "monalisa.cern.ch";
 
     private static final Logger logger = Logger.getLogger(JiniClient.class.getName());
 

@@ -78,11 +78,11 @@ fi
 
 echo "`date`: Trying TO copy the downloaded files" >>${LOG_FILE} 2>&1
 
-CP_CMD="cp -fr ${TMP_DIR}/monalisa.cacr.caltech.edu/FARM_ML/Service/* ${MonaLisa_HOME}/Service/"
+CP_CMD="cp -fr ${TMP_DIR}/monalisa.cern.ch/FARM_ML/Service/* ${MonaLisa_HOME}/Service/"
 echo "`date`: Trying [${CP_CMD}]" >>${LOG_FILE} 2>&1
 ${CP_CMD} 2>>${LOG_FILE}
 
-CP_CMD="cp -fr ${TMP_DIR}/monalisa.cacr.caltech.edu/FARM_ML/Control/* ${MonaLisa_HOME}/Control/"
+CP_CMD="cp -fr ${TMP_DIR}/monalisa.cern.ch/FARM_ML/Control/* ${MonaLisa_HOME}/Control/"
 echo "`date`: Trying [${CP_CMD}]" >>${LOG_FILE} 2>&1
 ${CP_CMD} 2>>${LOG_FILE}
 

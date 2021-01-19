@@ -580,7 +580,7 @@ public class MLLUSHelper implements Runnable {
         try {
 
             // get specified LookupLocators[]
-            LookupLocator[] lookupLocators = Utils.getLUDSs("monalisa.cacr.caltech.edu,monalisa.cern.ch");
+            LookupLocator[] lookupLocators = Utils.getLUDSs("monalisa.cern.ch");
             Configuration cfgLUSs = null;
             try {
                 cfgLUSs = getBasicExportConfig();

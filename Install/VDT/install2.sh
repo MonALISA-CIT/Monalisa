@@ -294,7 +294,7 @@ MonaLisa.LONG=LONGITUDE
 ######################## REGISTRATION #############################
 # List of Lookup Services separated by comma
 #
-lia.Monitor.LUSs=monalisa.cacr.caltech.edu,monalisa.cern.ch
+lia.Monitor.LUSs=monalisa.cern.ch
 #
 # Group to use in Jini! The LUSs define above must have been started
 # using this group. For example to set group to cms-us
@@ -502,7 +502,7 @@ lia.Monitor.Store.TransparentStoreFast.writer_2.table_name=monitor_s_10hour
 ## you want to see the connectivity between yor farm and others in the GUI
 ## Client please inform us and we'll add the peers in this config file.
 ## So, for now, please do not modify this parameter
-lia.Monitor.ABPing.ConfigURL=http://monalisa.cacr.caltech.edu/ABPingFarmConfig
+lia.Monitor.ABPing.ConfigURL=http://monalisa.cern.ch/ABPingFarmConfig
 
 
 ################ Logging configuration ##################################

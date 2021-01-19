@@ -1258,10 +1258,10 @@ public class RegFarmMonitor extends BasicService implements Runnable, DataStore,
         String rawURLs = null;
         if (!isVRVS) {
             rawURLs = AppConfig.getProperty("lia.monitor.updateURLs",
-                    "http://monalisa.cacr.caltech.edu/FARM_ML,http://monalisa.cern.ch/MONALISA/FARM_ML");
+                    "http://monalisa.cern.ch/FARM_ML,http://monalisa.cern.ch/MONALISA/FARM_ML");
         } else {
             rawURLs = AppConfig.getProperty("lia.monitor.updateURLs",
-                    "http://monalisa.cacr.caltech.edu/VRVS_ML,http://monalisa.cern.ch/MONALISA/VRVS_ML");
+                    "http://monalisa.cern.ch/VRVS_ML,http://monalisa.cern.ch/MONALISA/VRVS_ML");
         }
 
         StringTokenizer st = new StringTokenizer(rawURLs, ",");

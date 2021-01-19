@@ -40,7 +40,7 @@ import net.jini.lookup.ServiceDiscoveryManager;
 public class OSDaemon extends Thread implements XDRMessageNotifier {
 
     private static final Logger logger = Logger.getLogger(OSDaemon.class.getName());
-    private static final String default_LUDs = "monalisa.cacr.caltech.edu,monalisa.cern.ch";
+    private static final String default_LUDs = "monalisa.cern.ch";
     private static final Object sync = new Object();
     private static OSDaemon _thisInstance = null;
     private static ServiceDiscoveryManager sdm;

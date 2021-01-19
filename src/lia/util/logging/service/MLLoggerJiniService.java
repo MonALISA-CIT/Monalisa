@@ -92,7 +92,7 @@ public class MLLoggerJiniService extends Thread implements ServiceIDListener, Se
     private String getCodebase() {
         String codebase = "";
         String dlURLs = AppConfig.getProperty("lia.util.logging.service.dlURLs",
-                "http://monalisa.cacr.caltech.edu/LOGGER_ML,http://monalisa.cern.ch/MONALISA/LOGGER_ML");
+                "http://monalisa.cern.ch/MONALISA/LOGGER_ML");
 
         StringTokenizer st = new StringTokenizer(dlURLs, ",");
         if ((st != null) && (st.countTokens() > 0)) {

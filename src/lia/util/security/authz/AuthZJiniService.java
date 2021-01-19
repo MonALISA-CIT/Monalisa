@@ -91,7 +91,7 @@ public class AuthZJiniService extends Thread implements ServiceIDListener, Servi
     private String getCodebase() {
         String codebase = "";
         String dlURLs = AppConfig.getProperty("lia.util.security.authz.dlURLs",
-                "http://monalisa.cacr.caltech.edu/AUTHZ_ML,http://monalisa.cern.ch/MONALISA/AUTHZ_ML");
+                "http://monalisa.cern.ch/MONALISA/AUTHZ_ML");
 
         StringTokenizer st = new StringTokenizer(dlURLs, ",");
         if ((st != null) && (st.countTokens() > 0)) {

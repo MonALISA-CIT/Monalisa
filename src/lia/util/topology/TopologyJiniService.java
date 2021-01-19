@@ -90,7 +90,7 @@ public class TopologyJiniService extends Thread implements ServiceIDListener, Se
     private String getCodebase() {
         String codebase = "";
         String dlURLs = AppConfig.getProperty("lia.util.topology.dlURLs",
-                "http://monalisa.cacr.caltech.edu/TOPO_ML,http://monalisa.cern.ch/MONALISA/TOPO_ML");
+                "http://monalisa.cern.ch/MONALISA/TOPO_ML");
 
         StringTokenizer st = new StringTokenizer(dlURLs, ",");
         if ((st != null) && (st.countTokens() > 0)) {
