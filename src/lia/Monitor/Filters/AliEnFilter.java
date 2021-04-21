@@ -1585,11 +1585,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @param lFinishTime
 		 */
 		public JobStatusCS(final String sJobID, final String sOrgName, final int iStatus, final String sSubmitHost, final String sExecHost, final long lReceiveTime, final long lStartTime,
-				final long lFinishTime) {
+				final long lFinishTime, final int siteId) {
 			this(sJobID, sOrgName);
 			setStatus(iStatus);
 			setSubmitHost(sSubmitHost);
-			setExecHost(sExecHost, null);
+			setExecHost(sExecHost, null, siteId);
 			setStatusTime(JobUtil.JS_INSERTING, lReceiveTime);
 			setStatusTime(JobUtil.JS_RUNNING, lStartTime);
 			setStatusTime(JobUtil.JS_DONE, lFinishTime);
@@ -1652,8 +1652,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 *
 		 * @param sExecHost
 		 * @param oRes
+		 * @param siteId 
 		 */
-		public void setExecHost(final String sExecHost, final Object oRes) {
+		public void setExecHost(final String sExecHost, final Object oRes, final int siteId) {
 			this.lastUpdateTime = NTPDate.currentTimeMillis();
 			this.notInAliEn = false;
 
@@ -1664,7 +1665,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			this.execHost = sExecHost;
 
 			if (sExecHost.equals("NO_SITE")) {
-				this.execSite = getSite(jobID);
+				if (siteId > 0)
+					this.execSite = siteCache.get(Integer.valueOf(siteId));
+				else
+					this.execSite = getSite(jobID);
 
 				if (this.execSite == null)
 					this.execSite = "CentralServices";
@@ -4105,7 +4109,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					final long lStart = System.currentTimeMillis();
 
-					if (!db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished FROM QUEUE WHERE statusId in (10,5,21,6,1,7,11,17,18,19,12);")) {
+					if (!db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE statusId in (10,5,21,6,1,7,11,17,18,19,12);")) {
 						logger.log(Level.WARNING, "Direct DB query failed, falling back to querying AliEn");
 						ok = false;
 					}
@@ -4131,7 +4135,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							final long started = db.getl(7) * 1000;
 							final long finished = db.getl(8) * 1000;
 
-							crtAliEnJobs.add(new JobStatusCS(queueId, orgName, statusId, userName + "@" + submitHostName, execHostName, received, started, finished));
+							final int siteId = db.geti(9);
+
+							crtAliEnJobs.add(new JobStatusCS(queueId, orgName, statusId, userName + "@" + submitHostName, execHostName, received, started, finished, siteId));
 						}
 
 						final long lEnd = System.currentTimeMillis();
@@ -4238,7 +4244,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							finishTime = 1000 * Long.parseLong(stk.nextToken());
 
 						if ((jobID != null) && (status != 0) && (execHost != null) && (submitHost != null))
-							crtAliEnJobs.add(new JobStatusCS(jobID, orgName, status, submitHost, execHost, receiveTime, startTime, finishTime));
+							crtAliEnJobs.add(new JobStatusCS(jobID, orgName, status, submitHost, execHost, receiveTime, startTime, finishTime, 0));
 					}
 					catch (@SuppressWarnings("unused") final Exception e) {
 						continue;
@@ -4791,7 +4797,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				final int status = (int) r.param[stid];
 				final JobStatusCS jscs = findJobStatusCS(orgName, jobID, true);
 
-				jscs.setExecHost(execHost, o);
+				jscs.setExecHost(execHost, o, 0);
 				jscs.setStatus(status);
 			}
 		}
@@ -4818,7 +4824,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					orgName = StringFactory.get(orgName);
 
 					final JobStatusCS jscs = findJobStatusCS(orgName, jobID, true);
-					jscs.setExecHost(execHost, o);
+					jscs.setExecHost(execHost, o, 0);
 					jscs.setSubmitHost(submitHost);
 				}
 				else
@@ -4891,7 +4897,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				if ((now - oJS.lastUpdateTime) > PARAM_EXPIRE) {
 					oJS.setStatus(nJS.status);
 					oJS.setSubmitHost(nJS.submitHost);
-					oJS.setExecHost(nJS.execHost, null);
+					oJS.setExecHost(nJS.execHost, null, 0);
 				}
 				if (oJS.submitHost == null)
 					oJS.setSubmitHost(nJS.submitHost);
@@ -7294,7 +7300,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		return null;
 	}
 
-	private static final GenericLastValuesCache<Integer, String> siteCache = new GenericLastValuesCache<Integer, String>() {
+	static final GenericLastValuesCache<Integer, String> siteCache = new GenericLastValuesCache<Integer, String>() {
 		private static final long serialVersionUID = 1L;
 
 		@Override
