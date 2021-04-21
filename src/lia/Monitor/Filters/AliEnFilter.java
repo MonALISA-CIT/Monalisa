@@ -1476,6 +1476,26 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// }
 	}
 
+	JobStatusCS jsStatusfromDB(final DBFunctions db, final String orgName) {
+		final String queueId = db.gets(1);
+		final int statusId = db.geti(2);
+		final String userName = getUserName(db.geti(3));
+
+		final int submitHostId = db.geti(4);
+		final String submitHostName = submitHostId > 0 ? getHost(submitHostId) : "NO_SITE";
+
+		final int execHostId = db.geti(5);
+		final String execHostName = execHostId > 0 ? getHost(execHostId) : "NO_SITE";
+
+		final long received = db.getl(6) * 1000;
+		final long started = db.getl(7) * 1000;
+		final long finished = db.getl(8) * 1000;
+
+		final int siteId = db.geti(9);
+
+		return new JobStatusCS(queueId, orgName, statusId, userName + "@" + submitHostName, execHostName, received, started, finished, siteId);
+	}
+
 	/** Class used to store job status. It is used only in the AliEn Central Services ML. */
 	private final class JobStatusCS {
 		/**
@@ -4127,23 +4147,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						final ArrayList<JobStatusCS> crtAliEnJobs = new ArrayList<>(10240);
 
 						while (db.moveNext()) {
-							final String queueId = db.gets(1);
-							final int statusId = db.geti(2);
-							final String userName = getUserName(db.geti(3));
-
-							final int submitHostId = db.geti(4);
-							final String submitHostName = submitHostId > 0 ? getHost(submitHostId) : "NO_SITE";
-
-							final int execHostId = db.geti(5);
-							final String execHostName = execHostId > 0 ? getHost(execHostId) : "NO_SITE";
-
-							final long received = db.getl(6) * 1000;
-							final long started = db.getl(7) * 1000;
-							final long finished = db.getl(8) * 1000;
-
-							final int siteId = db.geti(9);
-
-							crtAliEnJobs.add(new JobStatusCS(queueId, orgName, statusId, userName + "@" + submitHostName, execHostName, received, started, finished, siteId));
+							crtAliEnJobs.add(jsStatusfromDB(db, orgName));
 						}
 
 						final long lEnd = System.currentTimeMillis();
@@ -4854,7 +4858,16 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		JobStatusCS jscs = htJobStats.get(jobID);
 		if ((jscs == null) && create) {
-			jscs = new JobStatusCS(jobID, orgName);
+			try (DBFunctions db = getQueueDB()) {
+				if (db == null || !db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
+					logger.log(Level.WARNING, "Direct DB query failed, falling back to the legacy method of waiting for the fields to be updated");
+					jscs = new JobStatusCS(jobID, orgName);
+				}
+				else {
+					jscs = jsStatusfromDB(db, orgName);
+				}
+			}
+
 			htJobStats.put(jobID, jscs);
 		}
 
