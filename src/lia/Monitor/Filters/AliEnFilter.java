@@ -1508,6 +1508,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 */
 		String execHost;
 
+		int siteId;
+
 		/**
 		 * site where the job is executed (a ML-name from LDAP)
 		 */
@@ -1583,6 +1585,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @param lReceiveTime
 		 * @param lStartTime
 		 * @param lFinishTime
+		 * @param siteId
 		 */
 		public JobStatusCS(final String sJobID, final String sOrgName, final int iStatus, final String sSubmitHost, final String sExecHost, final long lReceiveTime, final long lStartTime,
 				final long lFinishTime, final int siteId) {
@@ -1652,7 +1655,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 *
 		 * @param sExecHost
 		 * @param oRes
-		 * @param siteId 
+		 * @param siteId
 		 */
 		public void setExecHost(final String sExecHost, final Object oRes, final int siteId) {
 			this.lastUpdateTime = NTPDate.currentTimeMillis();
@@ -1665,8 +1668,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			this.execHost = sExecHost;
 
 			if (sExecHost.equals("NO_SITE")) {
-				if (siteId > 0)
+				if (siteId > 0) {
 					this.execSite = siteCache.get(Integer.valueOf(siteId));
+					this.siteId = siteId;
+				}
 				else
 					this.execSite = getSite(jobID);
 
@@ -1696,7 +1701,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (nExecSite == null)
 					logger.log(Level.WARNING,
-							"Received a bad execHost=" + sExecHost + ". Keeping previous execSite=" + this.execSite + "\norig. rez=" + oRes + "\nCEhosts = " + AliEnFilter.this.htSitesCEhosts);
+							"Received a bad execHost=" + sExecHost + ", host=" + host + ". Keeping previous execSite=" + this.execSite + "\norig. rez=" + oRes + "\nCEhosts = "
+									+ AliEnFilter.this.htSitesCEhosts);
 				else
 					this.execSite = nExecSite;
 			}
@@ -4857,7 +4863,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/**
 	 * This is called when this filter starts, and then on a regular basis, with a vector of JobStatusCS objects that describe the jobs currently running in AliEn. This is done to synchronize the
-	 * filter's hashes with the image of the jobs as AliEn sees it. This is needed because dome UDPs might get lost and therefore ML might report different data from AliEn.
+	 * filter's hashes with the image of the jobs as AliEn sees it. This is needed because some UDPs might get lost and therefore ML might report different data from AliEn.
 	 *
 	 * @param crtAliEnJobs
 	 */
@@ -4897,7 +4903,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				if ((now - oJS.lastUpdateTime) > PARAM_EXPIRE) {
 					oJS.setStatus(nJS.status);
 					oJS.setSubmitHost(nJS.submitHost);
-					oJS.setExecHost(nJS.execHost, null, 0);
+					oJS.setExecHost(nJS.execHost, null, nJS.siteId);
 				}
 				if (oJS.submitHost == null)
 					oJS.setSubmitHost(nJS.submitHost);
