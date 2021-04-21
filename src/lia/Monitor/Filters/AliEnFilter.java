@@ -142,10 +142,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	public static final String Name = "AliEnFilter";
 
 	/** contains hashes with job data for each CE (JobInfo's) */
-	final Hashtable<String, Hashtable<String, JobInfo>> htComputingElements = new Hashtable<String, Hashtable<String, JobInfo>>();
+	final Hashtable<String, Hashtable<String, JobInfo>> htComputingElements = new Hashtable<>();
 
 	/** contains hashes with job data for each CE (JobInfo's) */
-	private final Hashtable<String, Hashtable<String, NodeInfo>> htSites = new Hashtable<String, Hashtable<String, NodeInfo>>();
+	private final Hashtable<String, Hashtable<String, NodeInfo>> htSites = new Hashtable<>();
 
 	/** known job states for all CEs */
 	final DataArray knownJobStates = new DataArray();
@@ -184,7 +184,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	final DataArray knownJobAgentParams = new DataArray();
 
 	/** contains NetMatcher's with sites domains */
-	final Hashtable<String, NetMatcher> htSitesNetMatchers = new Hashtable<String, NetMatcher>();
+	final Hashtable<String, NetMatcher> htSitesNetMatchers = new Hashtable<>();
 
 	/**
 	 * Reentrant lock for the above NetMatcher
@@ -192,7 +192,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	final ReentrantReadWriteLock sitesNetMatchersLock = new ReentrantReadWriteLock();
 
 	/** contains NatMatcher's with SEs hosts */
-	final Hashtable<String, NetMatcher> htSEsNetMatchers = new Hashtable<String, NetMatcher>();
+	final Hashtable<String, NetMatcher> htSEsNetMatchers = new Hashtable<>();
 
 	/**
 	 *
@@ -200,19 +200,19 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	final ReentrantReadWriteLock sesNetMatchers = new ReentrantReadWriteLock();
 
 	/** holds data about sites traffic (XrdInfo's) */
-	final Hashtable<String, XrdInfo> htSitesTraffic = new Hashtable<String, XrdInfo>();
+	final Hashtable<String, XrdInfo> htSitesTraffic = new Hashtable<>();
 
 	/** holds data about SEs traffic (XrdInfo's) */
-	final Hashtable<String, XrdInfo> htSEsTraffic = new Hashtable<String, XrdInfo>();
+	final Hashtable<String, XrdInfo> htSEsTraffic = new Hashtable<>();
 
 	/** how many jobs can run on this site (from LDAP) */
-	final Hashtable<String, Integer> htCEsMaxJobs = new Hashtable<String, Integer>();
+	final Hashtable<String, Integer> htCEsMaxJobs = new Hashtable<>();
 
 	/** holds data about Castorgrid servers */
-	final Hashtable<String, RfcpInfo> htCastorgridServers = new Hashtable<String, RfcpInfo>();
+	final Hashtable<String, RfcpInfo> htCastorgridServers = new Hashtable<>();
 
 	/** contains CE hosts (NetMatcher-s) for each site */
-	final Hashtable<String, NetMatcher> htSitesCEhosts = new Hashtable<String, NetMatcher>();
+	final Hashtable<String, NetMatcher> htSitesCEhosts = new Hashtable<>();
 
 	/**
 	 *
@@ -220,54 +220,54 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	final ReentrantReadWriteLock sitesCEhostsLock = new ReentrantReadWriteLock();
 
 	/** contains the jobs in each Organisation (Hash of JobStatusCSs) */
-	final Hashtable<String, Hashtable<String, JobStatusCS>> htOrgCSJobStats = new Hashtable<String, Hashtable<String, JobStatusCS>>();
+	final Hashtable<String, Hashtable<String, JobStatusCS>> htOrgCSJobStats = new Hashtable<>();
 
 	/** contains the FTD transfers in each organisation (Hash of TransferStatusCSs) */
-	final Hashtable<String, Hashtable<String, TransferStatusCS>> htOrgCSTransferStats = new Hashtable<String, Hashtable<String, TransferStatusCS>>();
+	final Hashtable<String, Hashtable<String, TransferStatusCS>> htOrgCSTransferStats = new Hashtable<>();
 
 	/** contains FTD transfers summaries */
-	final Hashtable<String, DataArray> htOrgTransfersSESummary = new Hashtable<String, DataArray>();
+	final Hashtable<String, DataArray> htOrgTransfersSESummary = new Hashtable<>();
 
 	/** contains FTD transfers summaries */
-	final Hashtable<String, DataArray> htOrgTransfersStatusSummary = new Hashtable<String, DataArray>();
+	final Hashtable<String, DataArray> htOrgTransfersStatusSummary = new Hashtable<>();
 
 	/** contains hashes with ROOT job data for each Site (RootJobInfo's) */
-	final Hashtable<String, Hashtable<String, RootJobInfo>> htSitesRootJobs = new Hashtable<String, Hashtable<String, RootJobInfo>>();
+	final Hashtable<String, Hashtable<String, RootJobInfo>> htSitesRootJobs = new Hashtable<>();
 
 	/** contains hashes with API Services for each Site (APIServiceInfo's) */
-	final Hashtable<String, Hashtable<String, APIServiceInfo>> htSitesAPIServices = new Hashtable<String, Hashtable<String, APIServiceInfo>>();
+	final Hashtable<String, Hashtable<String, APIServiceInfo>> htSitesAPIServices = new Hashtable<>();
 
 	/** contains hashes with JobAgents for each Site (JobAgentInfo's) */
-	final Hashtable<String, Hashtable<String, JobAgentInfo>> htSitesJobAgents = new Hashtable<String, Hashtable<String, JobAgentInfo>>();
+	final Hashtable<String, Hashtable<String, JobAgentInfo>> htSitesJobAgents = new Hashtable<>();
 
 	/**
 	 * histogram of number of jobs executed by the job agents on each site
 	 */
-	final Hashtable<String, Histogram> htSitesJobAgentsNumJobs = new Hashtable<String, Histogram>();
+	final Hashtable<String, Histogram> htSitesJobAgentsNumJobs = new Hashtable<>();
 
 	/** contains hashes with CEs for each Site (CEInfo's) -> summarize jobAgents_(running|slots|queued) */
-	final Hashtable<String, Hashtable<String, CEInfo>> htSitesCEs = new Hashtable<String, Hashtable<String, CEInfo>>();
+	final Hashtable<String, Hashtable<String, CEInfo>> htSitesCEs = new Hashtable<>();
 
 	/** contains hashes with DAQ hosts for each site (DAQInfo's) */
-	final Hashtable<String, Hashtable<String, DAQInfo>> htSitesDAQ = new Hashtable<String, Hashtable<String, DAQInfo>>();
+	final Hashtable<String, Hashtable<String, DAQInfo>> htSitesDAQ = new Hashtable<>();
 
 	/** contains FTSTransferInfo's with key=FTD transferID */
-	final Hashtable<String, Hashtable<String, FTSTransferInfo>> htFTSTransfers = new Hashtable<String, Hashtable<String, FTSTransferInfo>>();
+	final Hashtable<String, Hashtable<String, FTSTransferInfo>> htFTSTransfers = new Hashtable<>();
 
 	/** contains FDTTestTransferInfo's with key=CrtMLName_destIP:port */
-	final Hashtable<String, FDTTestTransferInfo> htFDTTestTransfers = new Hashtable<String, FDTTestTransferInfo>();
+	final Hashtable<String, FDTTestTransferInfo> htFDTTestTransfers = new Hashtable<>();
 
 	/** contains QuotaInfo's with key=node (i.e. user_requestType) */
-	final Hashtable<String, QuotaInfo> htQuotaInfos = new Hashtable<String, QuotaInfo>();
+	final Hashtable<String, QuotaInfo> htQuotaInfos = new Hashtable<>();
 
 	/** contains hashes like [CAF instance (string) => hash [ unique CAF job-like ID => RootCafUsageInfo] */
-	final Hashtable<String, Hashtable<String, RootCafUsageInfo>> htRootCafUsageInfos = new Hashtable<String, Hashtable<String, RootCafUsageInfo>>();
+	final Hashtable<String, Hashtable<String, RootCafUsageInfo>> htRootCafUsageInfos = new Hashtable<>();
 
 	/** contains summaries for XrdServers data produced by the monXrootd module */
-	final Hashtable<String, XrdServerInfo> htXrdServers = new Hashtable<String, XrdServerInfo>();
+	final Hashtable<String, XrdServerInfo> htXrdServers = new Hashtable<>();
 
 	/** contains hashes with SEs */
-	final Hashtable<String, SETransferInfo> htAliEnSEs = new Hashtable<String, SETransferInfo>();
+	final Hashtable<String, SETransferInfo> htAliEnSEs = new Hashtable<>();
 
 	/** contains results produced for debug purposes */
 	// final Vector vDebugResults = new Vector();
@@ -482,98 +482,99 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 */
 		public static String jobStatusToText(final int status) {
 			switch (status) {
-			case JS_INSERTING:
-				return "INSERTING";
-			case JS_SPLITTING:
-				return "SPLITTING";
-			case JS_SPLIT:
-				return "SPLIT";
-			case JS_QUEUED:
-				return "QUEUED";
-			case JS_WAITING:
-				return "WAITING";
-			case JS_ASSIGNED:
-				return "ASSIGNED";
-			case JS_STARTED:
-				return "STARTED";
-			case JS_INTERACTIV:
-				return "INTERACTIV";
-			case JS_IDLE:
-				return "IDLE";
-			case JS_RUNNING:
-				return "RUNNING";
-			case JS_SAVING:
-				return "SAVING";
-			case JS_SAVED:
-				return "SAVED";
-			case JS_SAVED_WARNING:
-				return "SAVED_WARNING";
-			case JS_MERGING:
-				return "MERGING";
-			case JS_FORCEMERGE:
-				return "FORCEMERGE";
-			case JS_DONE:
-				return "DONE";
-			case JS_DONE_WARNING:
-				return "DONE_WARNING";
-			case JS_TO_STAGE:
-				return "TO_STAGE";
-			case JS_A_STAGED:
-				return "A_STAGED";
-			case JS_STAGING:
-				return "STAGING";
-			case JS_ERROR_A:
-				return "ERROR_A";
-			case JS_ERROR_I:
-				return "ERROR_I";
-			case JS_ERROR_E:
-				return "ERROR_E";
-			case JS_ERROR_IB:
-				return "ERROR_IB";
-			case JS_ERROR_M:
-				return "ERROR_M";
-			case JS_ERROR_R:
-				return "ERROR_R";
-			case JS_ERROR_S:
-				return "ERROR_S";
-			case JS_ERROR_SPLIT:
-				return "ERROR_SPLT";
-			case JS_ERROR_SV:
-				return "ERROR_SV";
-			case JS_ERROR_V:
-				return "ERROR_V";
-			case JS_ERROR_VN:
-				return "ERROR_VN";
-			case JS_EXPIRED:
-				return "EXPIRED";
-			case JS_FAILED:
-				return "FAILED";
-			case JS_KILLED:
-				return "KILLED";
-			case JS_ZOMBIE:
-				return "ZOMBIE";
-			case JS_ERROR_VT:
-				return "ERROR_VT";
-			case JS_ERROR_RE:
-				return "ERROR_RE";
-			case JS_ERROR_W:
-				return "ERROR_W";
-			case JS_ERROR_EW:
-				return "ERROR_EW";
-			case JS_OVER_WAITING:
-				return "OVER_WAITING";
-			case JS_UPDATING:
-				return "UPDATING";
-			case JS_FAULTY:
-				return "FAULTY";
-			case JS_INCORRECT:
-				return "INCORRECT";
-			case JS_ANY_ERROR:
-				return "ERROR";
+				case JS_INSERTING:
+					return "INSERTING";
+				case JS_SPLITTING:
+					return "SPLITTING";
+				case JS_SPLIT:
+					return "SPLIT";
+				case JS_QUEUED:
+					return "QUEUED";
+				case JS_WAITING:
+					return "WAITING";
+				case JS_ASSIGNED:
+					return "ASSIGNED";
+				case JS_STARTED:
+					return "STARTED";
+				case JS_INTERACTIV:
+					return "INTERACTIV";
+				case JS_IDLE:
+					return "IDLE";
+				case JS_RUNNING:
+					return "RUNNING";
+				case JS_SAVING:
+					return "SAVING";
+				case JS_SAVED:
+					return "SAVED";
+				case JS_SAVED_WARNING:
+					return "SAVED_WARNING";
+				case JS_MERGING:
+					return "MERGING";
+				case JS_FORCEMERGE:
+					return "FORCEMERGE";
+				case JS_DONE:
+					return "DONE";
+				case JS_DONE_WARNING:
+					return "DONE_WARNING";
+				case JS_TO_STAGE:
+					return "TO_STAGE";
+				case JS_A_STAGED:
+					return "A_STAGED";
+				case JS_STAGING:
+					return "STAGING";
+				case JS_ERROR_A:
+					return "ERROR_A";
+				case JS_ERROR_I:
+					return "ERROR_I";
+				case JS_ERROR_E:
+					return "ERROR_E";
+				case JS_ERROR_IB:
+					return "ERROR_IB";
+				case JS_ERROR_M:
+					return "ERROR_M";
+				case JS_ERROR_R:
+					return "ERROR_R";
+				case JS_ERROR_S:
+					return "ERROR_S";
+				case JS_ERROR_SPLIT:
+					return "ERROR_SPLT";
+				case JS_ERROR_SV:
+					return "ERROR_SV";
+				case JS_ERROR_V:
+					return "ERROR_V";
+				case JS_ERROR_VN:
+					return "ERROR_VN";
+				case JS_EXPIRED:
+					return "EXPIRED";
+				case JS_FAILED:
+					return "FAILED";
+				case JS_KILLED:
+					return "KILLED";
+				case JS_ZOMBIE:
+					return "ZOMBIE";
+				case JS_ERROR_VT:
+					return "ERROR_VT";
+				case JS_ERROR_RE:
+					return "ERROR_RE";
+				case JS_ERROR_W:
+					return "ERROR_W";
+				case JS_ERROR_EW:
+					return "ERROR_EW";
+				case JS_OVER_WAITING:
+					return "OVER_WAITING";
+				case JS_UPDATING:
+					return "UPDATING";
+				case JS_FAULTY:
+					return "FAULTY";
+				case JS_INCORRECT:
+					return "INCORRECT";
+				case JS_ANY_ERROR:
+					return "ERROR";
+				default:
+					if (logger.isLoggable(Level.FINEST))
+						logger.log(Level.FINEST, "Unknown job status for " + status);
+					return "UNKNOWN";
 			}
-			if (logger.isLoggable(Level.FINEST))
-				logger.log(Level.FINEST, "Unknown job status for " + status);
-			return "UNKNOWN";
 		}
 
 		/**
@@ -809,30 +810,31 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 */
 		static String transferStatusToText(final int status) {
 			switch (status) {
-			case TS_INSERTING:
-				return "INSERTING";
-			case TS_WAITING:
-				return "WAITING";
-			case TS_ASSIGNED:
-				return "ASSIGNED";
-			case TS_LOCAL_COPY:
-				return "LOCAL_COPY";
-			case TS_TRANSFERRING:
-				return "TRANSFERRING";
-			case TS_CLEANING:
-				return "CLEANING";
-			case TS_DONE:
-				return "DONE";
-			case TS_FAILED:
-				return "FAILED";
-			case TS_KILLED:
-				return "KILLED";
-			case TS_EXPIRED:
-				return "EXPIRED";
+				case TS_INSERTING:
+					return "INSERTING";
+				case TS_WAITING:
+					return "WAITING";
+				case TS_ASSIGNED:
+					return "ASSIGNED";
+				case TS_LOCAL_COPY:
+					return "LOCAL_COPY";
+				case TS_TRANSFERRING:
+					return "TRANSFERRING";
+				case TS_CLEANING:
+					return "CLEANING";
+				case TS_DONE:
+					return "DONE";
+				case TS_FAILED:
+					return "FAILED";
+				case TS_KILLED:
+					return "KILLED";
+				case TS_EXPIRED:
+					return "EXPIRED";
+				default:
+					if (logger.isLoggable(Level.FINEST))
+						logger.log(Level.FINEST, "Unknown transfer status for " + status);
+					return "UNKNOWN";
 			}
-			if (logger.isLoggable(Level.FINEST))
-				logger.log(Level.FINEST, "Unknown transfer status for " + status);
-			return "UNKNOWN";
 		}
 
 		/**
@@ -941,32 +943,33 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 */
 		static String jaStatusToText(final int status) {
 			switch (status) {
-			case AS_REQUESTING_JOB:
-				return "REQUESTING_JOB";
-			case AS_INSTALLING_PKGS:
-				return "INSTALLING_PKGS";
-			case AS_JOB_STARTED:
-				return "JOB_STARTED";
-			case AS_RUNNING_JOB:
-				return "RUNNING_JOB";
-			case AS_DONE:
-				return "DONE";
-			case AS_ERROR_HC:
-				return "ERROR_HC";
-			case AS_ERROR_IP:
-				return "ERROR_IP";
-			case AS_ERROR_GET_JDL:
-				return "ERROR_GET_JDL";
-			case AS_ERROR_JDL:
-				return "ERROR_JDL";
-			case AS_ERROR_DIRS:
-				return "ERROR_DIRS";
-			case AS_ERROR_START:
-				return "ERROR_START";
+				case AS_REQUESTING_JOB:
+					return "REQUESTING_JOB";
+				case AS_INSTALLING_PKGS:
+					return "INSTALLING_PKGS";
+				case AS_JOB_STARTED:
+					return "JOB_STARTED";
+				case AS_RUNNING_JOB:
+					return "RUNNING_JOB";
+				case AS_DONE:
+					return "DONE";
+				case AS_ERROR_HC:
+					return "ERROR_HC";
+				case AS_ERROR_IP:
+					return "ERROR_IP";
+				case AS_ERROR_GET_JDL:
+					return "ERROR_GET_JDL";
+				case AS_ERROR_JDL:
+					return "ERROR_JDL";
+				case AS_ERROR_DIRS:
+					return "ERROR_DIRS";
+				case AS_ERROR_START:
+					return "ERROR_START";
+				default:
+					if (logger.isLoggable(Level.FINEST))
+						logger.log(Level.FINEST, "Unknown JobAgent status for " + status);
+					return "UNKNOWN";
 			}
-			if (logger.isLoggable(Level.FINEST))
-				logger.log(Level.FINEST, "Unknown JobAgent status for " + status);
-			return "UNKNOWN";
 		}
 
 		private static final int[] jaSid = new int[] { AS_REQUESTING_JOB, AS_INSTALLING_PKGS, AS_JOB_STARTED, AS_RUNNING_JOB, AS_DONE, AS_ERROR_HC, AS_ERROR_IP, AS_ERROR_GET_JDL, AS_ERROR_JDL,
@@ -1167,23 +1170,25 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				else
 					// it's a result from a job
 					for (int i = r.param_name.length - 1; i >= 0; i--) {
-					final String name = r.param_name[i];
+						final String name = r.param_name[i];
 
-					if (name.equals("status")) {
-					this.status = (int) r.param[i];
-					// we want to consider the job as being alive only while
-					// it reports its status (form JobAgent)
-					this.stats.setParam(JobUtil.jobStatusToText(this.status), this.status);
-					this.lastUpdateTime = NTPDate.currentTimeMillis();
-					} else if (name.equals("cpu_time") || name.equals("cpu_ksi2k") || name.equals("cpu_hep06") || name.equals("run_time") || name.equals("run_ksi2k") || name.equals("run_hep06"))
-						// append _R because will be reported as rates
-						this.crtValues.setParam(name + "_R", r.param[i]);
-					else
-						// disk_usage workdir_size disk_total disk_free disk_used
-						// virtualmem mem_usage rss cpu_usage
-						this.values.setParam(name, r.param[i]);
+						if (name.equals("status")) {
+							this.status = (int) r.param[i];
+							// we want to consider the job as being alive only while
+							// it reports its status (form JobAgent)
+							this.stats.setParam(JobUtil.jobStatusToText(this.status), this.status);
+							this.lastUpdateTime = NTPDate.currentTimeMillis();
+						}
+						else if (name.equals("cpu_time") || name.equals("cpu_ksi2k") || name.equals("cpu_hep06") || name.equals("run_time") || name.equals("run_ksi2k") || name.equals("run_hep06"))
+							// append _R because will be reported as rates
+							this.crtValues.setParam(name + "_R", r.param[i]);
+						else
+							// disk_usage workdir_size disk_total disk_free disk_used
+							// virtualmem mem_usage rss cpu_usage
+							this.values.setParam(name, r.param[i]);
 					}
-			} else if (o instanceof eResult) {
+			}
+			else if (o instanceof eResult) {
 				final eResult er = (eResult) o;
 				if (er.ClusterName.equals("ROOT_AliEnJob_Info"))
 					handleRootJobInfo(er);
@@ -1222,15 +1227,18 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					transf_mbytes = deltaMB;
 					if (!prevT)
 						this.crtValues.addToParam("transf_moved_files_R", 1);
-				} else if (name.equals("read_bytes")) {
+				}
+				else if (name.equals("read_bytes")) {
 					this.crtValues.addToParam("transf_read_mbytes_R", deltaMB);
 					if (!prevT)
 						this.crtValues.addToParam("transf_read_files_R", 1);
-				} else if (name.equals("written_bytes")) {
+				}
+				else if (name.equals("written_bytes")) {
 					this.crtValues.addToParam("transf_written_mbytes_R", deltaMB);
 					if (!prevT)
 						this.crtValues.addToParam("transf_written_files_R", 1);
-				} else if (name.equals("speed"))
+				}
+				else if (name.equals("speed"))
 					this.values.setParam("transf_speed", r.param[i]);
 				// else ignore it, i.e. we don't care about:
 				// elapsed_time, src_IP, dst_IP
@@ -1273,8 +1281,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				else if (paramName.equals("readbytes_str"))
 					try {
 						readBytes = Double.parseDouble(paramValue);
-					} catch (final NumberFormatException nfe) {
-						logger.warning("Got invalid readbytes_str in: " + er);
+					}
+					catch (final NumberFormatException nfe) {
+						logger.log(Level.WARNING, "Got invalid readbytes_str in: " + er, nfe);
 						// don't add this to monitoring
 						return;
 					}
@@ -1292,7 +1301,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// job is reading a new file; account all the the readBytes
 				readFiles++;
 				readMBytes = convertBtoMB(readBytes);
-			} else
+			}
+			else
 				// job reading the same file; account only the difference
 				readMBytes = convertBtoMB(readBytes - this.prevRootTransf.getParam(key));
 
@@ -1428,7 +1438,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						}
 					}
 					this.prevStats.setAsDataArray(this.stats);
-				} else // we are in the same state as before
+				}
+				else // we are in the same state as before
 				if (!((this.status == JobUtil.JS_SAVED) || (this.status == JobUtil.JS_SAVED_WARNING) || (this.status < 0))) {
 					// we don't want to report these cumulative parameters several times
 					jobsInState.addToParam(statusText + "_jobs", 1);
@@ -1657,7 +1668,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (this.execSite == null)
 					this.execSite = "CentralServices";
-			} else {
+			}
+			else {
 				String nExecSite = null;
 
 				int iIdx = sExecHost.indexOf('@');
@@ -1674,7 +1686,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					if (iIdx2 > 0)
 						nExecSite = host.substring(iIdx + 2, iIdx2);
-				} else
+				}
+				else
 					nExecSite = getNetMatch(AliEnFilter.this.htSitesCEhosts, AliEnFilter.this.sitesCEhostsLock, host);
 
 				if (nExecSite == null)
@@ -1900,7 +1913,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 									timeDeltasForUser.addToParam(paramNameCNT, 1);
 									timeDeltasUsersTotal.addToParam(paramNameAVG, deltaSeconds);
 									timeDeltasUsersTotal.addToParam(paramNameCNT, 1);
-								} else
+								}
+								else
 									logger.warning(
 											"Invalid times for job " + this.jobID + " status transitions: " + firstName + "=" + new Date(firstTime) + " " + secondName + "=" + new Date(secondTime));
 
@@ -1915,7 +1929,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					}
 					if (JobUtil.isFinalStatus(this.status))
 						jobsInCS.addToParam("TOTAL_jobs", 1);
-				} else // we are in the same state as before
+				}
+				else // we are in the same state as before
 				if (!JobUtil.isFinalStatus(this.status)) {
 					// we don't want to report these final statuses several times
 					final DataArray da = selectDA(jobsInCS, jobsInSite);
@@ -2095,7 +2110,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					if (name.equals("statusID")) {
 						this.status = (int) r.param[i];
 						this.stats.setParam(TransferUtil.transferStatusToText(this.status), this.status);
-					} else if (name.equals("size"))
+					}
+					else if (name.equals("size"))
 						this.size = (long) r.param[i];
 					else if (name.equals("received"))
 						this.receiveTime = 1000 * (long) r.param[i];
@@ -2106,7 +2122,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					else
 						logger.log(Level.WARNING, "Received unknown transfer parameter `" + name + "` in R=" + r);
 				}
-			} else if (o instanceof eResult) {
+			}
+			else if (o instanceof eResult) {
 				final eResult er = (eResult) o;
 
 				for (int i = er.param_name.length - 1; i >= 0; i--) {
@@ -2120,7 +2137,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						setDstSE((String) er.param[i]);
 					else if (name.equals("Protocol")) {
 						// TODO: aggregate per protocol
-					} else
+					}
+					else
 						logger.log(Level.WARNING, "Received unknown transfer parameter `" + name + "` in eR=" + er);
 				}
 			}
@@ -2247,7 +2265,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						if (transfTime > 0)
 							tda.addToParam("transf_speed_mbs", sizeMB / transfTime);
 					}
-				} else {
+				}
+				else {
 					// we are in the same state as before
 					tda.addToParam("transf_mbytes", 0);
 					tda.addToParam("transf_mbytes_R", 0);
@@ -2356,22 +2375,26 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				else if (sParam.equals("status")) {
 					this.status = sValue;
 					this.stats.setParam(this.status, 1);
-				} else if (sParam.equals("readbytes_str"))
+				}
+				else if (sParam.equals("readbytes_str"))
 					try {
 						readBytes = Double.parseDouble(sValue);
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring readbytes_str = " + sValue, ex);
 					}
 				else if (sParam.equals("processedbytes_str"))
 					try {
 						this.jobParams.setParam("processedbytes", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring processedbytes_str = " + sValue, ex);
 					}
 				else if (er.param_name[i].equals("events_str"))
 					try {
 						this.jobParams.setParam("events", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring events_str = " + sValue, ex);
 					}
 				// }else if(er.param_name[i].equals("realtime_str")){
@@ -2383,25 +2406,29 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				else if (sParam.equals("cputime_str"))
 					try {
 						this.jobParams.setParam("cputime", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring cputime_str = " + sValue, ex);
 					}
 				else if (sParam.equals("shdmem_str"))
 					try {
 						this.jobParams.setParam("shdmem", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring shdmem_str = " + sValue, ex);
 					}
 				else if (sParam.equals("rssmem_str"))
 					try {
 						this.jobParams.setParam("rssmem", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring rssmem_str = " + sValue, ex);
 					}
 				else if (sParam.equals("totmem_str"))
 					try {
 						this.jobParams.setParam("totmem", Double.parseDouble(sValue));
-					} catch (final Exception ex) {
+					}
+					catch (final Exception ex) {
 						logger.log(Level.WARNING, "Ignoring totmem_str = " + sValue, ex);
 					}
 			}
@@ -2538,7 +2565,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					// sum-up cummulative parameters
 					sda.addToParam(par, crtVal);
 					sda.addToParam(par + "_R", delta / timeInterval);
-				} else if (par.equals("shdmem") || par.equals("rssmem") || par.equals("totmem"))
+				}
+				else if (par.equals("shdmem") || par.equals("rssmem") || par.equals("totmem"))
 					// sum-up running parameters
 					sda.addToParam(par, crtVal);
 			}
@@ -2811,7 +2839,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			else if (type.equals("staging") || type.equals("migrating")) {
 				da.addToDataArray(this.sumValues);
 				this.sumValues.addToParam(type + "_count", 1); // we'll need how many of each type we have
-			} else if (type.equals("gc")) {
+			}
+			else if (type.equals("gc")) {
 				final Iterator<String> it = da.parameterSet().iterator();
 				while (it.hasNext()) {
 					final String paramName = it.next();
@@ -3154,7 +3183,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						this.stats.addToParam(statName + "_ja", 1);
 						this.stats.addToParam(statName + "_ja_R", 1 / timeInterval);
 					}
-				} else
+				}
+				else
 					this.stats.setParam(statName + "_ja", 1);
 			}
 		}
@@ -3342,7 +3372,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					if (logger.isLoggable(Level.FINE))
 						logger.log(Level.FINE, "DAQ Value " + pValue + " added to the rates, which are now:\n   " + this.rates);
-				} else if (pName.equals("delay"))
+				}
+				else if (pName.equals("delay"))
 					this.avgs.addToParam("delay_avg", pValue);
 			}
 		}
@@ -3458,8 +3489,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		public FTSTransferInfo(final String sFtdFullName, final String sTransferID) {
 			this.ftdFullName = sFtdFullName;
 			this.transferID = sTransferID;
-			this.vStatus = new ArrayList<String>();
-			this.vTimes = new ArrayList<Long>();
+			this.vStatus = new ArrayList<>();
+			this.vTimes = new ArrayList<>();
 			// this will not be reported; it's only used to have a time basis for the 'real' statuses
 			this.vStatus.add("dummy_invalid_status");
 			this.vTimes.add(Long.valueOf(NTPDate.currentTimeMillis()));
@@ -4040,7 +4071,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				pro = MLProcess.exec(new String[] { "/bin/sh", "-c", cmd }, timeout);
 				out = pro.getInputStream();
 				return new BufferedReader(new InputStreamReader(out));
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				logger.log(Level.WARNING, "FAILED to execute cmd = " + cmd, t);
 			}
 			if (pro != null)
@@ -4048,7 +4080,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			if (out != null)
 				try {
 					out.close();
-				} catch (final IOException ex) {
+				}
+				catch (final IOException ex) {
 					logger.log(Level.WARNING, "FAILED to close the output stream for cmd = " + cmd, ex);
 				}
 			return null;
@@ -4063,12 +4096,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		private boolean getAliEnJobs() {
 			final String orgName = AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "Alice").toUpperCase();
 
-			final DBFunctions db = getQueueDB();
-
 			boolean ok = true;
 
-			if (db != null)
-				try {
+			try (DBFunctions db = getQueueDB()) {
+
+				if (db != null) {
 					db.setReadOnly(true);
 
 					final long lStart = System.currentTimeMillis();
@@ -4076,12 +4108,13 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					if (!db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished FROM QUEUE WHERE statusId in (10,5,21,6,1,7,11,17,18,19,12);")) {
 						logger.log(Level.WARNING, "Direct DB query failed, falling back to querying AliEn");
 						ok = false;
-					} else {
+					}
+					else {
 						final long lProcess = System.currentTimeMillis();
 
 						logger.log(Level.INFO, "Active jobs query returned in " + (lProcess - lStart) + " ms");
 
-						final ArrayList<JobStatusCS> crtAliEnJobs = new ArrayList<JobStatusCS>(10240);
+						final ArrayList<JobStatusCS> crtAliEnJobs = new ArrayList<>(10240);
 
 						while (db.moveNext()) {
 							final String queueId = db.gets(1);
@@ -4110,12 +4143,12 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						logger.log(Level.INFO, "Updated in-memory status " + crtAliEnJobs.size() + " jobs via direct query in " + (System.currentTimeMillis() - lEnd) + " ms");
 						return true;
 					}
-				} catch (final Throwable t) {
-					logger.log(Level.WARNING, "Caught exception while loading job status from query", t);
-					ok = false;
-				} finally {
-					db.close();
 				}
+			}
+			catch (final Throwable t) {
+				logger.log(Level.WARNING, "Caught exception while loading job status from query", t);
+				ok = false;
+			}
 
 			if (ok)
 				return true;
@@ -4124,16 +4157,15 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			logger.log(Level.INFO, "Trying to load status for current AliEn jobs...");
 
-			BufferedReader buff = procOutput(cmd, 30 * 1000); // this should be really fast
+			try (BufferedReader buff = procOutput(cmd, 30 * 1000)) { // this should be really fast
 
-			if (buff == null) {
-				logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
-				return false;
-			}
+				if (buff == null) {
+					logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
+					return false;
+				}
 
-			String line;
+				String line;
 
-			try {
 				boolean proxyOK = false;
 				while ((line = buff.readLine()) != null) {
 					line = line.trim();
@@ -4148,30 +4180,28 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					logger.log(Level.WARNING, "Failed to create proxy with " + cmd);
 					return false;
 				}
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				logger.log(Level.WARNING, "FAILED to read output from " + cmd, t);
 				return false;
-			} finally {
-				try {
-					buff.close();
-				} catch (final Throwable t) {
-					// ignore
-				}
 			}
 
 			// proxy was created ok. now sync the jobs
 			cmd = ALIEN + " -x " + JOB_SYNC_SCRIPT;
-			buff = procOutput(cmd, JOB_SYNC_SCRIPT_TIMEOUT);
-			if (buff == null) {
-				logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
-				return false;
-			}
-			try {
+
+			try (BufferedReader buff = procOutput(cmd, JOB_SYNC_SCRIPT_TIMEOUT)) {
+				if (buff == null) {
+					logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
+					return false;
+				}
+
 				boolean finishedOK = false;
 
-				final ArrayList<JobStatusCS> crtAliEnJobs = new ArrayList<JobStatusCS>(10240);
+				final ArrayList<JobStatusCS> crtAliEnJobs = new ArrayList<>(10240);
 
 				final boolean bLog = logger.isLoggable(Level.FINEST);
+
+				String line;
 
 				while ((line = buff.readLine()) != null) {
 					line = line.trim();
@@ -4209,7 +4239,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 						if ((jobID != null) && (status != 0) && (execHost != null) && (submitHost != null))
 							crtAliEnJobs.add(new JobStatusCS(jobID, orgName, status, submitHost, execHost, receiveTime, startTime, finishTime));
-					} catch (final Exception e) {
+					}
+					catch (@SuppressWarnings("unused") final Exception e) {
 						continue;
 					}
 				}
@@ -4223,15 +4254,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// status of AliEn jobs loaded ok; populate hashes...
 				addJobStatusCSBulk(crtAliEnJobs);
 				return true;
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				logger.log(Level.WARNING, "FAILED to read output from " + cmd, t);
 				return false;
-			} finally {
-				try {
-					buff.close();
-				} catch (final Throwable t) {
-					// ignore
-				}
 			}
 		}
 
@@ -4252,7 +4278,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			try {
 				boolean finishedOK = false;
 				final String orgName = StringFactory.get(AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "ALICE").toUpperCase());
-				final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<TransferStatusCS>(1024);
+				final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<>(1024);
 				String line;
 				while ((line = buff.readLine()) != null) {
 					line = line.trim();
@@ -4295,7 +4321,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							finishTime = 1000 * Long.parseLong(stk.nextToken());
 						if ((transferID != null) && (status != 0))
 							crtAliEnTransfers.add(new TransferStatusCS(transferID, orgName, status, size, user, srcSE, dstSE, receiveTime, startTime, finishTime));
-					} catch (final Exception e) {
+					}
+					catch (@SuppressWarnings("unused") final Exception e) {
 						continue;
 					}
 				}
@@ -4307,13 +4334,16 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// status of AliEn jobs loaded ok; populate hashes...
 				addTransferStatusCSBulk(crtAliEnTransfers);
 				return true;
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				logger.log(Level.WARNING, "FAILED to read output from " + cmd, t);
 				return false;
-			} finally {
+			}
+			finally {
 				try {
 					buff.close();
-				} catch (final Throwable t) {
+				}
+				catch (@SuppressWarnings("unused") final Throwable t) {
 					// ignore
 				}
 			}
@@ -4331,10 +4361,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			if (buff != null) {
 				String line;
 				Hashtable<String, NetMatcher> crt = null;
-				final Hashtable<String, NetMatcher> sites_domains = new Hashtable<String, NetMatcher>();
-				final Hashtable<String, NetMatcher> ses_hosts = new Hashtable<String, NetMatcher>();
-				final Hashtable<String, Integer> ces_max_jobs = new Hashtable<String, Integer>();
-				final Hashtable<String, NetMatcher> sites_ce_hosts = new Hashtable<String, NetMatcher>();
+				final Hashtable<String, NetMatcher> sites_domains = new Hashtable<>();
+				final Hashtable<String, NetMatcher> ses_hosts = new Hashtable<>();
+				final Hashtable<String, Integer> ces_max_jobs = new Hashtable<>();
+				final Hashtable<String, NetMatcher> sites_ce_hosts = new Hashtable<>();
 
 				boolean bJobs = false;
 
@@ -4349,15 +4379,18 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							crt = sites_domains;
 							bJobs = false;
 							continue;
-						} else if (line.equals("[SEs_hosts]")) {
+						}
+						else if (line.equals("[SEs_hosts]")) {
 							bJobs = false;
 							crt = ses_hosts;
 							continue;
-						} else if (line.equals("[CEs_max_jobs]")) {
+						}
+						else if (line.equals("[CEs_max_jobs]")) {
 							bJobs = true;
 							crt = null;
 							continue;
-						} else if (line.equals("[Sites_CE_hosts]")) {
+						}
+						else if (line.equals("[Sites_CE_hosts]")) {
 							bJobs = false;
 							crt = sites_ce_hosts;
 							continue;
@@ -4370,7 +4403,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						final String value = line.substring(eq + 1).trim();
 
 						if ((crt != null) && ((crt == sites_domains) || (crt == ses_hosts) || (crt == sites_ce_hosts))) {
-							final ArrayList<String> nets = new ArrayList<String>();
+							final ArrayList<String> nets = new ArrayList<>();
 							String redirect = null;
 							if (value.startsWith(">"))
 								redirect = value.substring(1);
@@ -4389,7 +4422,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 											nets.add(val);
 										else
 											nets.add("." + val);
-									} else
+									}
+									else
 										// this is for CEs, SEs...
 										nets.add(val);
 								}
@@ -4408,17 +4442,20 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 										nm.addInetNetworks(nets);
 									else
 										logger.log(Level.WARNING, "Not found NetMatchers for " + AliEnFilter.this.farmName + " to redirected farm " + redirect);
-								} else {
+								}
+								else {
 									logger.log(Level.FINE, "Resolving nets : " + nets);
 
 									final NetMatcher nm = new NetMatcher(nets);
 									crt.put(key, nm);
 								}
-						} else if (bJobs)
+						}
+						else if (bJobs)
 							try {
 								ces_max_jobs.put(key, Integer.valueOf(value));
-							} catch (final NumberFormatException ex) {
-								logger.log(Level.WARNING, "Got invalid maxJobs number " + key + " = " + value);
+							}
+							catch (final NumberFormatException ex) {
+								logger.log(Level.WARNING, "Got invalid maxJobs number " + key + " = " + value, ex);
 							}
 					}
 					// if we made it so far, we can use this as the current configuration
@@ -4427,7 +4464,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					try {
 						AliEnFilter.this.htSitesNetMatchers.clear();
 						AliEnFilter.this.htSitesNetMatchers.putAll(sites_domains);
-					} finally {
+					}
+					finally {
 						sitesNetMatchersLock.writeLock().unlock();
 					}
 
@@ -4437,7 +4475,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						// ses.put("Alice::CERN::MonaLisa", new NetMatcher(new String[] {"monalisa.cern.ch"}));
 						AliEnFilter.this.htSEsNetMatchers.clear();
 						AliEnFilter.this.htSEsNetMatchers.putAll(ses_hosts);
-					} finally {
+					}
+					finally {
 						sesNetMatchers.writeLock().unlock();
 					}
 
@@ -4450,7 +4489,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					try {
 						AliEnFilter.this.htSitesCEhosts.clear();
 						AliEnFilter.this.htSitesCEhosts.putAll(sites_ce_hosts);
-					} finally {
+					}
+					finally {
 						sitesCEhostsLock.writeLock().unlock();
 					}
 
@@ -4464,16 +4504,20 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						this.confFirstSuccess = true;
 					}
 					return true;
-				} catch (final Throwable t) {
+				}
+				catch (final Throwable t) {
 					logger.log(Level.WARNING, "FAILED to read output from " + LDAP_QUERY_SCRIPT, t);
-				} finally {
+				}
+				finally {
 					try {
 						buff.close();
-					} catch (final Throwable t) {
+					}
+					catch (@SuppressWarnings("unused") final Throwable t) {
 						// ignore
 					}
 				}
-			} else
+			}
+			else
 				logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
 
 			return false;
@@ -4484,15 +4528,13 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			// run this command in background. If the script is not started, it will start and
 			// this command won't return
 			final String cmd = ALIEN_PERL + " " + VOBOX_MON_SCRIPT + " >>" + FarmHOME + "/vobox_mon.log" + " 2>>" + FarmHOME + "/vobox_mon.log &";
-			final BufferedReader buff = procOutput(cmd, 5 * 1000); // a minute should be enough to read ldap
-			if (buff != null)
-				try {
-					buff.close();
-				} catch (final Throwable t) {
-					// ignore
-				}
-			else
-				logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
+			try (BufferedReader buff = procOutput(cmd, 5 * 1000)) { // a minute should be enough to read ldap
+				if (buff == null)
+					logger.log(Level.WARNING, "Got null OutputStream from " + cmd);
+			}
+			catch (IOException e) {
+				logger.log(Level.WARNING, "Exception executing " + cmd, e);
+			}
 		}
 
 		@Override
@@ -4516,7 +4558,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				if (!jobsWasSuccessful) {
 					if (this.jobAttemptInterval <= (60 * 60 * 1000))
 						this.jobAttemptInterval *= 2;
-				} else {
+				}
+				else {
 					JOB_SYNC_RUN_INTERVAL = AppConfig.getl("lia.Monitor.Filters.AliEnFilter.JOB_SYNC_RUN_INTERVAL", JOB_SYNC_RUN_INTERVAL / 1000) * 1000;
 					this.jobAttemptInterval = JOB_SYNC_RUN_INTERVAL;
 				}
@@ -4530,7 +4573,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				if (!transfersWasSuccessful) {
 					if (this.transferAttemptInterval <= (60 * 60 * 1000))
 						this.transferAttemptInterval *= 2;
-				} else {
+				}
+				else {
 					JOB_SYNC_RUN_INTERVAL = AppConfig.getl("lia.Monitor.Filters.AliEnFilter.JOB_SYNC_RUN_INTERVAL", JOB_SYNC_RUN_INTERVAL / 1000) * 1000;
 					this.transferAttemptInterval = JOB_SYNC_RUN_INTERVAL;
 				}
@@ -4558,7 +4602,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			final ConfigLoader configLoader = new ConfigLoader();
 			configLoader.run();
 			tmConf.schedule(configLoader, 0, 2 * 60 * 1000);
-		} else
+		}
+		else
 			logger.log(Level.SEVERE, "Not starting ConfigLoader thread since ALIEN_ROOT is '" + ALIEN_ROOT + "'");
 	}
 
@@ -4621,7 +4666,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				addSrvXrdData(r);
 			else if (Cluster.startsWith("SE_READ_") || Cluster.startsWith("SE_WRITE_"))
 				addSEfileTransfer(r);
-		} else if (o instanceof eResult) {
+		}
+		else if (o instanceof eResult) {
 			final eResult er = (eResult) o;
 			if ("AliEnFilter".equals(er.Module))
 				return;
@@ -4644,9 +4690,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			else if (Cluster.startsWith("ROOT_")) {
 				if (!Cluster.startsWith("ROOT_IGN_"))
 					addRootJobData(er);
-			} else if (Cluster.indexOf("_FTS_") > 0)
+			}
+			else if (Cluster.indexOf("_FTS_") > 0)
 				addFTSTransferData(er);
-		} else if (o instanceof Collection<?>) {
+		}
+		else if (o instanceof Collection<?>) {
 			final Iterator<?> it = ((Collection<?>) o).iterator();
 
 			while (it.hasNext())
@@ -4701,9 +4749,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htJobsInCE == null)
 			if (create) {
 				// first appearance of this CE. create the CE hash
-				htJobsInCE = new Hashtable<String, JobInfo>();
+				htJobsInCE = new Hashtable<>();
 				this.htComputingElements.put(ceName, htJobsInCE);
-			} else
+			}
+			else
 				return null;
 
 		JobInfo ji = htJobsInCE.get(jobID);
@@ -4712,7 +4761,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this job. Create the JobInfo structure.
 				ji = new JobInfo(ceName, jobID);
 				htJobsInCE.put(jobID, ji);
-			} else
+			}
+			else
 				return null;
 
 		return ji;
@@ -4744,7 +4794,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				jscs.setExecHost(execHost, o);
 				jscs.setStatus(status);
 			}
-		} else if (o instanceof eResult) {
+		}
+		else if (o instanceof eResult) {
 			final eResult er = (eResult) o;
 
 			final String execHost = er.NodeName;
@@ -4769,7 +4820,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					final JobStatusCS jscs = findJobStatusCS(orgName, jobID, true);
 					jscs.setExecHost(execHost, o);
 					jscs.setSubmitHost(submitHost);
-				} else
+				}
+				else
 					submitHost = null;
 			}
 
@@ -4784,7 +4836,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	private JobStatusCS findJobStatusCS(final String orgName, final String jobID, final boolean create) {
 		Hashtable<String, JobStatusCS> htJobStats = this.htOrgCSJobStats.get(orgName);
 		if (htJobStats == null) {
-			htJobStats = new Hashtable<String, JobStatusCS>();
+			htJobStats = new Hashtable<>();
 			this.htOrgCSJobStats.put(orgName, htJobStats);
 		}
 
@@ -4808,7 +4860,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// adding / updating jobs
 		final long now = NTPDate.currentTimeMillis();
 
-		final HashMap<String, Set<String>> hmCrtAliEnJobsPerOrg = new HashMap<String, Set<String>>();
+		final HashMap<String, Set<String>> hmCrtAliEnJobsPerOrg = new HashMap<>();
 
 		String sOldOrg = null;
 
@@ -4831,7 +4883,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				final Hashtable<String, JobStatusCS> htJobStats = this.htOrgCSJobStats.get(nJS.orgName);
 				htJobStats.put(nJS.jobID, nJS);
 				addedJobs++;
-			} else {
+			}
+			else {
 				// this job was already discovered. We have to 'merge' the
 				// details from nJS into oJS where they don't exist
 				// status, submitHost and execHost are updated only if they weren't updated lately.
@@ -4853,7 +4906,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (sCrtAliEnJobIDs == null) {
 					// most probably we have only one organization so all the jobs will go in this structure
-					sCrtAliEnJobIDs = new HashSet<String>(crtAliEnJobs.size());
+					sCrtAliEnJobIDs = new HashSet<>(crtAliEnJobs.size());
 					hmCrtAliEnJobsPerOrg.put(nJS.orgName, sCrtAliEnJobIDs);
 				}
 
@@ -4913,7 +4966,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (o instanceof Result) {
 			final Result r = (Result) o;
 			tscs.updateData(r);
-		} else if (o instanceof eResult) {
+		}
+		else if (o instanceof eResult) {
 			final eResult er = (eResult) o;
 			tscs.updateData(er);
 		}
@@ -4925,7 +4979,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	private TransferStatusCS findTransferStatusCS(final String orgName, final String transferID, final boolean create) {
 		Hashtable<String, TransferStatusCS> htTransferStats = this.htOrgCSTransferStats.get(orgName);
 		if (htTransferStats == null) {
-			htTransferStats = new Hashtable<String, TransferStatusCS>();
+			htTransferStats = new Hashtable<>();
 			this.htOrgCSTransferStats.put(orgName, htTransferStats);
 		}
 
@@ -4949,7 +5003,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// adding / updating transfers
 		final long now = NTPDate.currentTimeMillis();
 
-		final Map<String, Set<String>> hmTransfersPerOrg = new HashMap<String, Set<String>>();
+		final Map<String, Set<String>> hmTransfersPerOrg = new HashMap<>();
 
 		String sOldOrg = null;
 
@@ -4970,7 +5024,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				final Hashtable<String, TransferStatusCS> htTransferStats = this.htOrgCSTransferStats.get(nTS.orgName);
 				htTransferStats.put(nTS.transferID, nTS);
 				addedTransfers++;
-			} else {
+			}
+			else {
 				// this transfer was already discrovered. We have to 'merge' the
 				// details from nTS into oTS where they don't exist
 				// transferID and status FOR SURE have the latest value, so we don't check/change them
@@ -4982,7 +5037,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				sTransferIDs = hmTransfersPerOrg.get(nTS.orgName);
 
 				if (sTransferIDs == null) {
-					sTransferIDs = new HashSet<String>(crtAliEnTransfers.size());
+					sTransferIDs = new HashSet<>(crtAliEnTransfers.size());
 					hmTransfersPerOrg.put(nTS.orgName, sTransferIDs);
 				}
 
@@ -5070,7 +5125,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		Hashtable<String, NodeInfo> htNodesInSite = this.htSites.get(site);
 		if (htNodesInSite == null) {
-			htNodesInSite = new Hashtable<String, NodeInfo>();
+			htNodesInSite = new Hashtable<>();
 			this.htSites.put(site, htNodesInSite);
 		}
 
@@ -5098,13 +5153,14 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		try {
 			return InetAddress.getByAddress(bIP);
-		} catch (final UnknownHostException ex) {
+		}
+		catch (@SuppressWarnings("unused") final UnknownHostException ex) {
 			return null;
 		}
 	}
 
 	// set some reasonable limits to how many entries can be cached
-	static final ExpirationCache<InetAddress, String> netMatchIPCache = new ExpirationCache<InetAddress, String>(10000);
+	static final ExpirationCache<InetAddress, String> netMatchIPCache = new ExpirationCache<>(10000);
 
 	/** return the key of the entry in the given hashtable that matched the given IP */
 	private static String getNetMatch(final Hashtable<String, NetMatcher> matchers, final ReentrantReadWriteLock rwLock, final InetAddress ip) {
@@ -5121,10 +5177,12 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			try {
 				cachedValue = getNetMatchUnsync(matchers, ip);
-			} finally {
+			}
+			finally {
 				rwLock.readLock().unlock();
 			}
-		} else
+		}
+		else
 			synchronized (matchers) {
 				cachedValue = getNetMatchUnsync(matchers, ip);
 			}
@@ -5142,7 +5200,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	}
 
 	// set some reasonable limits to how many entries can be cached
-	static final ExpirationCache<String, String> netMatchCache = new ExpirationCache<String, String>(10000);
+	static final ExpirationCache<String, String> netMatchCache = new ExpirationCache<>(10000);
 
 	/**
 	 * return the key of the entry in the given hashtable that matched the given hostname
@@ -5166,10 +5224,12 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			try {
 				cachedValue = getNetMatchUnsync(matchers, hostName);
-			} finally {
+			}
+			finally {
 				rwLock.readLock().unlock();
 			}
-		} else
+		}
+		else
 			synchronized (matchers) {
 				cachedValue = getNetMatchUnsync(matchers, hostName);
 			}
@@ -5188,7 +5248,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			if (host == null)
 				return null;
-		} catch (final NumberFormatException nfe) {
+		}
+		catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 			// ignore hosts that are actually a host ID in AliEn
 		}
 
@@ -5297,7 +5358,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			else if (!dstFarm.equals(siteName))
 				srcFarm = siteName;
 			// else there's nothing we can do; it will be UNK -> this farm
-		} else // srcFarm is known
+		}
+		else // srcFarm is known
 		if (dstFarm.equals(UNKNOWN))
 			if (!srcFarm.equals(siteName))
 				dstFarm = siteName;
@@ -5321,7 +5383,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			da.setParam("transf_rd_mbytes_R", transf_mbytes);
 			da.setParam("transf_rd_files_R", transf_files);
 			findXrdAndAdd(this.htSEsTraffic, srcSE, da, false);
-		} else if (dstSE != null) {
+		}
+		else if (dstSE != null) {
 			da.setParam("transf_wr_mbytes_R", transf_mbytes);
 			da.setParam("transf_wr_files_R", transf_files);
 			findXrdAndAdd(this.htSEsTraffic, dstSE, da, false);
@@ -5364,7 +5427,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (type != null) {
 			final DataArray da = new DataArray(r);
 			xi.addData(da, type);
-		} else
+		}
+		else
 			logger.log(Level.INFO, "Ignoring non-standard 'CastorGrid_scripts' result: " + r);
 	}
 
@@ -5505,9 +5569,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htRootJobsInFarm == null)
 			if (create) {
 				// first appearance of this farm
-				htRootJobsInFarm = new Hashtable<String, RootJobInfo>();
+				htRootJobsInFarm = new Hashtable<>();
 				this.htSitesRootJobs.put(sFarmName, htRootJobsInFarm);
-			} else
+			}
+			else
 				return null;
 
 		final String key = jobID + "|" + subJobID;
@@ -5517,7 +5582,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this ROOT job. Create the RootJobInfo structure.
 				rji = new RootJobInfo(sFarmName, jobID, subJobID);
 				htRootJobsInFarm.put(key, rji);
-			} else
+			}
+			else
 				return null;
 
 		return rji;
@@ -5549,9 +5615,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htAPIServicesInFarm == null)
 			if (create) {
 				// first appearance of this farm
-				htAPIServicesInFarm = new Hashtable<String, APIServiceInfo>();
+				htAPIServicesInFarm = new Hashtable<>();
 				this.htSitesAPIServices.put(sFarmName, htAPIServicesInFarm);
-			} else
+			}
+			else
 				return null;
 
 		APIServiceInfo api = htAPIServicesInFarm.get(apiService);
@@ -5560,7 +5627,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this ROOT job. Create the RootJobInfo structure.
 				api = new APIServiceInfo(sFarmName, apiService);
 				htAPIServicesInFarm.put(apiService, api);
-			} else
+			}
+			else
 				return null;
 
 		return api;
@@ -5587,7 +5655,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				h.setMaxLimit(50);
 				h.add(r, idxNumJobs);
 				htSitesJobAgentsNumJobs.put(sFarm, h);
-			} else
+			}
+			else
 				synchronized (h) {
 					h.add(r, idxNumJobs);
 				}
@@ -5602,9 +5671,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htJobAgentsInFarm == null)
 			if (create) {
 				// first appearance of this farm
-				htJobAgentsInFarm = new Hashtable<String, JobAgentInfo>();
+				htJobAgentsInFarm = new Hashtable<>();
 				this.htSitesJobAgents.put(sFarmName, htJobAgentsInFarm);
-			} else
+			}
+			else
 				return null;
 
 		JobAgentInfo ja = htJobAgentsInFarm.get(jobAgent);
@@ -5613,7 +5683,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this JobAgent. Create the JobAgentInfo structure.
 				ja = new JobAgentInfo(sFarmName, jobAgent);
 				htJobAgentsInFarm.put(jobAgent, ja);
-			} else
+			}
+			else
 				return null;
 
 		return ja;
@@ -5639,9 +5710,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htCEsInFarm == null)
 			if (create) {
 				// first appearance of this farm
-				htCEsInFarm = new Hashtable<String, CEInfo>();
+				htCEsInFarm = new Hashtable<>();
 				this.htSitesCEs.put(sFarmName, htCEsInFarm);
-			} else
+			}
+			else
 				return null;
 
 		CEInfo ce = htCEsInFarm.get(ceName);
@@ -5650,7 +5722,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this JobAgent. Create the JobAgentInfo structure.
 				ce = new CEInfo(sFarmName, ceName);
 				htCEsInFarm.put(ceName, ce);
-			} else
+			}
+			else
 				return null;
 
 		return ce;
@@ -5675,9 +5748,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htDAQInFarm == null)
 			if (create) {
 				// first appearance of this farm
-				htDAQInFarm = new Hashtable<String, DAQInfo>();
+				htDAQInFarm = new Hashtable<>();
 				this.htSitesDAQ.put(sFarmName, htDAQInFarm);
-			} else
+			}
+			else
 				return null;
 
 		DAQInfo daq = htDAQInFarm.get(daqHost);
@@ -5686,7 +5760,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this DAQ. Create the DAQInfo structure.
 				daq = new DAQInfo(sFarmName, daqHost);
 				htDAQInFarm.put(daqHost, daq);
-			} else
+			}
+			else
 				return null;
 
 		return daq;
@@ -5707,9 +5782,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		Hashtable<String, FTSTransferInfo> htFTD = this.htFTSTransfers.get(ftdFullName);
 		if (htFTD == null)
 			if (create) {
-				htFTD = new Hashtable<String, FTSTransferInfo>();
+				htFTD = new Hashtable<>();
 				this.htFTSTransfers.put(ftdFullName, htFTD);
-			} else
+			}
+			else
 				return null;
 
 		FTSTransferInfo ftsTrInfo = htFTD.get(transferID);
@@ -5718,7 +5794,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				// first time we know about this FTS Transfer. Create the FTSTransferInfo structure.
 				ftsTrInfo = new FTSTransferInfo(ftdFullName, transferID);
 				htFTD.put(transferID, ftsTrInfo);
-			} else
+			}
+			else
 				return null;
 
 		return ftsTrInfo;
@@ -5756,7 +5833,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	/// QUOTA data ///////////////////////////////////////////////////////////////////////////
 
 	private void addQuotaData(final Result r) {
-		final QuotaInfo quotaInfo = findQuotaInfo(r.ClusterName, r.NodeName, true);
+		final QuotaInfo quotaInfo = findQuotaInfo(r.NodeName, true);
 
 		if (quotaInfo != null)
 			quotaInfo.setData(r);
@@ -5764,7 +5841,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			logger.log(Level.WARNING, "Cannot get the QuotaInfo for this result: " + r);
 	}
 
-	private QuotaInfo findQuotaInfo(final String cluster, final String node, final boolean create) {
+	private QuotaInfo findQuotaInfo(final String node, final boolean create) {
 		QuotaInfo quotaInfo = this.htQuotaInfos.get(node);
 
 		if (quotaInfo == null)
@@ -5806,9 +5883,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		Hashtable<String, RootCafUsageInfo> htInfosHash = this.htRootCafUsageInfos.get(cluster);
 		if (htInfosHash == null)
 			if (create) {
-				htInfosHash = new Hashtable<String, RootCafUsageInfo>();
+				htInfosHash = new Hashtable<>();
 				this.htRootCafUsageInfos.put(cluster, htInfosHash);
-			} else
+			}
+			else
 				return null;
 
 		RootCafUsageInfo info = htInfosHash.get(node);
@@ -5844,10 +5922,12 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (clusterName.startsWith("SE_READ_")) {
 			name = StringFactory.get(clusterName.substring("SE_READ_".length()));
 			operation = "read";
-		} else if (clusterName.startsWith("SE_WRITE_")) {
+		}
+		else if (clusterName.startsWith("SE_WRITE_")) {
 			name = StringFactory.get(clusterName.substring("SE_WRITE_".length()));
 			operation = "write";
-		} else {
+		}
+		else {
 			logger.warning("Cannot be! SE transfer result clusterName is not SE_READ_* or SE_WRITE_*: " + clusterName);
 			return;
 		}
@@ -5926,7 +6006,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			try {
 				da.setParam("jobid", Double.parseDouble(ji.jobID));
-			} catch (final Throwable t) {
+			}
+			catch (@SuppressWarnings("unused") final Throwable t) {
 				// ignore
 			}
 
@@ -5956,16 +6037,16 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		final DataArray allSum = new DataArray(this.knownJobParams);
 		final DataArray allMed = new DataArray(this.knownJobParams);
 		final DataArray allJobs = new DataArray(this.knownJobStates);
-		final Hashtable<String, DataArray> htUserSum = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htUserSum = new Hashtable<>();
 		int jobsCount = 0;
 
 		final int iTopJobsCount = AppConfig.geti("lia.Monitor.Filters.AliEnFilter.topJobs", 3);
 
-		final ArrayList<JobInfo> topJobsByVirtualMem = new ArrayList<JobInfo>(iTopJobsCount);
-		final ArrayList<JobInfo> topJobsByRSS = new ArrayList<JobInfo>(iTopJobsCount);
+		final ArrayList<JobInfo> topJobsByVirtualMem = new ArrayList<>(iTopJobsCount);
+		final ArrayList<JobInfo> topJobsByRSS = new ArrayList<>(iTopJobsCount);
 
-		final Map<String, ArrayList<JobInfo>> topJobsByVirtualMemPerUser = new HashMap<String, ArrayList<JobInfo>>();
-		final Map<String, ArrayList<JobInfo>> topJobsByRSSPerUser = new HashMap<String, ArrayList<JobInfo>>();
+		final Map<String, ArrayList<JobInfo>> topJobsByVirtualMemPerUser = new HashMap<>();
+		final Map<String, ArrayList<JobInfo>> topJobsByRSSPerUser = new HashMap<>();
 
 		// go and analyze jobs in all CEs
 		for (final Entry<String, Hashtable<String, JobInfo>> cme : this.htComputingElements.entrySet()) {
@@ -5979,8 +6060,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			final DataArray med = new DataArray(this.knownJobParams);
 			final DataArray jobs = new DataArray(this.knownJobStates);
 
-			final ArrayList<JobInfo> topCEJobsByVirtualMem = new ArrayList<JobInfo>(iTopJobsCount);
-			final ArrayList<JobInfo> topCEJobsByRSS = new ArrayList<JobInfo>(iTopJobsCount);
+			final ArrayList<JobInfo> topCEJobsByVirtualMem = new ArrayList<>(iTopJobsCount);
+			final ArrayList<JobInfo> topCEJobsByRSS = new ArrayList<>(iTopJobsCount);
 
 			// compute min, max, sum and med from all jobs in this CE
 			for (final Iterator<Map.Entry<String, JobInfo>> jit = htJobsInCE.entrySet().iterator(); jit.hasNext();) {
@@ -5991,7 +6072,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					if (logger.isLoggable(Level.FINEST))
 						logger.log(Level.FINEST, "Removing jobInfo " + ji.jobID + "@" + ceName);
 					jit.remove();
-				} else {
+				}
+				else {
 					if (ji.values.containsKey("virtualmem")) {
 						addToSortedArray(topCEJobsByVirtualMem, ji, jobComparatorVirtualMem, iTopJobsCount);
 
@@ -5999,7 +6081,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							ArrayList<JobInfo> topVM = topJobsByVirtualMemPerUser.get(ji.jobUser);
 
 							if (topVM == null) {
-								topVM = new ArrayList<JobInfo>();
+								topVM = new ArrayList<>();
 								topJobsByVirtualMemPerUser.put(ji.jobUser, topVM);
 							}
 
@@ -6014,7 +6096,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 							ArrayList<JobInfo> topRSS = topJobsByRSSPerUser.get(ji.jobUser);
 
 							if (topRSS == null) {
-								topRSS = new ArrayList<JobInfo>();
+								topRSS = new ArrayList<>();
 								topJobsByRSSPerUser.put(ji.jobUser, topRSS);
 							}
 
@@ -6147,11 +6229,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// statistics for all Organisations that report here
 		final DataArray daOrgSitesJobs = new DataArray(this.knownJobStatusSite);
 		final DataArray daOrgCSJobs = new DataArray(this.knownJobStatusCS);
-		final Hashtable<String, DataArray> htOrgJobsSummary = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htOrgJobsSummary = new Hashtable<>();
 		final DataArray daOrgUsersJobs = new DataArray(this.knownUserJobsParams);
-		final Hashtable<String, DataArray> htUsersJobsSummary = new Hashtable<String, DataArray>();
-		final Hashtable<String, DataArray> htOrgSitesStatusTimeDeltas = new Hashtable<String, DataArray>();
-		final Hashtable<String, DataArray> htUsersStatusTimeDeltas = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htUsersJobsSummary = new Hashtable<>();
+		final Hashtable<String, DataArray> htOrgSitesStatusTimeDeltas = new Hashtable<>();
+		final Hashtable<String, DataArray> htUsersStatusTimeDeltas = new Hashtable<>();
 
 		// go and analyze jobs in all ORGs
 		for (final Entry<String, Hashtable<String, JobStatusCS>> ome : this.htOrgCSJobStats.entrySet()) {
@@ -6358,7 +6440,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					if (logger.isLoggable(Level.FINEST))
 						logger.log(Level.FINEST, "Removing nodeInfo " + ni.host + "@" + ni.site);
 					nit.remove();
-				} else
+				}
+				else
 					// add the computed job-related results for this node
 					ni.addJobRez(rez);
 			}
@@ -6412,7 +6495,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			if (!xi.summarize(da)) {
 				sit.remove(); // node expired
 				addRezFromDA(rez, "Site_Traffic_Summary", siteName, null);
-			} else
+			}
+			else
 				addRezFromDA(rez, "Site_Traffic_Summary", siteName, da);
 		}
 	}
@@ -6429,7 +6513,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			if (!xi.summarize(da)) {
 				seit.remove(); // node expired
 				addRezFromDA(rez, "SE_Traffic_Summary", seName, null);
-			} else
+			}
+			else
 				addRezFromDA(rez, "SE_Traffic_Summary", seName, da);
 		}
 	}
@@ -6451,7 +6536,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			if (!ri.summarize(nodeDA, maxDA)) {
 				csit.remove(); // node expired; remove it
 				addRezFromDA(rez, "CastorGrid_scripts_Summary", hostName, null);
-			} else {
+			}
+			else {
 				maxDA.maxToDataArray(maxTotals); // set the maximum in totals
 				nodeDA.addToDataArray(sumTotals); // add the other values in totals
 				// now we can report for this node
@@ -6469,9 +6555,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	private void summarizeRootJobs(final List<Serializable> rez) {
 		final DataArray daHostTotals = new DataArray(this.knownRootJobsHostParams);
 		final DataArray daDestTotals = new DataArray(this.knownRootJobsDestParams);
-		final Hashtable<String, DataArray> hostStats = new Hashtable<String, DataArray>();
-		final Hashtable<String, DataArray> destStats = new Hashtable<String, DataArray>();
-		final Hashtable<String, DataArray> destToHostsStats = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> hostStats = new Hashtable<>();
+		final Hashtable<String, DataArray> destStats = new Hashtable<>();
+		final Hashtable<String, DataArray> destToHostsStats = new Hashtable<>();
 
 		for (final Iterator<Entry<String, Hashtable<String, RootJobInfo>>> sit = this.htSitesRootJobs.entrySet().iterator(); sit.hasNext();) {
 			final Entry<String, Hashtable<String, RootJobInfo>> sme = sit.next();
@@ -6618,7 +6704,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					r.addSet(h.getName() + "_jobs_end_R", volume / timeInterval);
 
 					h.clearValues();
-				} else {
+				}
+				else {
 					r.addSet(h.getName() + "_ja_end_R", 0);
 					r.addSet(h.getName() + "_jobs_end_R", 0);
 				}
@@ -6670,7 +6757,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/** Summarize the DAQ statistics on each site */
 	private void summarizeFTSTransfers(final List<Serializable> rez) {
-		final Hashtable<String, DataArray> channelsSummary = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> channelsSummary = new Hashtable<>();
 
 		// summarize the data about all channels
 		for (final Iterator<Entry<String, Hashtable<String, FTSTransferInfo>>> ftit = this.htFTSTransfers.entrySet().iterator(); ftit.hasNext();) {
@@ -6710,7 +6797,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/** Summarize FDT Test Transfers */
 	private void summarizeFDTTestTransfers(final List<Serializable> rez) {
-		final Hashtable<String, DataArray> htFDTLinksSummary = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htFDTLinksSummary = new Hashtable<>();
 		// summarize the info for all FDT Test Transfers
 		for (final Iterator<FDTTestTransferInfo> ftit = this.htFDTTestTransfers.values().iterator(); ftit.hasNext();) {
 			final FDTTestTransferInfo fdtTr = ftit.next();
@@ -6726,7 +6813,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/** Summarize QuotaInfos */
 	private void summarizeQuotaInfos(final List<Serializable> rez) {
-		final Hashtable<String, DataArray> htQuotaSummary = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htQuotaSummary = new Hashtable<>();
 		// summarize the info for all QuotaInfos
 		for (final Iterator<QuotaInfo> qit = this.htQuotaInfos.values().iterator(); qit.hasNext();) {
 			final QuotaInfo quotaInfo = qit.next();
@@ -6747,8 +6834,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/** Summarize RootCafUsageInfos */
 	private void summarizeRootCafUsageInfos(final List<Serializable> rez) {
-		final Hashtable<String, DataArray> htUserSummaries = new Hashtable<String, DataArray>();
-		final Hashtable<String, DataArray> htGroupSummaries = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htUserSummaries = new Hashtable<>();
+		final Hashtable<String, DataArray> htGroupSummaries = new Hashtable<>();
 		for (final Iterator<Entry<String, Hashtable<String, RootCafUsageInfo>>> cit = this.htRootCafUsageInfos.entrySet().iterator(); cit.hasNext();) {
 			final Entry<String, Hashtable<String, RootCafUsageInfo>> cme = cit.next();
 			final String cluster = cme.getKey();
@@ -6792,7 +6879,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	/** Summarize XrdServerInfos */
 	private void summarizeXrdServerInfos(final List<Serializable> rez) {
-		final Hashtable<String, DataArray> htSummaries = new Hashtable<String, DataArray>();
+		final Hashtable<String, DataArray> htSummaries = new Hashtable<>();
 		for (final Iterator<XrdServerInfo> sit = this.htXrdServers.values().iterator(); sit.hasNext();) {
 			final XrdServerInfo xrd = sit.next();
 			if (!xrd.summarize(htSummaries))
@@ -6824,7 +6911,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				seit.remove(); // node expired
 				addRezFromDA(rez, "SE_AliEnTraffic_Summary", seName, null);
 				addRezFromDA(rez, "Site_SE_AliEnTraffic_Summary", this.farmName + "-" + seName, null);
-			} else {
+			}
+			else {
 				addRezFromDA(rez, "SE_AliEnTraffic_Summary", seName, da);
 				addRezFromDA(rez, "Site_SE_AliEnTraffic_Summary", this.farmName + "-" + seName, da);
 			}
@@ -6885,95 +6973,113 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		reloadConfigParameters();
 
-		final Vector<Serializable> rez = new Vector<Serializable>();
+		final Vector<Serializable> rez = new Vector<>();
 		try {
 			summarizeJobs(rez); // this must be called before summarizeNodes !
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeJobs()", t);
 		}
 		try {
 			summarizeJobStatusCS(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeJobStatusCS()", t);
 		}
 		try {
 			summarizeTransferStatusCS(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeTransferStatusCS()", t);
 		}
 		try {
 			summarizeNodes(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeNodes()", t);
 		}
 		try {
 			summarizeSitesTraffic(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeSitesTraffic()", t);
 		}
 		try {
 			summarizeSEsTraffic(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeSEsTraffic()", t);
 		}
 		try {
 			summarizeCastorgridTraffic(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeCastorgridTraffic()", t);
 		}
 		try {
 			summarizeRootJobs(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeRootJobs()", t);
 		}
 		try {
 			summarizeAPIServices(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeAPIServices()", t);
 		}
 		try {
 			summarizeJobAgents(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeJobAgents()", t);
 		}
 		try {
 			summarizeCEs(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeCEs()", t);
 		}
 		try {
 			summarizeDAQ(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeDAQ()", t);
 		}
 		try {
 			summarizeFTSTransfers(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeFTSTransfers()", t);
 		}
 		try {
 			summarizeFDTTestTransfers(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeFDTTestTransfers()", t);
 		}
 		try {
 			summarizeQuotaInfos(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeQuotaInfos()", t);
 		}
 		try {
 			summarizeRootCafUsageInfos(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeRootCafUsageInfos()", t);
 		}
 		try {
 			summarizeXrdServerInfos(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeXrdServerInfos()", t);
 		}
 		try {
 			summarizeSEsAliEnTraffic(rez);
-		} catch (final Throwable t) {
+		}
+		catch (final Throwable t) {
 			logger.log(Level.WARNING, "Error doing summarizeSEsAliEnTraffic()", t);
 		}
 
@@ -6985,7 +7091,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			final StringBuilder sb = new StringBuilder();
 			for (final Serializable serializable : rez)
 				sb.append(serializable.toString() + "\n");
-			
+
 			logger.log(Level.FINEST, "Summarised results are: " + sb.toString());
 		}
 
@@ -7015,7 +7121,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			if (AppConfig.getb("lia.Monitor.Filters.AliEnFilter.resetDataArrayStats", true))
 				DataArray.resetStats();
-		} else
+		}
+		else
 			DataArray.setCollectStatistics(false);
 
 		return rez;
@@ -7079,12 +7186,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		@Override
 		protected String resolve(final Integer key) {
-			final DBFunctions db = getQueueDB();
+			try (DBFunctions db = getQueueDB()) {
+				if (db == null)
+					return null;
 
-			if (db == null)
-				return null;
-
-			try {
 				db.setReadOnly(true);
 
 				db.query("SELECT user FROM QUEUE_USER where userId=?;", false, key);
@@ -7095,8 +7200,6 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					return StringFactory.get(db.gets(1));
 				}
-			} finally {
-				db.close();
 			}
 
 			if (logger.isLoggable(Level.FINE))
@@ -7117,12 +7220,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		@Override
 		protected String resolve(final Integer key) {
-			final DBFunctions db = getQueueDB();
+			try (DBFunctions db = getQueueDB()) {
+				if (db == null)
+					return null;
 
-			if (db == null)
-				return null;
-
-			try {
 				db.setReadOnly(true);
 
 				db.query("SELECT host FROM QUEUE_HOST where hostId=?;", false, key);
@@ -7133,8 +7234,6 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					return StringFactory.get(db.gets(1));
 				}
-			} finally {
-				db.close();
 			}
 
 			if (logger.isLoggable(Level.FINE))
@@ -7175,28 +7274,60 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		try {
 			iJobID = Long.valueOf(jobId);
-		} catch (final NumberFormatException nfe) {
+		}
+		catch (@SuppressWarnings("unused") final NumberFormatException nfe) {
 			return null;
 		}
 
-		final DBFunctions db = getQueueDB();
+		try (DBFunctions db = getQueueDB()) {
+			if (db == null)
+				return null;
 
-		if (db == null)
-			return null;
-
-		try {
 			db.setReadOnly(true);
 
-			db.query("SELECT user FROM QUEUE INNER JOIN QUEUE_USER USING (userId) WHERE queueId=?;", false, iJobID);
+			db.query("SELECT userId FROM QUEUE WHERE queueId=?;", false, iJobID);
 
 			if (db.moveNext())
-				return db.gets(1);
-		} finally {
-			db.close();
+				return userCache.get(Integer.valueOf(db.geti(1)));
 		}
 
 		return null;
 	}
+
+	private static final GenericLastValuesCache<Integer, String> siteCache = new GenericLastValuesCache<Integer, String>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected int getMaximumSize() {
+			// active users are usually < 100, this size is enough to cache the collaboration
+			return 2000;
+		}
+
+		@Override
+		protected String resolve(final Integer key) {
+			try (DBFunctions db = getQueueDB()) {
+
+				if (db == null)
+					return null;
+
+				db.setReadOnly(true);
+
+				db.query("select site from SITEQUEUES where siteId=?;", false, key);
+
+				if (db.moveNext()) {
+					if (logger.isLoggable(Level.FINE))
+						logger.log(Level.FINE, "Resolved site ID " + key + " to " + db.gets(1));
+
+					return StringFactory.get(db.gets(1));
+				}
+
+				if (logger.isLoggable(Level.FINE))
+					logger.log(Level.FINE, "Could not resolve site id " + key);
+
+				return null;
+			}
+		}
+	};
 
 	/**
 	 * Get execution site for this job
@@ -7205,18 +7336,21 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	 * @return site name, if known
 	 */
 	String getSite(final String queueId) {
-		final DBFunctions db = getQueueDB();
+		try (DBFunctions db = getQueueDB()) {
+			if (db == null)
+				return null;
 
-		if (db == null)
-			return null;
+			db.setReadOnly(true);
 
-		db.setReadOnly(true);
+			db.setQueryTimeout(1000 * 30);
 
-		try {
-			db.query("SELECT site FROM QUEUE INNER JOIN SITEQUEUES USING(siteId) WHERE queueId=?;", false, queueId);
+			db.query("SELECT siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(queueId));
 
 			if (db.moveNext()) {
-				final String queueName = db.gets(1);
+				final String queueName = siteCache.get(Integer.valueOf(db.geti(1)));
+
+				if (queueName == null)
+					return null;
 
 				try {
 					final String site = queueName.substring(queueName.indexOf("::") + 2, queueName.lastIndexOf("::"));
@@ -7237,15 +7371,15 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 						}
 
 						return bestClosest;
-					} finally {
+					}
+					finally {
 						AliEnFilter.this.sitesCEhostsLock.readLock().unlock();
 					}
-				} catch (final Exception e) {
+				}
+				catch (@SuppressWarnings("unused") final Exception e) {
 					// ignore
 				}
 			}
-		} finally {
-			db.close();
 		}
 
 		return null;
