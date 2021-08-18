@@ -118,11 +118,10 @@ public class MCluster implements java.io.Serializable, Comparable<MCluster>, Sor
     		return null;
     	
         synchronized (nodeList) {
-        	for (final MNode mnode: nodeList){
-        		if (node.equals(mnode.name)){
-        			return mnode;
-        		}
-        	}
+        	final int idx = nodeList.indexOf(new MNode(node, null, null));
+        	
+        	if (idx>=0)
+        		return nodeList.elementAt(idx);
         }
         
         return null;
