@@ -5150,12 +5150,18 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		Hashtable<String, NodeInfo> htNodesInSite = this.htSites.get(site);
 		if (htNodesInSite == null) {
+			if (!create)
+				return null;
+			
 			htNodesInSite = new Hashtable<>();
 			this.htSites.put(site, htNodesInSite);
 		}
 
 		NodeInfo ni = htNodesInSite.get(host);
 		if (ni == null) {
+			if (!create)
+				return null;
+			
 			ni = new NodeInfo(site, host);
 			htNodesInSite.put(host, ni);
 		}
@@ -6453,9 +6459,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			final Hashtable<String, NodeInfo> htNodesInSite = sme.getValue();
 
 			final DataArray min = new DataArray();
-			final DataArray max = new DataArray(this.knownNodeParams);
-			final DataArray sum = new DataArray(this.knownNodeParams);
-			final DataArray med = new DataArray(this.knownNodeParams);
+			final DataArray max = new DataArray();
+			final DataArray sum = new DataArray();
+			final DataArray med = new DataArray();
 
 			for (final Iterator<Entry<String, NodeInfo>> nit = htNodesInSite.entrySet().iterator(); nit.hasNext();) {
 				final Entry<String, NodeInfo> nme = nit.next();
