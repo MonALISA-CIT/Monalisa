@@ -135,14 +135,19 @@ public class monTempSensor extends SchJob implements MonitoringModule {
 					pw.println("v");
 					pw.flush();
 
-					final String line = br.readLine();
+					// give it time to answer
+					Thread.sleep(100);
 
-					if ("{OfficeTemperatureSensor}".equals(line))
-						return true;
+					if (br.ready()) {
+						final String line = br.readLine();
+
+						if ("{OfficeTemperatureSensor}".equals(line))
+							return true;
+					}
 
 					close();
 				}
-				catch (@SuppressWarnings("unused") final IOException ioe) {
+				catch (@SuppressWarnings("unused") final IOException | InterruptedException ioe) {
 					// ignore
 				}
 			}
@@ -175,6 +180,11 @@ public class monTempSensor extends SchJob implements MonitoringModule {
 
 			String line = br.readLine();
 
+			if (line == null) {
+				close();
+				return false;
+			}
+
 			if (line.startsWith("{") && line.endsWith("}") && line.indexOf(' ') > 1) {
 				line = line.substring(1, line.length() - 1);
 
@@ -182,9 +192,9 @@ public class monTempSensor extends SchJob implements MonitoringModule {
 
 				vdData[0] = Double.parseDouble(line.substring(0, idx));
 				vdData[1] = Double.parseDouble(line.substring(idx + 1));
-			}
 
-			return true;
+				return true;
+			}
 		}
 		catch (@SuppressWarnings("unused") final IOException ioe) {
 			close();
@@ -213,6 +223,8 @@ public class monTempSensor extends SchJob implements MonitoringModule {
 			}
 			catch (final Exception e) {
 				e.printStackTrace();
+
+				return;
 			}
 		}
 	}
