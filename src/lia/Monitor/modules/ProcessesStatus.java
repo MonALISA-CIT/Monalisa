@@ -14,7 +14,6 @@ import lia.Monitor.monitor.MNode;
 import lia.Monitor.monitor.MonModuleInfo;
 import lia.Monitor.monitor.Result;
 import lia.util.Utils;
-import lia.util.ntp.NTPDate;
 import lia.util.proc.OSProccessStatWrapper;
 import lia.util.proc.ProcFSUtil;
 import lia.util.process.ExternalProcesses;
@@ -25,153 +24,157 @@ import lia.util.process.ExternalProcesses;
  */
 public class ProcessesStatus extends AbstractSchJobMonitoring {
 
-    /**
-     * Message logger
-     */
-//    private static final Logger logger = Logger.getLogger(ProcessesStatus.class.getName());
+	private final MonModuleInfo info = new MonModuleInfo();
 
-    /**
-     * stop complaining :)
-     */
-    private static final long serialVersionUID = 1L;
+	/**
+	 * Message logger
+	 */
+	// private static final Logger logger = Logger.getLogger(ProcessesStatus.class.getName());
 
-    @Override
-    public boolean isRepetitive() {
-        return true;
-    }
+	/**
+	 * stop complaining :)
+	 */
+	private static final long serialVersionUID = 1L;
 
-    @Override
-    public String getTaskName() {
-        return "ProcessesStatus";
-    }
+	@Override
+	public boolean isRepetitive() {
+		return true;
+	}
 
-    @SuppressWarnings("null")
-    @Override
-    public Object doProcess() throws Exception {
-        final Result r = new Result(node.getFarmName(), node.getClusterName(), node.getName(), getTaskName());
+	@Override
+	public String getTaskName() {
+		return "ProcessesStatus";
+	}
 
-        r.time = NTPDate.currentTimeMillis();
+	@SuppressWarnings("null")
+	@Override
+	public Object doProcess() throws Exception {
+		final Result r = getResult();
 
-        final Map<String, AtomicInteger> counters = new HashMap<String, AtomicInteger>();
+		final Map<String, AtomicInteger> counters = new HashMap<>();
 
-        counters.put("R", new AtomicInteger(0));
-        counters.put("D", new AtomicInteger(0));
-        counters.put("S", new AtomicInteger(0));
-        counters.put("Z", new AtomicInteger(0));
-        
-        if (isLinuxOS()) {
-            final OSProccessStatWrapper[] processes = ProcFSUtil.getCurrentProcs();
+		counters.put("R", new AtomicInteger(0));
+		counters.put("D", new AtomicInteger(0));
+		counters.put("S", new AtomicInteger(0));
+		counters.put("Z", new AtomicInteger(0));
 
-            char oldState = 0;
+		if (isLinuxOS()) {
+			final OSProccessStatWrapper[] processes = ProcFSUtil.getCurrentProcs();
 
-            AtomicInteger aiOld = null;
+			char oldState = 0;
 
-            if (processes != null) {
-                for (final OSProccessStatWrapper p : processes) {
-                    final char state = p.state;
+			AtomicInteger aiOld = null;
 
-                    if (state == oldState) {
-                        aiOld.incrementAndGet();
-                        continue;
-                    }
+			if (processes != null) {
+				for (final OSProccessStatWrapper p : processes) {
+					final char state = p.state;
 
-                    final String sState = String.valueOf(state);
+					if (state == oldState) {
+						aiOld.incrementAndGet();
+						continue;
+					}
 
-                    AtomicInteger ai = counters.get(sState);
+					final String sState = String.valueOf(state);
 
-                    if (ai != null) {
-                        ai.incrementAndGet();
-                    } else {
-                        ai = new AtomicInteger(1);
-                        counters.put(sState, ai);
-                    }
+					AtomicInteger ai = counters.get(sState);
 
-                    oldState = state;
-                    aiOld = ai;
-                }
-            }
-        } else {
-            // mac or solaris, need the output from ps
+					if (ai != null) {
+						ai.incrementAndGet();
+					}
+					else {
+						ai = new AtomicInteger(1);
+						counters.put(sState, ai);
+					}
 
-            final List<String> command = new ArrayList<String>(4);
+					oldState = state;
+					aiOld = ai;
+				}
+			}
+		}
+		else {
+			// mac or solaris, need the output from ps
 
-            command.add("ps");
-            command.add("-A");
-            command.add("-o");
+			final List<String> command = new ArrayList<>(4);
 
-            if (isSolarisOS()) {
-                command.add("s");
-            } else {
-                command.add("state");
-            }
+			command.add("ps");
+			command.add("-A");
+			command.add("-o");
 
-            try {
-                final String output = ExternalProcesses.getCmdOutput(command, true, 30L, TimeUnit.SECONDS);
+			if (isSolarisOS()) {
+				command.add("s");
+			}
+			else {
+				command.add("state");
+			}
 
-                final BufferedReader br = new BufferedReader(new StringReader(output));
+			try {
+				final String output = ExternalProcesses.getCmdOutput(command, true, 30L, TimeUnit.SECONDS);
 
-                String sLine;
+				try (BufferedReader br = new BufferedReader(new StringReader(output))) {
+					String sLine;
 
-                String sOldState = null;
+					String sOldState = null;
 
-                AtomicInteger aiOld = null;
+					AtomicInteger aiOld = null;
 
-                while ((sLine = br.readLine()) != null) {
-                    if (sLine.equals(sOldState)) {
-                        aiOld.incrementAndGet();
-                        continue;
-                    }
+					while ((sLine = br.readLine()) != null) {
+						if (sLine.equals(sOldState)) {
+							aiOld.incrementAndGet();
+							continue;
+						}
 
-                    AtomicInteger ai = counters.get(sLine);
+						AtomicInteger ai = counters.get(sLine);
 
-                    if (ai != null) {
-                        ai.incrementAndGet();
-                    } else {
-                        ai = new AtomicInteger(1);
-                        counters.put(sLine, ai);
-                    }
+						if (ai != null) {
+							ai.incrementAndGet();
+						}
+						else {
+							ai = new AtomicInteger(1);
+							counters.put(sLine, ai);
+						}
 
-                    sOldState = sLine;
-                    aiOld = ai;
-                }
+						sOldState = sLine;
+						aiOld = ai;
+					}
+				}
+			}
+			catch (final Throwable t) {
+				// ignore
+			}
+		}
 
-                br.close();
-            } catch (Throwable t) {
-                // ignore
-            }
-        }
+		int total = 0;
 
-        int total = 0;
+		for (final Map.Entry<String, AtomicInteger> me : counters.entrySet()) {
+			r.addSet("processes_" + me.getKey(), me.getValue().doubleValue());
 
-        for (final Map.Entry<String, AtomicInteger> me : counters.entrySet()) {
-            r.addSet("processes_" + me.getKey(), me.getValue().doubleValue());
+			total += me.getValue().get();
+		}
 
-            total += me.getValue().get();
-        }
+		r.addSet("processes", total);
 
-        r.addSet("processes", total);
+		final Vector<Object> v = new Vector<>(1);
 
-        final Vector<Object> v = new Vector<Object>(1);
+		v.add(r);
 
-        v.add(r);
+		return v;
+	}
 
-        return v;
-    }
+	@Override
+	protected MonModuleInfo initArgs(final String args) {
+		info.name = getTaskName();
+		return info;
+	}
 
-    @Override
-    protected MonModuleInfo initArgs(final String args) {
-        return null;
-    }
+	/**
+	 * @param args
+	 * @throws Exception
+	 */
+	public static void main(final String[] args) throws Exception {
+		final ProcessesStatus df = new ProcessesStatus();
+		df.init(new MNode("localhost", null, null), "");
 
-    /**
-     * @param args
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        final ProcessesStatus df = new ProcessesStatus();
-        df.init(new MNode("localhost", null, null), "");
-
-        Utils.dumpResults(df.doProcess());
-    }
+		Utils.dumpResults(df.doProcess());
+	}
 
 }
