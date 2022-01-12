@@ -145,11 +145,8 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 				}
 
 				if (sConfDir != null)
-					try {
-						final PrintWriter pw = new PrintWriter(new FileWriter(sConfDir + "REPOSITORY.total_requests"));
+					try (PrintWriter pw = new PrintWriter(new FileWriter(sConfDir + "REPOSITORY.total_requests"))){
 						pw.println("" + lTotalRequests);
-						pw.flush();
-						pw.close();
 					}
 					catch (final Exception e) {
 						System.err.println("WEB: cannot update the repository totals : " + e + " (" + e.getMessage() + ")");
@@ -1041,7 +1038,7 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 
 			if (sName.equals("JSESSIONID") || sName.startsWith("__utm") || sName.equals("vdnsessid") || sName.equals("vdnsessid") || sName.equals("LAZYJ_ID") || sName.equals("void")
 					|| sName.equals("AI_SESSION") || sName.equals("cod") || sName.equals("codMLMenu") || sName.equals("csd") || sName.equals("csdMLMenu") || sName.startsWith("lastval_div_")
-					|| sName.equals("_ga"))
+					|| sName.equals("_ga") || sName.equals("rl_anonymous_id") || sName.equals("_gid") || sName.equals("experimentation_subject_id") || sName.equals("rl_user_id"))
 				continue;
 
 			if (prop != null) {
