@@ -1348,7 +1348,7 @@
             <include name="lia/Monitor/Store/Fast/Replication/*.class" />
             <include name="lia/Monitor/tcpClient/*.class" />
             <include name="lia/Monitor/JiniClient/CommonGUI/IpAddrCache*.class" />
-            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/Monitor/DataCache/DataSelect*.class" />
             <include name="lia/Monitor/JiniSerFarmMon/NoImplProxy.class" />
             <include name="lia/Monitor/JiniSerFarmMon/ML*.class" />
             <include name="lia/Monitor/JiniSerFarmMon/GMLEPublisher.class" />
@@ -1762,7 +1762,7 @@
             <include name="lia/util/os/*.class" />
             <include name="lia/Monitor/Store/Fast/*.class" />
             <include name="lia/Monitor/Store/Fast/Replication/*.class" />
-            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/Monitor/DataCache/DataSelect*.class" />
             <include name="lia/web/bean/Generic/*.class" />
             <include name="lia/web/servlets/web/*.class" />
             <include name="lia/web/servlets/map2d/*.class" />
@@ -1775,7 +1775,7 @@
             <include name="lia/Monitor/Store/*.class" />
             <include name="lia/Monitor/Store/Fast/*.class" />
             <include name="lia/Monitor/Store/Fast/Replication/*.class" />
-            <include name="lia/Monitor/DataCache/DataSelect.class" />
+            <include name="lia/Monitor/DataCache/DataSelect*.class" />
             <include name="lia/ws/*.class" />
         </jar>
     </target>
