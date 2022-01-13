@@ -103,7 +103,7 @@ public class Cache implements DataReceiver, DataStore, Runnable, ShutdownReceive
 
     private final FarmMonitor main;
 
-    private static TransparentStoreInt store;
+    static TransparentStoreInt store;
 
     private static StoreFlusher storeFlusher = null;
 
