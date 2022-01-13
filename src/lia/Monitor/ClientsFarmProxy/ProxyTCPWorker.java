@@ -404,6 +404,9 @@ public class ProxyTCPWorker implements tcpConnNotifier {
     }
 
     public void sendMsg(Object msg) {
+		if (msg == null)
+			return;
+    	
         try {
             sendMsg(new ProxyPriorityMsg(msg, ProxyPriorityMsg.DEFAULT_PRIORITY));
         } catch (Throwable t) {
