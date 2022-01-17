@@ -4859,7 +4859,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		JobStatusCS jscs = htJobStats.get(jobID);
 		if ((jscs == null) && create) {
 			try (DBFunctions db = getQueueDB()) {
-				if (db == null || !db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
+				if (db == null || !db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID)) || !db.moveNext()) {
 					logger.log(Level.WARNING, "Direct DB query failed, falling back to the legacy method of waiting for the fields to be updated");
 					jscs = new JobStatusCS(jobID, orgName);
 				}
