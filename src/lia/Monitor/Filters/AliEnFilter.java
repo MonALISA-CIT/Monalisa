@@ -1788,7 +1788,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				final Hashtable<String, DataArray> htOrgSitesStatusTimeDeltas, final Hashtable<String, DataArray> htUsersStatusTimeDeltas) {
 
 			if (logger.isLoggable(Level.FINEST))
-				logger.log(Level.FINEST, "Summarizing jobStatusCS " + this.jobID + "@" + this.orgName + " submitSite=" + this.submitSite + " execSite=" + this.execSite);
+				logger.log(Level.FINEST, "Summarizing jobStatusCS " + this.jobID + "@" + this.orgName + " submitSite=" + this.submitSite + " execSite=" + this.execSite + " status=" + this.status);
 
 			DataArray jobsInSite = null;
 			DataArray timeDeltasInSite = null; // can be null if job is still in central services
