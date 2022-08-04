@@ -178,6 +178,13 @@ public class monTempSensor extends SchJob implements MonitoringModule {
 			pw.println("p");
 			pw.flush();
 
+			try {
+				Thread.sleep(100);
+			}
+			catch (@SuppressWarnings("unused") InterruptedException e) {
+				// ignore
+			}
+
 			String line = br.readLine();
 
 			if (line == null) {
