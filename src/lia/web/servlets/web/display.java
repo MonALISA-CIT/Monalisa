@@ -26,6 +26,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -170,12 +171,12 @@ public class display extends CacheServlet {
 	/**
 	 * Repository version
 	 */
-	public static final String sRepositoryVersion = "1.4.4";
+	public static final String sRepositoryVersion = "1.4.5";
 
 	/**
 	 * Date of last significant change
 	 */
-	public static final String sRepositoryDate = "2020.10.27";
+	public static final String sRepositoryDate = "2022.06.17";
 
 	/**
 	 * Wrapper HTML for the actual content (header, menu ...)
@@ -2659,7 +2660,7 @@ public class display extends CacheServlet {
 
 		final Iterator<String> it = _vTotalSeries.iterator();
 
-		final TreeMap<String, List<String>> separateGroups = new TreeMap<>();
+		final Map<String, List<String>> separateGroups = new LinkedHashMap<>();
 
 		for (int i = 0; i < pgeti(prop, "separate.groups", 0); i++) {
 			final String groupname = i + ":" + pgets(prop, "separate.group." + i + ".name");
