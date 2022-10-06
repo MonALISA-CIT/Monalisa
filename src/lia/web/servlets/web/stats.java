@@ -1219,7 +1219,7 @@ public final class stats extends CacheServlet {
 				while (itUnsolved.hasNext()) {
 					final int l = (itUnsolved.next()).intValue();
 
-					final FunctionDecode fd = func.get(l);
+					final FunctionDecode fd = (FunctionDecode) func.get(l).clone();
 
 					// wait until the column(s) this one depends upon are evaluated
 					if ((fd.sDependsOn.size() > 0) && !solved.containsAll(fd.sDependsOn)) {
@@ -1631,7 +1631,7 @@ public final class stats extends CacheServlet {
 		return l == 0 ? "" : sRez;
 	}
 
-	private static class FunctionDecode implements Serializable {
+	private static class FunctionDecode implements Serializable, Cloneable {
 		private static final long serialVersionUID = -1912618670392162787L;
 
 		/**
@@ -2227,6 +2227,18 @@ public final class stats extends CacheServlet {
 			sPlus = sPlus.replace('_', ' ');
 		}
 
+		@Override
+		public Object clone() {
+			try {
+				return super.clone();
+			}
+			catch (CloneNotSupportedException e) {
+				System.err.println(e.getMessage());
+				e.printStackTrace();
+			}
+
+			return this;
+		}
 	}
 
 	private static final String[] passParameters = new String[] { "compact.min_interval", "history.integrate.timebase", "default.measurement_interval", "totalperminute", "datainbits", "areachart",
