@@ -5134,6 +5134,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	 * @return node info
 	 */
 	NodeInfo findNodeInfo(final String siteParam, final String host, final boolean create) {
+		if (host == null)
+			return null;
+
 		String site = siteParam;
 
 		if (site == null) {
@@ -5156,7 +5159,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (htNodesInSite == null) {
 			if (!create)
 				return null;
-			
+
 			htNodesInSite = new Hashtable<>();
 			this.htSites.put(site, htNodesInSite);
 		}
@@ -5165,7 +5168,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		if (ni == null) {
 			if (!create)
 				return null;
-			
+
 			ni = new NodeInfo(site, host);
 			htNodesInSite.put(host, ni);
 		}
