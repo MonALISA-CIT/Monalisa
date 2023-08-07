@@ -139,6 +139,7 @@ import lia.Monitor.Store.TransparentStoreFactory;
 import lia.Monitor.Store.TransparentStoreFast;
 import lia.Monitor.Store.Fast.DB;
 import lia.Monitor.Store.Fast.IDGenerator;
+import lia.Monitor.monitor.AppConfig;
 import lia.Monitor.monitor.ExtendedResult;
 import lia.Monitor.monitor.Result;
 import lia.Monitor.monitor.TimestampedResult;
@@ -171,12 +172,12 @@ public class display extends CacheServlet {
 	/**
 	 * Repository version
 	 */
-	public static final String sRepositoryVersion = "1.4.5";
+	public static final String sRepositoryVersion = "1.4.6";
 
 	/**
 	 * Date of last significant change
 	 */
-	public static final String sRepositoryDate = "2022.06.17";
+	public static final String sRepositoryDate = "2023.08.07";
 
 	/**
 	 * Wrapper HTML for the actual content (header, menu ...)
@@ -289,11 +290,9 @@ public class display extends CacheServlet {
 					if ((diff * 1000L) < pgetl(prop, "compact.min_interval", 60000))
 						diff = pgetl(prop, "compact.min_interval", 60000) / 1000L;
 
-					if (diff < 30)
-						diff = 30; // min 30 sec
-					if (diff > 1800)
-						diff = 1800; // max 30 min
-
+					diff = Math.max(diff, AppConfig.geti("display.minCacheTime", 30));
+					diff = Math.min(diff, AppConfig.geti("display.maxCacheTime", 300));
+					
 					if (logTiming())
 						logTiming("display.getCacheTimeout() : Returning " + diff + " (" + lOldDiff + ") because " + lHistIntervalMax + "-" + lHistIntervalMin + ", "
 								+ pgeti(prop, "compact.displaypoints", 90));
