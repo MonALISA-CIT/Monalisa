@@ -285,7 +285,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			{ JobUtil.JS_SAVED, JobUtil.JS_DONE }, };
 
 	/** Helper class to identify AliEn job's status */
-	private static final class JobUtil {
+	public static final class JobUtil {
 		// All AliEn job's possible states
 		/**
 		 * inserting
@@ -4135,7 +4135,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 					final long lStart = System.currentTimeMillis();
 
-					if (!db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE statusId in (10,5,21,6,1,7,11,17,18,19,12);")) {
+					if (!db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE statusId in (10,5,21,6,1,7,11,17,18,19,12,-15);")) {
 						logger.log(Level.WARNING, "Direct DB query failed, falling back to querying AliEn");
 						ok = false;
 					}
