@@ -84,6 +84,7 @@ public final class ReplicationManager {
 
 		try {
 			this.backends = new ArrayList<DatabaseBackend>();
+			this.roBackends = new ArrayList<DatabaseBackend>();
 
 			for (int i = 0; i < 128; i++) {
 				final String sPrefix = "lia.Monitor." + (i == 0 ? "" : i + ".");
