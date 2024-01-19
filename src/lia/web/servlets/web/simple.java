@@ -111,7 +111,8 @@ public class simple extends CacheServlet {
 
 					if (dTemp > dMax)
 						dMax = dTemp;
-				} catch (@SuppressWarnings("unused") Exception e2) {
+				}
+				catch (@SuppressWarnings("unused") Exception e2) {
 					// ignore any conversion exception
 				}
 		}
@@ -168,7 +169,8 @@ public class simple extends CacheServlet {
 		try {
 			ChartUtilities.writeChartAsPNG(osOut, chart, width, height);
 			osOut.flush();
-		} catch (@SuppressWarnings("unused") IOException e1) {
+		}
+		catch (@SuppressWarnings("unused") IOException e1) {
 			// ignore IO exceptions
 		}
 
@@ -485,11 +487,13 @@ public class simple extends CacheServlet {
 
 		plot.addLayer(annotation1);
 
-		DialValueIndicator dvi = new DialValueIndicator(0);
-		dvi.setFont(FONT3);
-		dvi.setTemplateValue(Double.valueOf(mainValue));
-		dvi.setNumberFormat(new DecimalFormat(pgets(prop, "numberformat", "0")));
-		plot.addLayer(dvi);
+		if (pgetb(prop, "valueindicator", true)) {
+			DialValueIndicator dvi = new DialValueIndicator(0);
+			dvi.setFont(FONT3);
+			dvi.setTemplateValue(Double.valueOf(mainValue));
+			dvi.setNumberFormat(new DecimalFormat(pgets(prop, "numberformat", "0")));
+			plot.addLayer(dvi);
+		}
 
 		boolean bReversed = pgetb(prop, "reversed", false);
 

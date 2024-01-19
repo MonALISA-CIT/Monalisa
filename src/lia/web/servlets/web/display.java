@@ -177,7 +177,7 @@ public class display extends CacheServlet {
 	/**
 	 * Date of last significant change
 	 */
-	public static final String sRepositoryDate = "2023.08.07";
+	public static final String sRepositoryDate = "2024.01.19";
 
 	/**
 	 * Wrapper HTML for the actual content (header, menu ...)
