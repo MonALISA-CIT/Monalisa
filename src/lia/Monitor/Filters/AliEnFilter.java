@@ -4132,6 +4132,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (db != null) {
 					db.setReadOnly(true);
+					db.setQueryTimeout(60);
 
 					final long lStart = System.currentTimeMillis();
 
@@ -4859,17 +4860,21 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		JobStatusCS jscs = htJobStats.get(jobID);
 		if ((jscs == null) && create) {
 			try (DBFunctions db = getQueueDB()) {
-				if (db == null || !db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
-					logger.log(Level.WARNING, "Direct DB query failed for "+jobID+", falling back to the legacy method of waiting for the fields to be updated");
+				if (db!=null) {
+					db.setQueryTimeout(15);
+					
+					if (db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
+						if (db.moveNext())
+							jscs = jsStatusfromDB(db, orgName);
+						else
+							logger.log(Level.WARNING, jobID+" doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
+					}
+					else
+						logger.log(Level.WARNING, "Direct DB query failed for "+jobID+", falling back to the legacy method of waiting for the fields to be updated");
+				}
+				
+				if (jscs==null)
 					jscs = new JobStatusCS(jobID, orgName);
-				}
-				else if (!db.moveNext()) {
-					logger.log(Level.WARNING, jobID+" doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
-					jscs = new JobStatusCS(jobID, orgName);					
-				}
-				else {
-					jscs = jsStatusfromDB(db, orgName);
-				}
 			}
 
 			htJobStats.put(jobID, jscs);
@@ -7230,6 +7235,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				db.setReadOnly(true);
 
+				db.setQueryTimeout(15);
+				
 				db.query("SELECT user FROM QUEUE_USER where userId=?;", false, key);
 
 				if (db.moveNext()) {
@@ -7263,6 +7270,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 					return null;
 
 				db.setReadOnly(true);
+				
+				db.setQueryTimeout(15);
 
 				db.query("SELECT host FROM QUEUE_HOST where hostId=?;", false, key);
 
@@ -7323,6 +7332,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			db.setReadOnly(true);
 
+			db.setQueryTimeout(15);
+			
 			db.query("SELECT userId FROM QUEUE WHERE queueId=?;", false, iJobID);
 
 			if (db.moveNext())
@@ -7350,6 +7361,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				db.setReadOnly(true);
 
+				db.setQueryTimeout(15);
+				
 				db.query("select site from SITEQUEUES where siteId=?;", false, key);
 
 				if (db.moveNext()) {
@@ -7380,7 +7393,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 			db.setReadOnly(true);
 
-			db.setQueryTimeout(1000 * 30);
+			db.setQueryTimeout(15);
 
 			db.query("SELECT siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(queueId));
 
