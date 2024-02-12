@@ -4167,7 +4167,8 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 				ok = false;
 			}
 
-			if (ok)
+			// disable querying old command line alien, it doesn't work any more
+			if (true)
 				return true;
 
 			String cmd = ALIEN + " proxy-init";
@@ -4285,6 +4286,10 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @return true if it was successful.
 		 */
 		private boolean getAliEnTransfers() {
+			// disable old alien prompt
+			if (true)
+				return true;
+			
 			logger.log(Level.INFO, "Trying to load status for current AliEn transfers...");
 			final String cmd = ALIEN + " -x " + TRANSFER_SYNC_SCRIPT;
 			final BufferedReader buff = procOutput(cmd, JOB_SYNC_SCRIPT_TIMEOUT);
