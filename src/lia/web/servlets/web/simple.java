@@ -10,15 +10,12 @@ import java.awt.GradientPaint;
 import java.awt.Point;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.text.FieldPosition;
 import java.text.NumberFormat;
+import java.text.ParsePosition;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
-
-import lazyj.RequestWrapper;
-import lia.Monitor.monitor.AppConfig;
-import lia.web.utils.CacheServlet;
-import lia.web.utils.ColorFactory;
 
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -37,6 +34,11 @@ import org.jfree.data.general.DefaultValueDataset;
 import org.jfree.ui.GradientPaintTransformType;
 import org.jfree.ui.RectangleInsets;
 import org.jfree.ui.StandardGradientPaintTransformer;
+
+import lazyj.RequestWrapper;
+import lia.Monitor.monitor.AppConfig;
+import lia.web.utils.CacheServlet;
+import lia.web.utils.ColorFactory;
 
 /**
  * @author costing
@@ -487,11 +489,18 @@ public class simple extends CacheServlet {
 
 		plot.addLayer(annotation1);
 
+		NumberFormat format;
+
+		if (pgetb(prop, "numberformat.k", false))
+			format = new KCompactFormat();
+		else
+			format = new DecimalFormat(pgets(prop, "numberformat", "0"));
+
 		if (pgetb(prop, "valueindicator", true)) {
 			DialValueIndicator dvi = new DialValueIndicator(0);
 			dvi.setFont(FONT3);
 			dvi.setTemplateValue(Double.valueOf(mainValue));
-			dvi.setNumberFormat(new DecimalFormat(pgets(prop, "numberformat", "0")));
+			dvi.setNumberFormat(format);
 			plot.addLayer(dvi);
 		}
 
@@ -501,7 +510,7 @@ public class simple extends CacheServlet {
 		scale.setTickRadius(0.88);
 		scale.setTickLabelOffset(0.22);
 		scale.setTickLabelFont(bSmall ? FONT2_SMALL : FONT2);
-		scale.setTickLabelFormatter(new DecimalFormat(pgets(prop, "numberformat", "0")));
+		scale.setTickLabelFormatter(format);
 		plot.addScale(0, scale);
 
 		for (int i = 1; i < values.size(); i++) {
@@ -520,20 +529,22 @@ public class simple extends CacheServlet {
 		double dInnerRadius = 0.45;
 		double dOuterRadius = dInnerRadius + 0.01;
 
-		StandardDialRange range = new StandardDialRange(dYellow, dAbsMax, bReversed ? Color.green : Color.red);
-		range.setInnerRadius(dInnerRadius);
-		range.setOuterRadius(dOuterRadius);
-		plot.addLayer(range);
+		if (pgetb(prop, "dialrange", true)) {
+			StandardDialRange range = new StandardDialRange(dYellow, dAbsMax, bReversed ? Color.green : Color.red);
+			range.setInnerRadius(dInnerRadius);
+			range.setOuterRadius(dOuterRadius);
+			plot.addLayer(range);
 
-		StandardDialRange range2 = new StandardDialRange(dGreen, dYellow, Color.orange);
-		range2.setInnerRadius(dInnerRadius);
-		range2.setOuterRadius(dOuterRadius);
-		plot.addLayer(range2);
+			StandardDialRange range2 = new StandardDialRange(dGreen, dYellow, Color.orange);
+			range2.setInnerRadius(dInnerRadius);
+			range2.setOuterRadius(dOuterRadius);
+			plot.addLayer(range2);
 
-		StandardDialRange range3 = new StandardDialRange(dAbsMin, dGreen, bReversed ? Color.red : Color.green);
-		range3.setInnerRadius(dInnerRadius);
-		range3.setOuterRadius(dOuterRadius);
-		plot.addLayer(range3);
+			StandardDialRange range3 = new StandardDialRange(dAbsMin, dGreen, bReversed ? Color.red : Color.green);
+			range3.setInnerRadius(dInnerRadius);
+			range3.setOuterRadius(dOuterRadius);
+			plot.addLayer(range3);
+		}
 
 		for (int i = 0; i < values.size(); i++) {
 			DialPointer needle;
@@ -615,6 +626,32 @@ public class simple extends CacheServlet {
 						thermometerplot.setUnits(ThermometerPlot.UNITS_NONE);
 
 		return thermometerplot;
+	}
+
+	static class KCompactFormat extends java.text.NumberFormat {
+		private static final long serialVersionUID = 4048145208611764080L;
+
+		@Override
+		public StringBuffer format(final double number, final StringBuffer buffer, final FieldPosition pos) {
+			String sVal = String.valueOf((int) Math.floor(number / 1000)) + " K";
+
+			final StringBuffer toAppendTo = buffer == null ? new StringBuffer() : buffer;
+
+			toAppendTo.append(sVal);
+
+			return toAppendTo;
+		}
+
+		@Override
+		public StringBuffer format(long number, StringBuffer toAppendTo, FieldPosition pos) {
+			return format((double) number, toAppendTo, pos);
+		}
+
+		@Override
+		public Number parse(String source, ParsePosition parsePosition) {
+			return null;
+		}
+
 	}
 
 }
