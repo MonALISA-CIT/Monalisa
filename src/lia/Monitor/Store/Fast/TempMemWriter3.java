@@ -134,6 +134,7 @@ public final class TempMemWriter3 extends Writer implements TempMemWriterInterfa
         hmWriteLock = hmLock.writeLock();
 
         lMinTime = lMaxTime = NTPDate.currentTimeMillis();
+//        lMinTime = 0;
 
         calculateHardLimit();
 
