@@ -634,13 +634,18 @@ public final class Cache {
 		if (o instanceof Collection<?>) {
 			final Collection<TimestampedResult> collection = (Collection<TimestampedResult>) o;
 
-			alRez = new ArrayList<TimestampedResult>(collection.size());
+			alRez = new ArrayList<TimestampedResult>(pred.bLastVals ? 1 : collection.size());
 
 			for (final TimestampedResult oResult : collection) {
 				final long lTime = oResult.getTime();
 
 				if ((lTime > 0) && (lTime >= lMin) && (lTime <= lMax)) {
-					alRez.add(oResult);
+					if (alRez.size() == 0 || !pred.bLastVals)
+						alRez.add(oResult);
+					else {
+						if (alRez.get(0).getTime() < lTime)
+							alRez.set(0, oResult);
+					}
 				}
 			}
 		}
