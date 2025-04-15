@@ -1039,7 +1039,7 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 			if (sName.equals("JSESSIONID") || sName.startsWith("__utm") || sName.equals("vdnsessid") || sName.equals("vdnsessid") || sName.equals("LAZYJ_ID") || sName.equals("void")
 					|| sName.equals("AI_SESSION") || sName.equals("cod") || sName.equals("codMLMenu") || sName.equals("csd") || sName.equals("csdMLMenu") || sName.startsWith("lastval_div_")
 					|| sName.startsWith("_ga") || sName.equals("tier_badge_id") || sName.equals("rl_anonymous_id") || sName.equals("_gid") || sName.equals("experimentation_subject_id")
-					|| sName.equals("rl_user_id"))
+					|| sName.equals("rl_user_id") || sName.toLowerCase().contains("marketing") || sName.equals("pinned"))
 				continue;
 
 			if (prop != null) {
