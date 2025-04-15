@@ -583,223 +583,229 @@ public final class TransparentStoreFast implements TransparentStoreInt, Runnable
 									+ "' : ", e);
 						}
 					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0) && (iWriteMode == 2)) {
-						try {
-							String sBackupTableName = sTableName + "_backup_rrd";
-							vWriters[i] = new eDBWriter(lTotalTime, sTableName);
-							vWriters[i + nr] = new eDBWriter(lTotalTime, sBackupTableName);
+					else
+						if ((lTotalTime > 0) && (sTableName.length() > 0) && (iWriteMode == 2)) {
+							try {
+								String sBackupTableName = sTableName + "_backup_rrd";
+								vWriters[i] = new eDBWriter(lTotalTime, sTableName);
+								vWriters[i + nr] = new eDBWriter(lTotalTime, sBackupTableName);
 
-							bSomeRotatingStructures = true;
+								bSomeRotatingStructures = true;
 
-							vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
-							vWriters[i + nr].setConstaints(sAcceptConstraints, sRejectConstraints);
+								vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
+								vWriters[i + nr].setConstaints(sAcceptConstraints, sRejectConstraints);
 
-							long lpw = vWriters[i].getOnlineTime();
-							long lbw = vWriters[i + nr].getOnlineTime();
+								long lpw = vWriters[i].getOnlineTime();
+								long lbw = vWriters[i + nr].getOnlineTime();
 
-							if (lpw >= lbw) {
-								vWriters[i].setOnline((lpw == 0) ? now : lpw);
-								vWriters[i + nr].setOffline();
+								if (lpw >= lbw) {
+									vWriters[i].setOnline((lpw == 0) ? now : lpw);
+									vWriters[i + nr].setOffline();
+								}
+								else {
+									vWriters[i].setOffline();
+									vWriters[i + nr].setOnline((lbw == 0) ? now : lbw);
+								}
+
+								sTableNames[i] = sTableName;
+								sTableNames[i + nr] = sBackupTableName;
+								vWriterLocks[i] = "lock_" + i;
+								vWriterLocks[i + nr] = "lock_" + (i + nr);
+
+								db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
+
+								if (db.moveNext()) {
+									db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
+											+ "';");
+								}
+								else {
+									logger.log(Level.INFO, "New object table detected : " + sTableName);
+									db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
+											+ "', 1);");
+								}
+
+								db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sBackupTableName + "';");
+
+								if (db.moveNext()) {
+									db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='"
+											+ sBackupTableName + "';");
+								}
+								else {
+									logger.log(Level.INFO, "New object table detected : " + sTableName);
+									db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('"
+											+ sBackupTableName + "', 1);");
+								}
+
+								hmWriters.put(sTableName, vWriters[i]);
+								hmWriters.put(sBackupTableName, vWriters[i + nr]);
 							}
-							else {
-								vWriters[i].setOffline();
-								vWriters[i + nr].setOnline((lbw == 0) ? now : lbw);
+							catch (Throwable e) {
+								vWriters[i] = null;
+								vWriters[i + nr] = null;
+								sTableNames[i] = null;
+								sTableNames[i + nr] = null;
+								logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
+										+ "' : ", e);
 							}
-
-							sTableNames[i] = sTableName;
-							sTableNames[i + nr] = sBackupTableName;
-							vWriterLocks[i] = "lock_" + i;
-							vWriterLocks[i + nr] = "lock_" + (i + nr);
-
-							db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
-
-							if (db.moveNext()) {
-								db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
-										+ "';");
-							}
-							else {
-								logger.log(Level.INFO, "New object table detected : " + sTableName);
-								db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
-										+ "', 1);");
-							}
-
-							db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sBackupTableName + "';");
-
-							if (db.moveNext()) {
-								db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='"
-										+ sBackupTableName + "';");
-							}
-							else {
-								logger.log(Level.INFO, "New object table detected : " + sTableName);
-								db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('"
-										+ sBackupTableName + "', 1);");
-							}
-
-							hmWriters.put(sTableName, vWriters[i]);
-							hmWriters.put(sBackupTableName, vWriters[i + nr]);
 						}
-						catch (Throwable e) {
-							vWriters[i] = null;
-							vWriters[i + nr] = null;
-							sTableNames[i] = null;
-							sTableNames[i + nr] = null;
-							logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
-									+ "' : ", e);
-						}
-					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0)
-							&& ((iWriteMode == 3) || (iWriteMode == 4))) {
-						try {
-							int iImport = Integer.parseInt(AppConfig.getProperty(
-									"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".import", "0").trim());
-							long lLimit = Long.parseLong(AppConfig.getProperty(
-									"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".countLimit", "-1").trim());
+						else
+							if ((lTotalTime > 0) && (sTableName.length() > 0)
+									&& ((iWriteMode == 3) || (iWriteMode == 4))) {
+								try {
+									int iImport = Integer.parseInt(AppConfig.getProperty(
+											"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".import", "0").trim());
+									long lLimit = Long.parseLong(AppConfig.getProperty(
+											"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".countLimit", "-1").trim());
 
-							vWriters[i] = new MemWriter(lTotalTime, lSamples, sTableName, iWriteMode, lLimit);
+									vWriters[i] = new MemWriter(lTotalTime, lSamples, sTableName, iWriteMode, lLimit);
 
-							vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
+									vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
 
-							sTableNames[i] = sTableName;
-							vWriterLocks[i] = "lock_" + i;
+									sTableNames[i] = sTableName;
+									vWriterLocks[i] = "lock_" + i;
 
-							logger.log(Level.INFO, "Memory table : " + sTableName);
+									logger.log(Level.INFO, "Memory table : " + sTableName);
 
-							hmWriters.put(sTableName, vWriters[i]);
+									hmWriters.put(sTableName, vWriters[i]);
 
-							if (iImport > 0) {
-								lNewTables.add(Integer.valueOf(i));
-							}
+									if (iImport > 0) {
+										lNewTables.add(Integer.valueOf(i));
+									}
 
-							vWriters[i].setOnline(now);
-						}
-						catch (Throwable e) {
-							vWriters[i] = null;
-							sTableNames[i] = null;
-							logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
-									+ "' : ", e);
-						}
-					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0)
-							&& ((iWriteMode == 5) || (iWriteMode == 6))) {
-						try {
-							int iImport = Integer.parseInt(AppConfig.getProperty(
-									"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".import", "1").trim());
-
-							vWriters[i] = new DBWriter2(lTotalTime, lSamples, sTableName, iWriteMode);
-
-							vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
-
-							sTableNames[i] = sTableName;
-							vWriterLocks[i] = "lock_" + i;
-
-							db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
-
-							logger.log(Level.INFO, "ID table : " + sTableName);
-
-							if (db.moveNext()) {
-								db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
-										+ "';");
-								lAllTables.add(sTableName);
-							}
-							else {
-								logger.log(Level.INFO, "New table detected : " + sTableName);
-								db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
-										+ "', 1);");
-								if (iImport > 0) {
-									lNewTables.add(Integer.valueOf(i));
+									vWriters[i].setOnline(now);
+								}
+								catch (Throwable e) {
+									vWriters[i] = null;
+									sTableNames[i] = null;
+									logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
+											+ "' : ", e);
 								}
 							}
+							else
+								if ((lTotalTime > 0) && (sTableName.length() > 0)
+										&& ((iWriteMode == 5) || (iWriteMode == 6))) {
+									try {
+										int iImport = Integer.parseInt(AppConfig.getProperty(
+												"lia.Monitor.Store.TransparentStoreFast.writer_" + i + ".import", "1").trim());
 
-							hmWriters.put(sTableName, vWriters[i]);
+										vWriters[i] = new DBWriter2(lTotalTime, lSamples, sTableName, iWriteMode);
 
-							vWriters[i].setOnline(now);
-						}
-						catch (Throwable e) {
-							vWriters[i] = null;
-							sTableNames[i] = null;
-							logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
-									+ "' : ", e);
-						}
+										vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
 
-					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0)
-							&& ((iWriteMode == 7) || (iWriteMode == 8))) {
-						int iImport = 0;
+										sTableNames[i] = sTableName;
+										vWriterLocks[i] = "lock_" + i;
 
-						try {
-							vWriters[i] = new DBWriter3(lTotalTime, lSamples, sTableName, iWriteMode);
+										db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
 
-							vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
+										logger.log(Level.INFO, "ID table : " + sTableName);
 
-							sTableNames[i] = sTableName;
-							vWriterLocks[i] = "lock_" + i;
+										if (db.moveNext()) {
+											db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
+													+ "';");
+											lAllTables.add(sTableName);
+										}
+										else {
+											logger.log(Level.INFO, "New table detected : " + sTableName);
+											db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
+													+ "', 1);");
+											if (iImport > 0) {
+												lNewTables.add(Integer.valueOf(i));
+											}
+										}
 
-							db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
+										hmWriters.put(sTableName, vWriters[i]);
 
-							logger.log(Level.INFO, "ID table v3: " + sTableName);
+										vWriters[i].setOnline(now);
+									}
+									catch (Throwable e) {
+										vWriters[i] = null;
+										sTableNames[i] = null;
+										logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
+												+ "' : ", e);
+									}
 
-							if (db.moveNext()) {
-								db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
-										+ "';");
-								lAllTables.add(sTableName);
-							}
-							else {
-								logger.log(Level.INFO, "New table detected : " + sTableName);
-								db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
-										+ "', 1);");
-								if (iImport > 0) {
-									lNewTables.add(Integer.valueOf(i));
 								}
-							}
+								else
+									if ((lTotalTime > 0) && (sTableName.length() > 0)
+											&& ((iWriteMode == 7) || (iWriteMode == 8))) {
+										int iImport = 0;
 
-							hmWriters.put(sTableName, vWriters[i]);
+										try {
+											vWriters[i] = new DBWriter3(lTotalTime, lSamples, sTableName, iWriteMode);
 
-							vWriters[i].setOnline(now);
+											vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
 
-						}
-						catch (Throwable e) {
-							vWriters[i] = null;
-							sTableNames[i] = null;
-							logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
-									+ "' : ", e);
-						}
-					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0)
-							&& ((iWriteMode == 9) || (iWriteMode == 10))) {
-						try {
+											sTableNames[i] = sTableName;
+											vWriterLocks[i] = "lock_" + i;
 
-							vWriters[i] = new AccountingWriter(sTableName, lTotalTime, iWriteMode);
+											db.query("SELECT * FROM monitor_tables WHERE mt_tablename='" + sTableName + "';");
 
-							vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
+											logger.log(Level.INFO, "ID table v3: " + sTableName);
 
-							sTableNames[i] = sTableName;
-							vWriterLocks[i] = "lock_" + i;
-							logger.log(Level.INFO, "Accounting table: " + sTableNames[i]);
+											if (db.moveNext()) {
+												db.query("UPDATE monitor_tables SET mt_status=1 WHERE mt_tablename='" + sTableName
+														+ "';");
+												lAllTables.add(sTableName);
+											}
+											else {
+												logger.log(Level.INFO, "New table detected : " + sTableName);
+												db.query("INSERT INTO monitor_tables (mt_tablename, mt_status) VALUES ('" + sTableName
+														+ "', 1);");
+												if (iImport > 0) {
+													lNewTables.add(Integer.valueOf(i));
+												}
+											}
 
-							hmWriters.put(sTableName, vWriters[i]);
+											hmWriters.put(sTableName, vWriters[i]);
 
-							vWriters[i].setOnline(now);
+											vWriters[i].setOnline(now);
 
-						}
-						catch (Exception e) {
-							vWriters[i] = null;
-							sTableNames[i] = null;
-							logger.log(Level.SEVERE, "Exception in initializing the accounting writer: ", e);
-						}
-					}
-					else if ((lTotalTime > 0) && (sTableName.length() > 0)
-							&& ((iWriteMode == 11) || (iWriteMode == 12))) {
-						vWriters[i] = new DBWriter4(lTotalTime, lSamples, sTableName, iWriteMode);
-						vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
-						sTableNames[i] = sTableName;
-						vWriterLocks[i] = "lock_" + i;
+										}
+										catch (Throwable e) {
+											vWriters[i] = null;
+											sTableNames[i] = null;
+											logger.log(Level.SEVERE, "Exception in initializing the store element '" + sTableName
+													+ "' : ", e);
+										}
+									}
+									else
+										if ((lTotalTime > 0) && (sTableName.length() > 0)
+												&& ((iWriteMode == 9) || (iWriteMode == 10))) {
+											try {
 
-						logger.log(Level.INFO, "DB4 table: " + sTableName);
+												vWriters[i] = new AccountingWriter(sTableName, lTotalTime, iWriteMode);
 
-						hmWriters.put(sTableName, vWriters[i]);
+												vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
 
-						vWriters[i].setOnline(now);
-					}
+												sTableNames[i] = sTableName;
+												vWriterLocks[i] = "lock_" + i;
+												logger.log(Level.INFO, "Accounting table: " + sTableNames[i]);
+
+												hmWriters.put(sTableName, vWriters[i]);
+
+												vWriters[i].setOnline(now);
+
+											}
+											catch (Exception e) {
+												vWriters[i] = null;
+												sTableNames[i] = null;
+												logger.log(Level.SEVERE, "Exception in initializing the accounting writer: ", e);
+											}
+										}
+										else
+											if ((lTotalTime > 0) && (sTableName.length() > 0)
+													&& ((iWriteMode == 11) || (iWriteMode == 12))) {
+												vWriters[i] = new DBWriter4(lTotalTime, lSamples, sTableName, iWriteMode);
+												vWriters[i].setConstaints(sAcceptConstraints, sRejectConstraints);
+												sTableNames[i] = sTableName;
+												vWriterLocks[i] = "lock_" + i;
+
+												logger.log(Level.INFO, "DB4 table: " + sTableName);
+
+												hmWriters.put(sTableName, vWriters[i]);
+
+												vWriters[i].setOnline(now);
+											}
 				}
 
 				List<String> lDeletedTables = new ArrayList<String>();
@@ -1466,17 +1472,19 @@ public final class TransparentStoreFast implements TransparentStoreInt, Runnable
 			if (lTime < t.lTime) {
 				return -1;
 			}
-			else if (lTime == t.lTime) {
-				if (indent < t.indent) {
-					return -1;
+			else
+				if (lTime == t.lTime) {
+					if (indent < t.indent) {
+						return -1;
+					}
+					else
+						if (indent > t.indent) {
+							return 1;
+						}
+						else {
+							return 0;
+						}
 				}
-				else if (indent > t.indent) {
-					return 1;
-				}
-				else {
-					return 0;
-				}
-			}
 			return 1;
 		}
 
@@ -1786,24 +1794,25 @@ public final class TransparentStoreFast implements TransparentStoreInt, Runnable
 						}
 					}
 				}
-				else if (vTypes[indent] == 2) { // eResult
-					eResult rez;
+				else
+					if (vTypes[indent] == 2) { // eResult
+						eResult rez;
 
-					while (db.moveNext()) {
-						rez = new eResult();
-						rez.time = db.getl("rectime");
-						rez.FarmName = db.gets("mfarm");
-						rez.ClusterName = db.gets("mcluster");
-						rez.NodeName = db.gets("mnode");
-						rez.addSet(db.gets("mfunction"), Writer.deserializeFromString(db.gets("mval")));
+						while (db.moveNext()) {
+							rez = new eResult();
+							rez.time = db.getl("rectime");
+							rez.FarmName = db.gets("mfarm");
+							rez.ClusterName = db.gets("mcluster");
+							rez.NodeName = db.gets("mnode");
+							rez.addSet(db.gets("mfunction"), Writer.deserializeFromString(db.gets("mval")));
 
-						StringFactory.convert(rez);
+							StringFactory.convert(rez);
 
-						if (DataSelect.matchResult(rez, p) != null) {
-							results.add(rez);
+							if (DataSelect.matchResult(rez, p) != null) {
+								results.add(rez);
+							}
 						}
 					}
-				}
 			}
 			catch (Throwable ee) {
 				logger.log(Level.WARNING, " Failed to execute the query ! ", ee);
@@ -2079,14 +2088,16 @@ public final class TransparentStoreFast implements TransparentStoreInt, Runnable
 
 					ds = new DataSplitter(vData, lTime, tmax, false);
 				}
-				else if (tmw instanceof TempMemWriter3) {
-					// System.err.println("TempMemWriter 3");
-					ds = ((TempMemWriter3) tmw).getDataSplitter(p);
-				}
-				else if (tmw instanceof TempMemWriter4) {
-					// System.err.println("TempMemWriter 4");
-					ds = ((TempMemWriter4) tmw).getDataSplitter();
-				}
+				else
+					if (tmw instanceof TempMemWriter3) {
+						// System.err.println("TempMemWriter 3");
+						ds = ((TempMemWriter3) tmw).getDataSplitter(p);
+					}
+					else
+						if (tmw instanceof TempMemWriter4) {
+							// System.err.println("TempMemWriter 4");
+							ds = ((TempMemWriter4) tmw).getDataSplitter();
+						}
 
 				if (ds != null) {
 					if (tmw instanceof TempMemWriter3) {
@@ -2397,9 +2408,9 @@ public final class TransparentStoreFast implements TransparentStoreInt, Runnable
 			final TreeSet<Integer> tsTableIDs = me.getValue();
 
 			// all eggs in one bin. Can we do something to speed it up ?
-			if ((tsTableIDs.size() > 10) && (ReplicationManager.getInstance().getOnlineBackendsCount() > 1)) {
+			if ((tsTableIDs.size() > 10) && (ReplicationManager.getInstance().getTotalBackendsCount() > 1)) {
 				// yes, we would be better off executing in parallel
-				final int chunks = Math.min(2 * ReplicationManager.getInstance().getOnlineBackendsCount(),
+				final int chunks = Math.min(2 * ReplicationManager.getInstance().getTotalBackendsCount(),
 						workers.size());
 
 				final int elements = 1 + (tsTableIDs.size() / chunks);

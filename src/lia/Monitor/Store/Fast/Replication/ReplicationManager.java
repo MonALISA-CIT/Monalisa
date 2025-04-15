@@ -182,6 +182,13 @@ public final class ReplicationManager {
 
 		return onlineBackends;
 	}
+	
+	/**
+	 * @return the total number of R/W and R/O that are currently online, to be used in load balancing decisions  
+	 */
+	public int getTotalBackendsCount() {
+		return getOnlineBackends(false).size() + getOnlineBackends(true).size();
+	}
 
 	/**
 	 * Get the number of backends that are online now
