@@ -234,7 +234,9 @@ public class Main extends JiniClient implements ShutdownReceiver, LocalDataFarmC
 		}
 
 		try {
-			final int iTomcatPort = AppConfig.geti("lia.Repository.tomcat_port", 0);
+			String tomcatPorts = AppConfig.getProperty("lia.Repository.tomcat_port", "");
+
+			final int iTomcatPort = Integer.parseInt(tomcatPorts.indexOf(' ') > 0 ? tomcatPorts.substring(0, tomcatPorts.indexOf(' ')) : tomcatPorts);
 
 			if (iTomcatPort > 0) {
 				logger.log(Level.INFO, "JStoreClient: starting exporter on port : " + iTomcatPort);
