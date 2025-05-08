@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export PATH=$JAVA_HOME/bin:$PATH
+
+java -jar -Djava.security.policy=policy.all \
+       -Dlia.Monitor.showPanels=groups,table,osgmap,gmap,topology \
+       -Dlia.Monitor.ClientsFarmProxy.ProxyGroup=farm_proxy \
+       -Dlia.Monitor.LUSs=monalisa.cern.ch \
+       -Dlia.util.geo.iNetGeoConfig=http://monalisa.cern.ch/iNetGeoConfig \
+       -Djava.util.logging.config.class=lia.Monitor.monitor.LoggerConfigClass \
+           -Dlia.Monitor.group=alice \
+       -Dlia.Monitor.groupUnselected=grid3,grid3-serv,atlas,ml,alice1,cms-us,vdt,vdt1 \
+            ../lib/JMonitorClient-No3D-CERN.jar
