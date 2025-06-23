@@ -57,6 +57,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Whether or not to use the AliEn LDAP to find the best ML service name matching a given queue name
+	 */
+	private static final boolean MATCH_ML_FROM_LDAP = true;
+
 	/** Logger used by this class */
 	static final Logger logger = Logger.getLogger(AliEnFilter.class.getName());
 
@@ -1474,6 +1479,33 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// values.sqDifToDataArray(med, stdev);
 		// rates.sqDifToDataArray(med, stdev);
 		// }
+	}
+
+	/**
+	 * Debug method
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		final AliEnFilter filter = new AliEnFilter("CentralTest");
+
+		try (DBFunctions db = getQueueDB()) {
+			db.setReadOnly(true);
+			db.setQueryTimeout(60);
+
+			for (String id : args) {
+				db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?;", false, Long.valueOf(id));
+
+				while (db.moveNext()) {
+					JobStatusCS js = filter.jsStatusfromDB(db, "ALICE");
+					Result r = new Result();
+					js.setExecHost("NO_SITE", r, 0);
+					js.setStatus(-12);
+
+					System.err.println(js.jobID + " : " + js.execSite);
+				}
+			}
+		}
 	}
 
 	JobStatusCS jsStatusfromDB(final DBFunctions db, final String orgName) {
@@ -4860,20 +4892,20 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		JobStatusCS jscs = htJobStats.get(jobID);
 		if ((jscs == null) && create) {
 			try (DBFunctions db = getQueueDB()) {
-				if (db!=null) {
+				if (db != null) {
 					db.setQueryTimeout(15);
-					
+
 					if (db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
 						if (db.moveNext())
 							jscs = jsStatusfromDB(db, orgName);
 						else
-							logger.log(Level.WARNING, jobID+" doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
+							logger.log(Level.WARNING, jobID + " doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
 					}
 					else
-						logger.log(Level.WARNING, "Direct DB query failed for "+jobID+", falling back to the legacy method of waiting for the fields to be updated");
+						logger.log(Level.WARNING, "Direct DB query failed for " + jobID + ", falling back to the legacy method of waiting for the fields to be updated");
 				}
-				
-				if (jscs==null)
+
+				if (jscs == null)
 					jscs = new JobStatusCS(jobID, orgName);
 			}
 
@@ -7205,7 +7237,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		dbProp.set("password", pass);
 		dbProp.set("driver", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_DRIVER", "com.mysql.jdbc.Driver"));
-		dbProp.set("host", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_HOST", "aliendb06b.cern.ch"));
+		dbProp.set("host", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_HOST", "alice-taskqueuedb.cern.ch"));
 		dbProp.set("port", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_PORT", "3308"));
 		dbProp.set("database", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_DBNAME", "processes"));
 		dbProp.set("user", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_USER", "root"));
@@ -7380,6 +7412,52 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		}
 	};
 
+	static final GenericLastValuesCache<String, String> queueToMLCache = new GenericLastValuesCache<String, String>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected int getMaximumSize() {
+			return 1000;
+		}
+
+		@Override
+		protected String resolve(final String queue) {
+			if (queue.lastIndexOf("::") == queue.indexOf("::"))
+				return "NO_SITE";
+
+			final String site = queue.substring(queue.indexOf("::") + 2, queue.lastIndexOf("::"));
+			final String qname = queue.substring(queue.lastIndexOf("::") + 2);
+
+			String query;
+
+			if (qname.startsWith(site))
+				query = "(|(ce=" + qname + ")(ce=LCG" + (qname.substring(site.length())) + "))";
+			else
+				query = "(ce=" + qname + ")";
+
+			Set<String> mlNames = LDAPHelper.checkLdapInformation(query, "ou=Config,ou=" + site + ",ou=Sites,", "monalisa");
+
+			if (mlNames == null || mlNames.isEmpty()) {
+				if (qname.startsWith(site))
+					query = "(|(name=" + qname + ")(name=LCG" + (qname.substring(site.length())) + "))";
+				else
+					query = "(name=" + qname + ")";
+
+				mlNames = LDAPHelper.checkLdapInformation(query, "ou=MonaLisa,ou=Services,ou=" + site + ",ou=Sites,", "name");
+			}
+
+			String mlName = site;
+
+			if (mlNames != null && mlNames.size() > 0) {
+				mlName = mlNames.iterator().next();
+				if (mlName.startsWith("LCG"))
+					mlName = site + mlName.substring(3);
+			}
+
+			return mlName;
+		}
+	};
+
 	/**
 	 * Get execution site for this job
 	 *
@@ -7402,6 +7480,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (queueName == null)
 					return null;
+
+				if (MATCH_ML_FROM_LDAP)
+					return queueToMLCache.get(queueName);
 
 				try {
 					final String site = queueName.substring(queueName.indexOf("::") + 2, queueName.lastIndexOf("::"));
