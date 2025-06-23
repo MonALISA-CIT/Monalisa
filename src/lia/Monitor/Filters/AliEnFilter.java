@@ -842,6 +842,22 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			}
 		}
 
+		static int transferStatusToInt(final String status) {
+			switch (status) {
+				case "INSERTING": return TS_INSERTING;
+				case "WAITING": return TS_WAITING;
+				case "ASSIGNED": return TS_ASSIGNED;
+				case "LOCAL_COPY": return TS_LOCAL_COPY;
+				case "TRANSFERRING": return TS_TRANSFERRING;
+				case "CLEANING": return TS_CLEANING;
+				case "DONE": return TS_DONE;
+				case "FAILED": return TS_FAILED;
+				case "KILLED": return TS_KILLED;
+				case "EXPIRED": return TS_EXPIRED;
+				default: return TS_UNKNOWN;
+			}
+		}
+		
 		/**
 		 * returns true if the given status is cummulative
 		 *
@@ -4185,7 +4201,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 						final long lEnd = System.currentTimeMillis();
 
-						logger.log(Level.INFO, "Loaded status for " + crtAliEnJobs.size() + " in " + (lEnd - lProcess) + " ms");
+						logger.log(Level.INFO, "Loaded status for " + crtAliEnJobs.size() + " jobs in " + (lEnd - lProcess) + " ms");
 						// status of AliEn jobs loaded ok; populate hashes...
 						addJobStatusCSBulk(crtAliEnJobs);
 
@@ -4317,7 +4333,36 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @return true if it was successful.
 		 */
 		private boolean getAliEnTransfers() {
+			final String orgName = StringFactory.get(AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "ALICE").toUpperCase());
+			final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<>(10240);
+
 			logger.log(Level.INFO, "Trying to load status for current AliEn transfers...");
+			
+			try (DBFunctions db = getTransfersDB()) {
+				if (db != null) {
+					db.setReadOnly(true);
+					db.setQueryTimeout(60);
+
+					if (db.query("select transferId,status,size,user,remove_replica,destination,received,started,finished from TRANSFERS_DIRECT where status NOT IN ('FAILED', 'KILLED', 'DONE', 'EXPIRED');")) {
+						while (db.moveNext()) {
+							crtAliEnTransfers
+									.add(new TransferStatusCS(db.gets(1), orgName, TransferUtil.transferStatusToInt(db.gets(2)), db.getl(3), db.gets(4), db.gets(5), db.gets(6), db.getl(7) * 1000,
+											db.getl(8) * 1000, db.getl(9) * 1000));
+						}
+
+						logger.log(Level.INFO, "Loaded " + crtAliEnTransfers.size() + " transfers directly from the database");
+
+						addTransferStatusCSBulk(crtAliEnTransfers);
+
+						return true;
+					}
+					
+					logger.log(Level.WARNING, "Transfers query failed to execute", db.getLastError());
+				}
+
+				logger.log(Level.WARNING, "Could not load the transfers list from the database");
+			}
+						
 			final String cmd = ALIEN + " -x " + TRANSFER_SYNC_SCRIPT;
 			final BufferedReader buff = procOutput(cmd, JOB_SYNC_SCRIPT_TIMEOUT);
 			if (buff == null) {
@@ -4326,8 +4371,6 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			}
 			try {
 				boolean finishedOK = false;
-				final String orgName = StringFactory.get(AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "ALICE").toUpperCase());
-				final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<>(1024);
 				String line;
 				while ((line = buff.readLine()) != null) {
 					line = line.trim();
@@ -7212,16 +7255,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	private static ExtProperties dbProp = null;
 
-	/**
-	 * @return connection to the database, if any
-	 */
-	static DBFunctions getQueueDB() {
-		if (configured) {
-			if (dbProp != null)
-				return new DBFunctions(dbProp);
-
-			return null;
-		}
+	private static synchronized final ExtProperties getDBProperties() {
+		if (configured)
+			return dbProp;
 
 		configured = true;
 
@@ -7244,10 +7280,35 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		dbProp.set("autoReconnect", "true");
 		dbProp.set("useServerPrepStmts", "true");
 
-		if (logger.isLoggable(Level.FINE))
-			logger.log(Level.FINE, "Database details for direct connection are:\n" + dbProp.toString());
+		return dbProp;
+	}
+	
+	/**
+	 * @return connection to the database, if any
+	 */
+	static DBFunctions getQueueDB() {
+		final ExtProperties prop = getDBProperties();
+		
+		if (prop!=null)
+			return new DBFunctions(dbProp);
 
-		return new DBFunctions(dbProp);
+		return null;
+	}
+	
+	static DBFunctions getTransfersDB() {
+		final ExtProperties prop = getDBProperties();
+		
+		if (prop!=null) {
+			final ExtProperties transfers = new ExtProperties(prop.getProperties());
+			
+			transfers.set("host", "alice-transfersdb.cern.ch");
+			transfers.set("port", "3307");
+			transfers.set("database", "transfers");
+			
+			return new DBFunctions(transfers);
+		}
+		
+		return null;
 	}
 
 	private static final GenericLastValuesCache<Integer, String> userCache = new GenericLastValuesCache<Integer, String>() {
