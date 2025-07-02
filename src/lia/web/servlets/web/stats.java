@@ -951,7 +951,10 @@ public final class stats extends CacheServlet {
 									mms.setStrings(hmStrings.get(Integer.valueOf(l)));
 								}
 
-								p3_1.modify("color", mmr.getColor(er.sRez));
+								final String color = mmr.getColor(er.sRez);
+
+								if (color != null)
+									p3_1.modify("color", color);
 							}
 						}
 
@@ -3684,7 +3687,7 @@ public final class stats extends CacheServlet {
 		return vPreds;
 	}
 
-	private static final class MinMaxStaticStringColors implements MinMaxRec {
+	public static final class MinMaxStaticStringColors implements MinMaxRec {
 		private final Properties prop;
 
 		/**
@@ -3712,9 +3715,28 @@ public final class stats extends CacheServlet {
 				colorIndex *= -1;
 			}
 
-			final Color c = ServletExtension.getColor(prop, s + ".color", (Color) Utils.DEFAULT_PAINT_SEQUENCE[colorIndex % Utils.DEFAULT_PAINT_SEQUENCE.length]);
+			Color defaultColor = (Color) Utils.DEFAULT_PAINT_SEQUENCE[colorIndex % Utils.DEFAULT_PAINT_SEQUENCE.length];
 
-			return Utils.toHex(c);
+			String sDefaultColor = pgets(prop, "default.color", null, false);
+
+			if (sDefaultColor != null && !"auto".equalsIgnoreCase(sDefaultColor)) {
+				if (!sDefaultColor.isBlank()) {
+					sDefaultColor = Formatare.replace(sDefaultColor, "$NAME", s);
+
+					sDefaultColor = parseOption(prop, "default.color", sDefaultColor, sDefaultColor, true, true);
+
+					defaultColor = ServletExtension.getColor(sDefaultColor, defaultColor);
+				}
+				else
+					defaultColor = null;
+			}
+
+			final Color c = ServletExtension.getColor(prop, s + ".color", defaultColor);
+
+			if (c != null)
+				return Utils.toHex(c);
+
+			return null;
 		}
 
 	}
