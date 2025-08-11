@@ -762,6 +762,11 @@ public final class stats extends CacheServlet {
 					sAlternate = replace(sAlternate, "$REALNAME", s2);
 					sAlternate = replace(sAlternate, "$NO", "" + (iColor + 1));
 
+					final String seriesURL = display.getExtProperty(prop, s2, "", "url");
+
+					if (seriesURL != null && !seriesURL.isBlank())
+						p3.modify("series_href", "href='" + Format.escHtml(seriesURL) + "'");
+
 					final StringBuilder csvLine = new StringBuilder();
 
 					if (bCSV) {
