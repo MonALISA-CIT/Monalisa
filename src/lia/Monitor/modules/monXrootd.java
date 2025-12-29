@@ -280,8 +280,8 @@ public class monXrootd extends monGenericUDP {
 				final String timeout = tmp.substring(iq + 1).trim();
 				try {
 					this.XRDSERVER_EXPIRE = Long.valueOf(timeout).longValue() * 1000; // it's
-																					// in
-																					// seconds
+																						// in
+																						// seconds
 				}
 				catch (final Throwable tt) {
 					// ignore
@@ -295,8 +295,8 @@ public class monXrootd extends monGenericUDP {
 				final String timeout = tmp.substring(iq + 1).trim();
 				try {
 					this.DICTINFO_EXPIRE = Long.valueOf(timeout).longValue() * 1000; // it's
-																				// in
-																				// seconds
+					// in
+					// seconds
 				}
 				catch (final Throwable tt) {
 					// ignore
@@ -463,6 +463,34 @@ public class monXrootd extends monGenericUDP {
 		}
 	}
 
+	private static boolean isActualUser(final String user, final String info) {
+		if (user == null)
+			return false;
+
+		final int idx = user.indexOf('/');
+		final int idx2 = user.indexOf('.', idx + 1);
+
+		if (idx > 0 && idx2 > 0) {
+			final String account = user.substring(idx + 1, idx2);
+
+			if (account.length() == 1) {
+				final char c = account.charAt(0);
+				if (c >= '1' && c <= '8')
+					return false;
+			}
+
+			if ("root".equals(account))
+				return false;
+
+			if ("daemon".equals(account) && info != null && info.contains("/replicate:"))
+				return false;
+
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * add the given data to the global data structures; data is reported in MB
 	 * 
@@ -493,7 +521,9 @@ public class monXrootd extends monGenericUDP {
 		if (di != null) {
 			r.param[2] = di.userIP;
 			r.param[3] = 0; // speed. filled at disconnect time
-			xsi.transfResults.put(di.user, r);
+
+			if (isActualUser(di.user, di.info))
+				xsi.transfResults.put(di.user, r);
 		}
 		else {
 			// else we ignore it
@@ -548,16 +578,16 @@ public class monXrootd extends monGenericUDP {
 	 */
 	static final String codeToText(final char c) {
 		switch (c) {
-		case 'd':
-			return "dictid mapping to a user/path combination";
-		case 'i':
-			return "dictid mapping to a session user/information combination";
-		case 't':
-			return "a file or I/O request trace";
-		case 'u':
-			return "dictid mapping to the user login name";
-		default:
-			return "UNKNOWN CODE!";
+			case 'd':
+				return "dictid mapping to a user/path combination";
+			case 'i':
+				return "dictid mapping to a session user/information combination";
+			case 't':
+				return "a file or I/O request trace";
+			case 'u':
+				return "dictid mapping to the user login name";
+			default:
+				return "UNKNOWN CODE!";
 		}
 	}
 
@@ -569,14 +599,14 @@ public class monXrootd extends monGenericUDP {
 	 */
 	static final int codeToType(final char c) {
 		switch (c) {
-		case 'd':
-			return DI_TYPE_PATH;
-		case 'i':
-			return DI_TYPE_APPINFO;
-		case 'u':
-			return DI_TYPE_LOGIN;
-		default:
-			return 0;
+			case 'd':
+				return DI_TYPE_PATH;
+			case 'i':
+				return DI_TYPE_APPINFO;
+			case 'u':
+				return DI_TYPE_LOGIN;
+			default:
+				return 0;
 		}
 	}
 
@@ -701,122 +731,122 @@ public class monXrootd extends monGenericUDP {
 			String key;
 			DictInfo di;
 			switch (type) {
-			case XROOTD_MON_APPID: // Application provided marker
-				br.skipChars(3); // skip 3 bytes;
-				final String appid = br.readStringLen(12);
-				for (int i = appid.length(); i < 12; i++) {
-					br.readByte(); // ignore the rest; make sure that we read
-									// the full record
-				}
-				// System.out.println("AppID = " + appid);
-				// TODO: don't know how to handle and what to do with it; ignore
-				// for now...
-				break;
-			case XROOTD_MON_CLOSE: // File has been closed
-				final int rRshift = br.readUByte();
-				final int wRshift = br.readUByte();
-				br.skipChars(1);
-				final long rTot = br.readUInt32();
-				final long wTot = br.readUInt32();
-				long dictid = br.readUInt32();
-				key = "" + dictid + "/" + stod;
-				di = xsi.dictMap.get(key);
-				if (logger.isLoggable(Level.FINER)) {
-					logger.log(Level.FINER, "CLOSE: rShift=" + rRshift + " wShift=" + wRshift + " rTot=" + rTot + " wTot=" + wTot + " dictID=" + dictid + " ref=" + di);
-				}
-				addRWsums(rRshift, wRshift, rTot, wTot, xsi, key);
+				case XROOTD_MON_APPID: // Application provided marker
+					br.skipChars(3); // skip 3 bytes;
+					final String appid = br.readStringLen(12);
+					for (int i = appid.length(); i < 12; i++) {
+						br.readByte(); // ignore the rest; make sure that we read
+										// the full record
+					}
+					// System.out.println("AppID = " + appid);
+					// TODO: don't know how to handle and what to do with it; ignore
+					// for now...
+					break;
+				case XROOTD_MON_CLOSE: // File has been closed
+					final int rRshift = br.readUByte();
+					final int wRshift = br.readUByte();
+					br.skipChars(1);
+					final long rTot = br.readUInt32();
+					final long wTot = br.readUInt32();
+					long dictid = br.readUInt32();
+					key = "" + dictid + "/" + stod;
+					di = xsi.dictMap.get(key);
+					if (logger.isLoggable(Level.FINER)) {
+						logger.log(Level.FINER, "CLOSE: rShift=" + rRshift + " wShift=" + wRshift + " rTot=" + rTot + " wTot=" + wTot + " dictID=" + dictid + " ref=" + di);
+					}
+					addRWsums(rRshift, wRshift, rTot, wTot, xsi, key);
 
-				touchXSIandDI(xsi, di);
+					touchXSIandDI(xsi, di);
 
-				// touchUserForKey(key, xsi);
-				di = xsi.dictMap.remove(key); // removed key
+					// touchUserForKey(key, xsi);
+					di = xsi.dictMap.remove(key); // removed key
 
-				if ((di != null) && (di.user != null) && (di.type == DI_TYPE_LOGIN)) {
-					xsi.dictUserMap.remove(di.user);
-				}
+					if ((di != null) && (di.user != null) && (di.type == DI_TYPE_LOGIN)) {
+						xsi.dictUserMap.remove(di.user);
+					}
 
-				break;
-			case XROOTD_MON_DISC: // Client has disconnected
-				br.skipChars(7);
-				final long seconds = br.readUInt32();
-				dictid = br.readUInt32();
-				key = "" + dictid + "/" + stod;
-				di = xsi.dictMap.get(key);
-				if (logger.isLoggable(Level.FINER)) {
-					logger.log(Level.FINER, "DISCONNECT: after " + seconds + " sec dictID=" + dictid + " ref=" + di);
-				}
-				// set the time for the transfer done by this user.
-				// the idea is that with xcp, there will be one transfer / user
-				// connection
-				// so we can use the connection time as the transfer time...
-				// TODO: find a better way to do this
-				if ((di != null) && (seconds > 0)) {
-					// di refers to the user
-					// find all results belonging to this user
-					for (final Enumeration<String> entk = xsi.transfResults.keys(); entk.hasMoreElements();) {
-						final String user = entk.nextElement();
-						final DictInfo udi = findDIforUser(user, xsi);
-						if ((udi != null) && udi.equals(di)) {
-							final Result r = xsi.transfResults.get(user);
-							r.param[3] = (r.param[0] + r.param[1]) / seconds; // in
-																				// MB/s
+					break;
+				case XROOTD_MON_DISC: // Client has disconnected
+					br.skipChars(7);
+					final long seconds = br.readUInt32();
+					dictid = br.readUInt32();
+					key = "" + dictid + "/" + stod;
+					di = xsi.dictMap.get(key);
+					if (logger.isLoggable(Level.FINER)) {
+						logger.log(Level.FINER, "DISCONNECT: after " + seconds + " sec dictID=" + dictid + " ref=" + di);
+					}
+					// set the time for the transfer done by this user.
+					// the idea is that with xcp, there will be one transfer / user
+					// connection
+					// so we can use the connection time as the transfer time...
+					// TODO: find a better way to do this
+					if ((di != null) && (seconds > 0)) {
+						// di refers to the user
+						// find all results belonging to this user
+						for (final Enumeration<String> entk = xsi.transfResults.keys(); entk.hasMoreElements();) {
+							final String user = entk.nextElement();
+							final DictInfo udi = findDIforUser(user, xsi);
+							if ((udi != null) && udi.equals(di)) {
+								final Result r = xsi.transfResults.get(user);
+								r.param[3] = (r.param[0] + r.param[1]) / seconds; // in
+																					// MB/s
+							}
 						}
 					}
-				}
-				di = xsi.dictMap.remove(key); // removed key
+					di = xsi.dictMap.remove(key); // removed key
 
-				if ((di != null) && (di.user != null) && (di.type == DI_TYPE_LOGIN)) {
-					xsi.dictUserMap.remove(di.user);
-				}
+					if ((di != null) && (di.user != null) && (di.type == DI_TYPE_LOGIN)) {
+						xsi.dictUserMap.remove(di.user);
+					}
 
-				break;
-			case XROOTD_MON_OPEN: // File has been opened
-				br.skipChars(11);
-				dictid = br.readUInt32();
-				key = "" + dictid + "/" + stod;
-				di = xsi.dictMap.get(key);
-				if (logger.isLoggable(Level.FINER)) {
-					logger.log(Level.FINER, "OPEN: dictID=" + dictid + " ref=" + di);
-				}
+					break;
+				case XROOTD_MON_OPEN: // File has been opened
+					br.skipChars(11);
+					dictid = br.readUInt32();
+					key = "" + dictid + "/" + stod;
+					di = xsi.dictMap.get(key);
+					if (logger.isLoggable(Level.FINER)) {
+						logger.log(Level.FINER, "OPEN: dictID=" + dictid + " ref=" + di);
+					}
 
-				touchXSIandDI(xsi, di);
+					touchXSIandDI(xsi, di);
 
-				// touchUserForKey(key, xsi);
-				break;
-			case XROOTD_MON_WINDOW: // Window timing mark
-				br.skipChars(7);
-				final long lastWend = br.readUInt32();
-				final long thisWstart = br.readUInt32();
-				if (logger.isLoggable(Level.FINER)) {
-					logger.log(Level.FINER, "WINDOW: lastEND: " + new Date(lastWend * 1000) + " thisSTART: " + new Date(thisWstart * 1000));
-				}
-				// TODO: does it worth using this information?
-				break;
-			default:
-				if ((type & XROOTD_MON_RWREQ) == 0) {
-					// Read or write request
-					br.pushBack(); // push back the type byte
-					final long offset = br.readInt64();
-					int rwSize = br.readInt32(); // SIGNED!
-					String rwType;
-					if (rwSize >= 0) {
-						rwType = "READ";
+					// touchUserForKey(key, xsi);
+					break;
+				case XROOTD_MON_WINDOW: // Window timing mark
+					br.skipChars(7);
+					final long lastWend = br.readUInt32();
+					final long thisWstart = br.readUInt32();
+					if (logger.isLoggable(Level.FINER)) {
+						logger.log(Level.FINER, "WINDOW: lastEND: " + new Date(lastWend * 1000) + " thisSTART: " + new Date(thisWstart * 1000));
+					}
+					// TODO: does it worth using this information?
+					break;
+				default:
+					if ((type & XROOTD_MON_RWREQ) == 0) {
+						// Read or write request
+						br.pushBack(); // push back the type byte
+						final long offset = br.readInt64();
+						int rwSize = br.readInt32(); // SIGNED!
+						String rwType;
+						if (rwSize >= 0) {
+							rwType = "READ";
+						}
+						else {
+							rwType = "WRITE";
+							rwSize *= -1;
+						}
+						dictid = br.readUInt32();
+						if (logger.isLoggable(Level.FINEST)) {
+							logger.log(Level.FINEST, rwType + ": offset=" + offset + " length=" + rwSize + " dictID=" + dictid + " ref=" + xsi.dictMap.get("" + dictid + "/" + stod));
+							// TODO: find a better way to use this data
+							// because for now, it's unusable, as it is
+						}
 					}
 					else {
-						rwType = "WRITE";
-						rwSize *= -1;
+						logger.log(Level.INFO, "UNKNOWN Trace message!");
+						br.skipChars(7);
 					}
-					dictid = br.readUInt32();
-					if (logger.isLoggable(Level.FINEST)) {
-						logger.log(Level.FINEST, rwType + ": offset=" + offset + " length=" + rwSize + " dictID=" + dictid + " ref=" + xsi.dictMap.get("" + dictid + "/" + stod));
-						// TODO: find a better way to use this data
-						// because for now, it's unusable, as it is
-					}
-				}
-				else {
-					logger.log(Level.INFO, "UNKNOWN Trace message!");
-					br.skipChars(7);
-				}
 			}
 		}
 	}
@@ -840,7 +870,7 @@ public class monXrootd extends monGenericUDP {
 				sourceToHostAddress.put(sourceAddress, serverHost, 1000 * 60 * 5);
 			}
 		}
-		
+
 		if (logger.isLoggable(Level.FINER)) {
 			logger.log(Level.FINER, "Received packet of size " + len + " from " + serverHost + " [" + source.getHostAddress() + "] at " + new Date());
 		}

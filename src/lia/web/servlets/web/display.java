@@ -292,7 +292,7 @@ public class display extends CacheServlet {
 
 					diff = Math.max(diff, AppConfig.geti("display.minCacheTime", 30));
 					diff = Math.min(diff, AppConfig.geti("display.maxCacheTime", 300));
-					
+
 					if (logTiming())
 						logTiming("display.getCacheTimeout() : Returning " + diff + " (" + lOldDiff + ") because " + lHistIntervalMax + "-" + lHistIntervalMin + ", "
 								+ pgeti(prop, "compact.displaypoints", 90));
@@ -5989,17 +5989,29 @@ public class display extends CacheServlet {
 	 * @return series alias
 	 */
 	public static final String getDescr(final Properties prop, final String sName, final String sDefault) {
-		String sDefaultDescr = pgets(prop, "default.descr", sDefault, false);
+		return getExtProperty(prop, sName, sDefault, "descr");
+	}
+
+	/**
+	 * @param prop
+	 * @param sName
+	 * @param sDefault
+	 * @param tag
+	 * @return the extended attribute of this series, either set for itself (<code>series.[tag] = smth</code> or set to <code>default.[tag]</code>, which replaces <code>$NAME</code> with the series name in its
+	 *         evaluation)
+	 */
+	public static final String getExtProperty(final Properties prop, final String sName, final String sDefault, final String tag) {
+		String sDefaultDescr = pgets(prop, "default." + tag, sDefault, false);
 
 		sDefaultDescr = Formatare.replace(sDefaultDescr, "$NAME", sName);
 
-		sDefaultDescr = parseOption(prop, "default.descr", sDefaultDescr, sDefaultDescr, true, true);
+		sDefaultDescr = parseOption(prop, "default." + tag, sDefaultDescr, sDefaultDescr, true, true);
 
-		String sAlias = pgets(prop, sName + ".descr", sDefaultDescr, false);
+		String sAlias = pgets(prop, sName + "." + tag, sDefaultDescr, false);
 
 		sAlias = Formatare.replace(sAlias, "$NAME", sName);
 
-		sAlias = parseOption(prop, sName + ".descr", sAlias, sAlias, true, true);
+		sAlias = parseOption(prop, sName + "." + tag, sAlias, sAlias, true, true);
 
 		return sAlias;
 	}

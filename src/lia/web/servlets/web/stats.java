@@ -762,6 +762,11 @@ public final class stats extends CacheServlet {
 					sAlternate = replace(sAlternate, "$REALNAME", s2);
 					sAlternate = replace(sAlternate, "$NO", "" + (iColor + 1));
 
+					final String seriesURL = display.getExtProperty(prop, s2, "", "url");
+
+					if (seriesURL != null && !seriesURL.isBlank())
+						p3.modify("series_href", "href='" + Format.escHtml(seriesURL) + "'");
+
 					final StringBuilder csvLine = new StringBuilder();
 
 					if (bCSV) {
@@ -951,7 +956,10 @@ public final class stats extends CacheServlet {
 									mms.setStrings(hmStrings.get(Integer.valueOf(l)));
 								}
 
-								p3_1.modify("color", mmr.getColor(er.sRez));
+								final String color = mmr.getColor(er.sRez);
+
+								if (color != null)
+									p3_1.modify("color", color);
 							}
 						}
 
@@ -1039,74 +1047,98 @@ public final class stats extends CacheServlet {
 					final Vector<String> vTemp = vTotals.get(m);
 
 					if (vTemp.size() > 0) {
+						final Map<Integer, Double> previousValues = new HashMap<>();
+
 						for (int k = 0; k < v3.size(); k++) {
 							final FunctionDecode fd = func.get(k);
 
 							if (vTemp.contains("" + k)) {
-
 								double dTotal = 0;
 								double dMin = NO_DATA;
 								double dMax = NO_DATA;
 								int iCount = 0;
 
-								for (int l = 0; l < v2.size(); l++) {
-									if (hideRows.contains(j + "_" + l)) {
-										continue;
+								if (fd.sFunc.equals("divcol")) {
+									final StringTokenizer divCols = new StringTokenizer(fd.sParams, ";");
+
+									try {
+										final Integer c1 = Integer.valueOf(divCols.nextToken());
+										final Integer c2 = Integer.valueOf(divCols.nextToken());
+
+										final Double d1 = previousValues.get(c1);
+										final Double d2 = previousValues.get(c2);
+
+										dTotal = d1.doubleValue() / d2.doubleValue();
+
+										if (fd.bFactor)
+											dTotal *= fd.dFactor;
 									}
-
-									final Vector<EvalResult> VR2 = VR1.get(l);
-									final EvalResult er = VR2.get(k);
-
-									if ((er.dRez >= 0) || fd.bAllowNegatives) {
-										dTotal += er.dRez;
-										iCount++;
-										dMin = ((dMin == NO_DATA) || (dMin > er.dRez)) ? er.dRez : dMin;
-										dMax = ((dMax == NO_DATA) || (dMax < er.dRez)) ? er.dRez : dMax;
+									catch (Exception e) {
+										logger.log(Level.WARNING, "Exception producing the divcol summary of column " + k + " for " + fd.sParams, e);
+										dTotal = NO_DATA;
 									}
 								}
-
-								switch (m) {
-									case 1: // average
-										if (iCount > 0) {
-											dTotal = dTotal / iCount;
-										}
-										else {
-											dTotal = NO_DATA;
-										}
-										break;
-									case 2: // stddev
-										if (iCount > 1) {
-											dTotal = dTotal / iCount;
-										}
-										else {
-											dTotal = NO_DATA;
-											break;
+								else {
+									for (int l = 0; l < v2.size(); l++) {
+										if (hideRows.contains(j + "_" + l)) {
+											continue;
 										}
 
-										double dSum = 0;
+										final Vector<EvalResult> VR2 = VR1.get(l);
+										final EvalResult er = VR2.get(k);
 
-										for (int l = 0; l < v2.size(); l++) {
-											final Vector<EvalResult> VR2 = VR1.get(l);
-											final EvalResult er = VR2.get(k);
-											if (er.dRez >= 0) {
-												final double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
-												dSum += dPatrat;
+										if ((er.dRez >= 0) || fd.bAllowNegatives) {
+											dTotal += er.dRez;
+											iCount++;
+											dMin = ((dMin == NO_DATA) || (dMin > er.dRez)) ? er.dRez : dMin;
+											dMax = ((dMax == NO_DATA) || (dMax < er.dRez)) ? er.dRez : dMax;
+										}
+									}
+
+									switch (m) {
+										case 1: // average
+											if (iCount > 0) {
+												dTotal = dTotal / iCount;
 											}
-										}
-										dSum /= (iCount - 1);
-										dTotal = Math.sqrt(dSum);
-										break;
-									case 3: // min
-										dTotal = dMin;
-										break;
-									case 4: // max
-										dTotal = dMax;
-										break;
-									default: // 0=total, or anything else
-										break;
+											else {
+												dTotal = NO_DATA;
+											}
+											break;
+										case 2: // stddev
+											if (iCount > 1) {
+												dTotal = dTotal / iCount;
+											}
+											else {
+												dTotal = NO_DATA;
+												break;
+											}
+
+											double dSum = 0;
+
+											for (int l = 0; l < v2.size(); l++) {
+												final Vector<EvalResult> VR2 = VR1.get(l);
+												final EvalResult er = VR2.get(k);
+												if (er.dRez >= 0) {
+													final double dPatrat = (er.dRez - dTotal) * (er.dRez - dTotal);
+													dSum += dPatrat;
+												}
+											}
+											dSum /= (iCount - 1);
+											dTotal = Math.sqrt(dSum);
+											break;
+										case 3: // min
+											dTotal = dMin;
+											break;
+										case 4: // max
+											dTotal = dMax;
+											break;
+										default: // 0=total, or anything else
+											break;
+									}
 								}
 
 								if ((dTotal >= 0) || fd.bAllowNegatives) {
+									previousValues.put(Integer.valueOf(k), Double.valueOf(dTotal));
 									p5_1.modify("value", convertDouble(fd, dTotal));
 								}
 								else {
@@ -3684,7 +3716,7 @@ public final class stats extends CacheServlet {
 		return vPreds;
 	}
 
-	private static final class MinMaxStaticStringColors implements MinMaxRec {
+	public static final class MinMaxStaticStringColors implements MinMaxRec {
 		private final Properties prop;
 
 		/**
@@ -3712,9 +3744,28 @@ public final class stats extends CacheServlet {
 				colorIndex *= -1;
 			}
 
-			final Color c = ServletExtension.getColor(prop, s + ".color", (Color) Utils.DEFAULT_PAINT_SEQUENCE[colorIndex % Utils.DEFAULT_PAINT_SEQUENCE.length]);
+			Color defaultColor = (Color) Utils.DEFAULT_PAINT_SEQUENCE[colorIndex % Utils.DEFAULT_PAINT_SEQUENCE.length];
 
-			return Utils.toHex(c);
+			String sDefaultColor = pgets(prop, "default.color", null, false);
+
+			if (sDefaultColor != null && !"auto".equalsIgnoreCase(sDefaultColor)) {
+				if (!sDefaultColor.isBlank()) {
+					sDefaultColor = Formatare.replace(sDefaultColor, "$NAME", s);
+
+					sDefaultColor = parseOption(prop, "default.color", sDefaultColor, sDefaultColor, true, true);
+
+					defaultColor = ServletExtension.getColor(sDefaultColor, defaultColor);
+				}
+				else
+					defaultColor = null;
+			}
+
+			final Color c = ServletExtension.getColor(prop, s + ".color", defaultColor);
+
+			if (c != null)
+				return Utils.toHex(c);
+
+			return null;
 		}
 
 	}

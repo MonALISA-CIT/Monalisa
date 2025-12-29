@@ -57,6 +57,11 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * Whether or not to use the AliEn LDAP to find the best ML service name matching a given queue name
+	 */
+	private static final boolean MATCH_ML_FROM_LDAP = true;
+
 	/** Logger used by this class */
 	static final Logger logger = Logger.getLogger(AliEnFilter.class.getName());
 
@@ -837,6 +842,22 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			}
 		}
 
+		static int transferStatusToInt(final String status) {
+			switch (status) {
+				case "INSERTING": return TS_INSERTING;
+				case "WAITING": return TS_WAITING;
+				case "ASSIGNED": return TS_ASSIGNED;
+				case "LOCAL_COPY": return TS_LOCAL_COPY;
+				case "TRANSFERRING": return TS_TRANSFERRING;
+				case "CLEANING": return TS_CLEANING;
+				case "DONE": return TS_DONE;
+				case "FAILED": return TS_FAILED;
+				case "KILLED": return TS_KILLED;
+				case "EXPIRED": return TS_EXPIRED;
+				default: return TS_UNKNOWN;
+			}
+		}
+		
 		/**
 		 * returns true if the given status is cummulative
 		 *
@@ -1474,6 +1495,33 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		// values.sqDifToDataArray(med, stdev);
 		// rates.sqDifToDataArray(med, stdev);
 		// }
+	}
+
+	/**
+	 * Debug method
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		final AliEnFilter filter = new AliEnFilter("CentralTest");
+
+		try (DBFunctions db = getQueueDB()) {
+			db.setReadOnly(true);
+			db.setQueryTimeout(60);
+
+			for (String id : args) {
+				db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?;", false, Long.valueOf(id));
+
+				while (db.moveNext()) {
+					JobStatusCS js = filter.jsStatusfromDB(db, "ALICE");
+					Result r = new Result();
+					js.setExecHost("NO_SITE", r, 0);
+					js.setStatus(-12);
+
+					System.err.println(js.jobID + " : " + js.execSite);
+				}
+			}
+		}
 	}
 
 	JobStatusCS jsStatusfromDB(final DBFunctions db, final String orgName) {
@@ -4153,7 +4201,7 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 						final long lEnd = System.currentTimeMillis();
 
-						logger.log(Level.INFO, "Loaded status for " + crtAliEnJobs.size() + " in " + (lEnd - lProcess) + " ms");
+						logger.log(Level.INFO, "Loaded status for " + crtAliEnJobs.size() + " jobs in " + (lEnd - lProcess) + " ms");
 						// status of AliEn jobs loaded ok; populate hashes...
 						addJobStatusCSBulk(crtAliEnJobs);
 
@@ -4286,11 +4334,36 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		 * @return true if it was successful.
 		 */
 		private boolean getAliEnTransfers() {
-			// disable old alien prompt
-			if (true)
-				return true;
-			
+			final String orgName = StringFactory.get(AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "ALICE").toUpperCase());
+			final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<>(10240);
+
 			logger.log(Level.INFO, "Trying to load status for current AliEn transfers...");
+			
+			try (DBFunctions db = getTransfersDB()) {
+				if (db != null) {
+					db.setReadOnly(true);
+					db.setQueryTimeout(60);
+
+					if (db.query("select transferId,status,size,user,remove_replica,destination,received,started,finished from TRANSFERS_DIRECT where status NOT IN ('FAILED', 'KILLED', 'DONE', 'EXPIRED');")) {
+						while (db.moveNext()) {
+							crtAliEnTransfers
+									.add(new TransferStatusCS(db.gets(1), orgName, TransferUtil.transferStatusToInt(db.gets(2)), db.getl(3), db.gets(4), db.gets(5), db.gets(6), db.getl(7) * 1000,
+											db.getl(8) * 1000, db.getl(9) * 1000));
+						}
+
+						logger.log(Level.INFO, "Loaded " + crtAliEnTransfers.size() + " transfers directly from the database");
+
+						addTransferStatusCSBulk(crtAliEnTransfers);
+
+						return true;
+					}
+					
+					logger.log(Level.WARNING, "Transfers query failed to execute", db.getLastError());
+				}
+
+				logger.log(Level.WARNING, "Could not load the transfers list from the database");
+			}
+						
 			final String cmd = ALIEN + " -x " + TRANSFER_SYNC_SCRIPT;
 			final BufferedReader buff = procOutput(cmd, JOB_SYNC_SCRIPT_TIMEOUT);
 			if (buff == null) {
@@ -4299,8 +4372,6 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 			}
 			try {
 				boolean finishedOK = false;
-				final String orgName = StringFactory.get(AppConfig.getGlobalEnvProperty("ALIEN_ORGANISATION", "ALICE").toUpperCase());
-				final ArrayList<TransferStatusCS> crtAliEnTransfers = new ArrayList<>(1024);
 				String line;
 				while ((line = buff.readLine()) != null) {
 					line = line.trim();
@@ -4865,20 +4936,20 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		JobStatusCS jscs = htJobStats.get(jobID);
 		if ((jscs == null) && create) {
 			try (DBFunctions db = getQueueDB()) {
-				if (db!=null) {
+				if (db != null) {
 					db.setQueryTimeout(15);
-					
+
 					if (db.query("SELECT queueId, statusId, userId, submitHostId, execHostId, received, started, finished, siteId FROM QUEUE WHERE queueId=?", false, Long.valueOf(jobID))) {
 						if (db.moveNext())
 							jscs = jsStatusfromDB(db, orgName);
 						else
-							logger.log(Level.WARNING, jobID+" doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
+							logger.log(Level.WARNING, jobID + " doesn't seem to exist in the queue any more, falling back to the legacy method of waiting for the fields to be updated");
 					}
 					else
-						logger.log(Level.WARNING, "Direct DB query failed for "+jobID+", falling back to the legacy method of waiting for the fields to be updated");
+						logger.log(Level.WARNING, "Direct DB query failed for " + jobID + ", falling back to the legacy method of waiting for the fields to be updated");
 				}
-				
-				if (jscs==null)
+
+				if (jscs == null)
 					jscs = new JobStatusCS(jobID, orgName);
 			}
 
@@ -7185,16 +7256,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 	private static ExtProperties dbProp = null;
 
-	/**
-	 * @return connection to the database, if any
-	 */
-	static DBFunctions getQueueDB() {
-		if (configured) {
-			if (dbProp != null)
-				return new DBFunctions(dbProp);
-
-			return null;
-		}
+	private static synchronized final ExtProperties getDBProperties() {
+		if (configured)
+			return dbProp;
 
 		configured = true;
 
@@ -7210,17 +7274,42 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 		dbProp.set("password", pass);
 		dbProp.set("driver", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_DRIVER", "com.mysql.jdbc.Driver"));
-		dbProp.set("host", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_HOST", "aliendb06b.cern.ch"));
+		dbProp.set("host", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_HOST", "alice-taskqueuedb.cern.ch"));
 		dbProp.set("port", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_PORT", "3308"));
 		dbProp.set("database", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_DBNAME", "processes"));
 		dbProp.set("user", AppConfig.getGlobalEnvProperty("ALIEN_DATABASE_PROCESSES_USER", "root"));
 		dbProp.set("autoReconnect", "true");
 		dbProp.set("useServerPrepStmts", "true");
 
-		if (logger.isLoggable(Level.FINE))
-			logger.log(Level.FINE, "Database details for direct connection are:\n" + dbProp.toString());
+		return dbProp;
+	}
+	
+	/**
+	 * @return connection to the database, if any
+	 */
+	static DBFunctions getQueueDB() {
+		final ExtProperties prop = getDBProperties();
+		
+		if (prop!=null)
+			return new DBFunctions(dbProp);
 
-		return new DBFunctions(dbProp);
+		return null;
+	}
+	
+	static DBFunctions getTransfersDB() {
+		final ExtProperties prop = getDBProperties();
+		
+		if (prop!=null) {
+			final ExtProperties transfers = new ExtProperties(prop.getProperties());
+			
+			transfers.set("host", "alice-transfersdb.cern.ch");
+			transfers.set("port", "3307");
+			transfers.set("database", "transfers");
+			
+			return new DBFunctions(transfers);
+		}
+		
+		return null;
 	}
 
 	private static final GenericLastValuesCache<Integer, String> userCache = new GenericLastValuesCache<Integer, String>() {
@@ -7385,6 +7474,52 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 		}
 	};
 
+	static final GenericLastValuesCache<String, String> queueToMLCache = new GenericLastValuesCache<String, String>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected int getMaximumSize() {
+			return 1000;
+		}
+
+		@Override
+		protected String resolve(final String queue) {
+			if (queue.lastIndexOf("::") == queue.indexOf("::"))
+				return "NO_SITE";
+
+			final String site = queue.substring(queue.indexOf("::") + 2, queue.lastIndexOf("::"));
+			final String qname = queue.substring(queue.lastIndexOf("::") + 2);
+
+			String query;
+
+			if (qname.startsWith(site))
+				query = "(|(ce=" + qname + ")(ce=LCG" + (qname.substring(site.length())) + "))";
+			else
+				query = "(ce=" + qname + ")";
+
+			Set<String> mlNames = LDAPHelper.checkLdapInformation(query, "ou=Config,ou=" + site + ",ou=Sites,", "monalisa");
+
+			if (mlNames == null || mlNames.isEmpty()) {
+				if (qname.startsWith(site))
+					query = "(|(name=" + qname + ")(name=LCG" + (qname.substring(site.length())) + "))";
+				else
+					query = "(name=" + qname + ")";
+
+				mlNames = LDAPHelper.checkLdapInformation(query, "ou=MonaLisa,ou=Services,ou=" + site + ",ou=Sites,", "name");
+			}
+
+			String mlName = site;
+
+			if (mlNames != null && mlNames.size() > 0) {
+				mlName = mlNames.iterator().next();
+				if (mlName.startsWith("LCG"))
+					mlName = site + mlName.substring(3);
+			}
+
+			return mlName;
+		}
+	};
+
 	/**
 	 * Get execution site for this job
 	 *
@@ -7407,6 +7542,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 
 				if (queueName == null)
 					return null;
+
+				if (MATCH_ML_FROM_LDAP)
+					return queueToMLCache.get(queueName);
 
 				try {
 					final String site = queueName.substring(queueName.indexOf("::") + 2, queueName.lastIndexOf("::"));
