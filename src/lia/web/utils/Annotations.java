@@ -73,10 +73,14 @@ public class Annotations {
 		sQuery+=bPreloadDescr ? "*" : "a_id,a_from,a_to,a_groups,a_text,a_color,a_textcolor,a_services,a_value";
 		
 		sQuery+=" FROM annotations WHERE "+
-				"(a_from>="+lStart+" and a_from<="+lEnd+") or "+
-				"(a_to>="+lStart+" and a_to<="+lEnd+") or "+
-				"(a_from<="+lStart+" and a_to>="+lEnd+") or "+
-				"(a_value=1) ";
+			"((a_from>="+lStart+" and a_from<="+lEnd+") or "+
+			"(a_to>="+lStart+" and a_to<="+lEnd+") or "+
+			"(a_from<="+lStart+" and a_to>="+lEnd+") or "+
+			"(a_value=1))";
+		
+		if (groups.size()>0) {
+			sQuery += " and (a_groups is null or a_groups && ARRAY[" + lazyj.Format.toCommaList(groups) + "])";
+		}
 		
 		if (limit > 0){
 			sQuery = "SELECT * FROM ("+sQuery+" ORDER BY a_to DESC, a_id DESC, a_from DESC LIMIT "+limit+" OFFSET "+offset+") AS x ";
