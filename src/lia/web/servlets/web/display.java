@@ -253,7 +253,7 @@ public class display extends CacheServlet {
 				if (kind.equals("hist") || kind.equals("combined_hist") || kind.equals("image") || kind.equals("farm_info")) {
 					final HttpSession sess = request.getSession(false);
 
-					long lHistIntervalMin = pgeti(prop, "interval.min", 3600000);
+					long lHistIntervalMin = pgetl(prop, "interval.min", 3600000);
 					try {
 						lHistIntervalMin = Long.parseLong((String) sess.getAttribute("interval.min"));
 					}
@@ -263,7 +263,7 @@ public class display extends CacheServlet {
 
 					lHistIntervalMin = getl("interval.min", lHistIntervalMin);
 
-					long lHistIntervalMax = pgeti(prop, "interval.max", 0);
+					long lHistIntervalMax = pgetl(prop, "interval.max", 0);
 					try {
 						lHistIntervalMax = Long.parseLong((String) sess.getAttribute("interval.max"));
 					}
@@ -767,7 +767,7 @@ public class display extends CacheServlet {
 
 		setLogTiming(prop);
 
-		final boolean bIgnoreInterval = (getl("interval.min", 0) < 0) || (getl("interval.max") < 0);
+		final boolean bIgnoreInterval = geti("allow.future.timestamps", 0 )==0 && ((getl("interval.min", 0) < 0) || (getl("interval.max") < 0));
 
 		if (bIgnoreInterval) {
 			prop.setProperty("interval.min.cookie.ignore", "true");
