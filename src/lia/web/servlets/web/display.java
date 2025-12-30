@@ -2813,8 +2813,8 @@ public class display extends CacheServlet {
 			logTiming("getDataSplitter final : " + lMinOffset + " -> " + lMaxOffset);
 
 		for (int i = 0; i < vp.length; i++) {
-			vp[i].tmin = lMinOffset;
-			vp[i].tmax = lMaxOffset;
+			vp[i].tmin = lMinOffset <= 0 ? lMinOffset : NTPDate.currentTimeMillis() + lMinOffset;
+			vp[i].tmax = lMaxOffset <=0 ? lMaxOffset : NTPDate.currentTimeMillis() + lMaxOffset;
 		}
 
 		return store.getDataSplitter(vp, lCompactInterval);
