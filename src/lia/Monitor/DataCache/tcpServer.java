@@ -69,15 +69,22 @@ public class tcpServer extends Thread {
             active = false;
         }
 
-        this.setName("(ML) tcpServer @ " + cache.getIPAddress() + ":" + lis_port);
-
-        try {
-            this.setDaemon(true);
-        } catch (Throwable t) {
-            logger.log(Level.WARNING, "Cannot setDaemon", t);
+        // initialize this only for its own identity information, it doesn't need to be listening at all in fact
+        if (AppConfig.getb("lia.Monitor.DataCache.disableTcpServer", true)) {
+        	listen_socket.close();
+        	active = false;
         }
+        else {
+        	this.setName("(ML) tcpServer @ " + cache.getIPAddress() + ":" + lis_port);
 
-        start();
+        	try {
+        		this.setDaemon(true);
+        	} catch (Throwable t) {
+        		logger.log(Level.WARNING, "Cannot setDaemon", t);
+        	}
+
+        	start();
+        }
     }
 
     @Override
