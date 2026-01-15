@@ -98,14 +98,14 @@ public final class DoubleFormat {
 				else if (sSize.equals("T"))
 					sSize = "P";
 				else if (sSize.equals("P"))
-					sSize = "X";
+					sSize = "E";
 			}
 	
 			for (int i=0; i<10 && d < 0.1d && sSize.length() > 0 && !sSize.equals("B"); i++) {
 				d *= dDiv;
 	
 				switch (sSize.charAt(0)) {
-					case 'X':
+					case 'E':
 						sSize = "P";
 						break;
 					case 'P':
