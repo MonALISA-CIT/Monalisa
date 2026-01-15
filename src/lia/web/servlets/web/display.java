@@ -172,12 +172,12 @@ public class display extends CacheServlet {
 	/**
 	 * Repository version
 	 */
-	public static final String sRepositoryVersion = "1.4.6";
+	public static final String sRepositoryVersion = "1.4.7";
 
 	/**
 	 * Date of last significant change
 	 */
-	public static final String sRepositoryDate = "2024.01.19";
+	public static final String sRepositoryDate = "2026.01.07";
 
 	/**
 	 * Wrapper HTML for the actual content (header, menu ...)
