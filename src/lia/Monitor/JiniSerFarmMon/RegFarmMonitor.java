@@ -516,6 +516,10 @@ public class RegFarmMonitor extends BasicService implements Runnable, DataStore,
                     while (((line = br.readLine()) != null) && !line.equals("")) {
                         // read data 'till end of file or empty line received
                         line = line.replaceAll("[ ]+", " ");
+                        
+                        if (!line.contains(":"))
+                        	continue;
+                        
                         String key = line.substring(0, line.indexOf(":")).toLowerCase();
                         if ((as == null) && key.equalsIgnoreCase("origin")) {
                             as = line.substring(line.indexOf("AS") + 2);
@@ -525,7 +529,7 @@ public class RegFarmMonitor extends BasicService implements Runnable, DataStore,
                         }
                     }
                 } catch (Throwable ex) {
-                    logger.log(Level.WARNING, "Error getting AS", ex);
+                    logger.log(Level.WARNING, "Error getting AS from `"+allQuery+"`", ex);
                 } finally {
                     Utils.closeIgnoringException(br);
                     Utils.closeIgnoringException(is);
