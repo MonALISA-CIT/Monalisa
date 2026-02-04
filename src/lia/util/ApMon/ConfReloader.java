@@ -20,6 +20,7 @@ public class ConfReloader extends Thread {
 
     ConfReloader (ApMon apm) {
 	this.apm = apm;
+	setName("ApMon.ConfReloader");
     }
 
     public void run() {
