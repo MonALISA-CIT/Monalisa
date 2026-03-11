@@ -49,7 +49,6 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.Week;
-import org.jfree.data.time.Year;
 import org.jfree.ui.Layer;
 import org.jfree.ui.LengthAdjustmentType;
 import org.jfree.ui.RectangleAnchor;
@@ -950,7 +949,7 @@ public final class Utils {
 
 		String sTimeAxis = null;
 
-		PeriodAxisLabelInfo[] aperiodaxislabelinfo = new PeriodAxisLabelInfo[2];
+		final PeriodAxisLabelInfo[] aperiodaxislabelinfo = new PeriodAxisLabelInfo[2];
 
 		Class<?> majorTickTime = Hour.class;
 
@@ -959,37 +958,28 @@ public final class Utils {
 			aperiodaxislabelinfo[1] = PALI_DATE;
 			sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
 		}
-		else
-			if (lDiff <= ((TIME_DAY * 2) + (TIME_HOUR * 1))) {
-				aperiodaxislabelinfo[0] = PALI_HOUR;
-				aperiodaxislabelinfo[1] = PALI_DATE;
-				sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
-			}
-			else
-				if (lDiff <= ((TIME_WEEK * 6) + (TIME_DAY * 1))) {
-					aperiodaxislabelinfo[0] = PALI_DAY;
-					aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
-					majorTickTime = Day.class;
-				}
-				else
-					if (lDiff <= ((TIME_MONTH * 3) + (TIME_DAY * 1))) {
-						// for 1.5 to 3 months show the weeks only
-						aperiodaxislabelinfo[0] = PALI_WEEK;
-						aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
-						majorTickTime = Week.class;
-					}
-					else if (lDiff <= TIME_MONTH * 12 * 7) {
-						// for at least 3 months just show the month names
-						aperiodaxislabelinfo[0] = PALI_MONTH;
-						aperiodaxislabelinfo[1] = PALI_YEAR;
-						majorTickTime = Month.class;
-					}
-					else {
-						// for long term plots, only show the year, avoiding clutter 
-						aperiodaxislabelinfo = new PeriodAxisLabelInfo[1];
-						aperiodaxislabelinfo[0] = PALI_YEAR;
-						majorTickTime = Year.class;
-					}
+		else if (lDiff <= ((TIME_DAY * 2) + (TIME_HOUR * 1))) {
+			aperiodaxislabelinfo[0] = PALI_HOUR;
+			aperiodaxislabelinfo[1] = PALI_DATE;
+			sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
+		}
+		else if (lDiff <= ((TIME_WEEK * 6) + (TIME_DAY * 1))) {
+			aperiodaxislabelinfo[0] = PALI_DAY;
+			aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
+			majorTickTime = Day.class;
+		}
+		else if (lDiff <= ((TIME_MONTH * 3) + (TIME_DAY * 1))) {
+			// for 1.5 to 3 months show the weeks only
+			aperiodaxislabelinfo[0] = PALI_WEEK;
+			aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
+			majorTickTime = Week.class;
+		}
+		else {
+			// for at least 3 months just show the month names
+			aperiodaxislabelinfo[0] = PALI_MONTH;
+			aperiodaxislabelinfo[1] = PALI_YEAR;
+			majorTickTime = Month.class;
+		}
 
 		if (ServletExtension.pgetd(prop, "font.scale", -1d) > 0)
 			for (int i = 0; i < aperiodaxislabelinfo.length; i++)
@@ -1470,15 +1460,14 @@ public final class Utils {
 					textAnchor = TextAnchor.CENTER_RIGHT;
 				}
 			}
-			else
-				if (bTop) {
-					labelAnchor = RectangleAnchor.TOP_RIGHT;
-					textAnchor = TextAnchor.TOP_LEFT;
-				}
-				else {
-					labelAnchor = RectangleAnchor.RIGHT;
-					textAnchor = TextAnchor.CENTER_LEFT;
-				}
+			else if (bTop) {
+				labelAnchor = RectangleAnchor.TOP_RIGHT;
+				textAnchor = TextAnchor.TOP_LEFT;
+			}
+			else {
+				labelAnchor = RectangleAnchor.RIGHT;
+				textAnchor = TextAnchor.CENTER_LEFT;
+			}
 
 			if (a.from == a.to) {
 				final ValueMarker valuemarker = new ValueMarker(a.from, a.color, SINGLE_VALUE_MARKER_STROKE);
@@ -1557,11 +1546,15 @@ public final class Utils {
 	}
 
 	private static final class JSPExecution {
-		final long lStarted = System.nanoTime();
+		final long lStarted;
 		final String jspName;
 
-		public JSPExecution(final String jspName) {
+		public JSPExecution(final String jspName, final Long timestamp) {
 			this.jspName = jspName;
+			if (timestamp != null)
+				lStarted = timestamp.longValue();
+			else
+				lStarted = System.nanoTime();
 		}
 
 		/**
@@ -1620,7 +1613,7 @@ public final class Utils {
 		final boolean isStartStatement = sServletName.startsWith("START ");
 
 		if (isStartStatement) {
-			jspExecutionStarted.overwrite(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim()), 1000 * 60 * 30);
+			jspExecutionStarted.overwrite(Long.valueOf(Thread.currentThread().getId()), new JSPExecution(sServletName.substring(6).trim(), null), 1000 * 60 * 30);
 
 			if (!bLogStart)
 				return;
@@ -1661,7 +1654,14 @@ public final class Utils {
 
 			final int port = request.getLocalPort();
 
-			final JSPExecution execution = isStartStatement ? null : jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
+			JSPExecution execution = isStartStatement ? null : jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
+
+			if (execution == null) {
+				final Long startTime = (Long) request.getAttribute("lia.web.servlets.web.requestStartTime");
+
+				if (startTime != null)
+					execution = new JSPExecution(sServletName, startTime);
+			}
 
 			double executionTimeReal = executionTime;
 
