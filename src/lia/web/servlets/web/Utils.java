@@ -1662,7 +1662,7 @@ public final class Utils {
 
 			JSPExecution execution = isStartStatement ? null : jspExecutionStarted.remove(Long.valueOf(Thread.currentThread().getId()));
 
-			if (execution == null) {
+			if (execution == null || !sServletName.startsWith(execution.jspName)) {
 				final Long startTime = (Long) request.getAttribute("lia.web.servlets.web.requestStartTime");
 
 				if (startTime != null)
