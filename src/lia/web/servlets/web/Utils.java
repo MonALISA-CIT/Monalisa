@@ -49,6 +49,7 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.Month;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.Week;
+import org.jfree.data.time.Year;
 import org.jfree.ui.Layer;
 import org.jfree.ui.LengthAdjustmentType;
 import org.jfree.ui.RectangleAnchor;
@@ -949,7 +950,7 @@ public final class Utils {
 
 		String sTimeAxis = null;
 
-		final PeriodAxisLabelInfo[] aperiodaxislabelinfo = new PeriodAxisLabelInfo[2];
+		PeriodAxisLabelInfo[] aperiodaxislabelinfo = new PeriodAxisLabelInfo[2];
 
 		Class<?> majorTickTime = Hour.class;
 
@@ -974,13 +975,18 @@ public final class Utils {
 			aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
 			majorTickTime = Week.class;
 		}
-		else {
+		else if (lDiff <= TIME_MONTH * 12 * 7) {
 			// for at least 3 months just show the month names
 			aperiodaxislabelinfo[0] = PALI_MONTH;
 			aperiodaxislabelinfo[1] = PALI_YEAR;
 			majorTickTime = Month.class;
 		}
-
+		else {
+			// for long term plots, only show the year, avoiding clutter
+			aperiodaxislabelinfo = new PeriodAxisLabelInfo[1];
+			aperiodaxislabelinfo[0] = PALI_YEAR;
+			majorTickTime = Year.class;
+		}
 		if (ServletExtension.pgetd(prop, "font.scale", -1d) > 0)
 			for (int i = 0; i < aperiodaxislabelinfo.length; i++)
 				if (aperiodaxislabelinfo[i] != null) {
