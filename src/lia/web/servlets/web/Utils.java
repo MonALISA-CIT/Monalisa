@@ -11,6 +11,7 @@ import java.awt.Shape;
 import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -311,6 +312,18 @@ public final class Utils {
 			vFiles.add(sFile);
 
 			final String sFullFileName = sConfDir + sFile + ".properties";
+
+			try {
+				final File base = new File(sConfDir).getCanonicalFile();
+				final File target = new File(sFullFileName).getCanonicalFile();
+				if (!target.toPath().startsWith(base.toPath())) {
+					throw new IOException("Path traversal rejected: " + sFullFileName);
+				}
+			}
+			catch (final Exception e) {
+				logger.log(Level.SEVERE, "Exception locating the configuration file", e);
+				return prop;
+			}
 
 			final Properties pTemp = new Properties();
 
@@ -959,34 +972,38 @@ public final class Utils {
 			aperiodaxislabelinfo[1] = PALI_DATE;
 			sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
 		}
-		else if (lDiff <= ((TIME_DAY * 2) + (TIME_HOUR * 1))) {
-			aperiodaxislabelinfo[0] = PALI_HOUR;
-			aperiodaxislabelinfo[1] = PALI_DATE;
-			sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
-		}
-		else if (lDiff <= ((TIME_WEEK * 6) + (TIME_DAY * 1))) {
-			aperiodaxislabelinfo[0] = PALI_DAY;
-			aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
-			majorTickTime = Day.class;
-		}
-		else if (lDiff <= ((TIME_MONTH * 3) + (TIME_DAY * 1))) {
-			// for 1.5 to 3 months show the weeks only
-			aperiodaxislabelinfo[0] = PALI_WEEK;
-			aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
-			majorTickTime = Week.class;
-		}
-		else if (lDiff <= TIME_MONTH * 12 * 7) {
-			// for at least 3 months just show the month names
-			aperiodaxislabelinfo[0] = PALI_MONTH;
-			aperiodaxislabelinfo[1] = PALI_YEAR;
-			majorTickTime = Month.class;
-		}
-		else {
-			// for long term plots, only show the year, avoiding clutter
-			aperiodaxislabelinfo = new PeriodAxisLabelInfo[1];
-			aperiodaxislabelinfo[0] = PALI_YEAR;
-			majorTickTime = Year.class;
-		}
+		else
+			if (lDiff <= ((TIME_DAY * 2) + (TIME_HOUR * 1))) {
+				aperiodaxislabelinfo[0] = PALI_HOUR;
+				aperiodaxislabelinfo[1] = PALI_DATE;
+				sTimeAxis = ServletExtension.pgets(prop, "timeaxis", "GMT Time");
+			}
+			else
+				if (lDiff <= ((TIME_WEEK * 6) + (TIME_DAY * 1))) {
+					aperiodaxislabelinfo[0] = PALI_DAY;
+					aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
+					majorTickTime = Day.class;
+				}
+				else
+					if (lDiff <= ((TIME_MONTH * 3) + (TIME_DAY * 1))) {
+						// for 1.5 to 3 months show the weeks only
+						aperiodaxislabelinfo[0] = PALI_WEEK;
+						aperiodaxislabelinfo[1] = PALI_MONTH_YEAR;
+						majorTickTime = Week.class;
+					}
+					else
+						if (lDiff <= TIME_MONTH * 12 * 7) {
+							// for at least 3 months just show the month names
+							aperiodaxislabelinfo[0] = PALI_MONTH;
+							aperiodaxislabelinfo[1] = PALI_YEAR;
+							majorTickTime = Month.class;
+						}
+						else {
+							// for long term plots, only show the year, avoiding clutter
+							aperiodaxislabelinfo = new PeriodAxisLabelInfo[1];
+							aperiodaxislabelinfo[0] = PALI_YEAR;
+							majorTickTime = Year.class;
+						}
 		if (ServletExtension.pgetd(prop, "font.scale", -1d) > 0)
 			for (int i = 0; i < aperiodaxislabelinfo.length; i++)
 				if (aperiodaxislabelinfo[i] != null) {
@@ -1466,14 +1483,15 @@ public final class Utils {
 					textAnchor = TextAnchor.CENTER_RIGHT;
 				}
 			}
-			else if (bTop) {
-				labelAnchor = RectangleAnchor.TOP_RIGHT;
-				textAnchor = TextAnchor.TOP_LEFT;
-			}
-			else {
-				labelAnchor = RectangleAnchor.RIGHT;
-				textAnchor = TextAnchor.CENTER_LEFT;
-			}
+			else
+				if (bTop) {
+					labelAnchor = RectangleAnchor.TOP_RIGHT;
+					textAnchor = TextAnchor.TOP_LEFT;
+				}
+				else {
+					labelAnchor = RectangleAnchor.RIGHT;
+					textAnchor = TextAnchor.CENTER_LEFT;
+				}
 
 			if (a.from == a.to) {
 				final ValueMarker valuemarker = new ValueMarker(a.from, a.color, SINGLE_VALUE_MARKER_STROKE);
