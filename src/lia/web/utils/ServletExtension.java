@@ -960,7 +960,8 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 							key = IDGenerator.generateKey(o, 0);
 							break;
 						case 't':
-							key = s = "" + lTime;
+							s = "" + lTime;
+							key = IDGenerator.generateKey(o, 0);
 							break;
 						case 'F':
 						default:

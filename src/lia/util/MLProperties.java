@@ -13,11 +13,13 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import lia.Monitor.Store.Fast.IDGenerator;
 import lia.Monitor.monitor.ExtResult;
 import lia.Monitor.monitor.Result;
 import lia.Monitor.monitor.TimestampedResult;
@@ -451,7 +453,7 @@ public final class MLProperties {
                 logger.log(Level.FINER, "Evaluating cache request : '" + sVal + "'");
             }
 
-            final TreeSet<String> ts = new TreeSet<String>(); //it's a sorted collection
+            final TreeMap<String, String> tm = new TreeMap<>();
 
             if (sVal.length() >= 2) {
                 final char c = sVal.charAt(0);
@@ -515,36 +517,40 @@ public final class MLProperties {
                         continue;
                     }
 
+                    String key;
+                    
                     switch (c) {
                     case 'C':
-                        s = sClusterName;
+                        key = s = sClusterName;
                         break;
                     case 'N':
-                        s = sNodeName;
+                    	key = s = sNodeName;
                         break;
                     case 'f':
-                        s = sParamName;
+                    	key = s = sParamName;
                         break;
                     case 'v':
-                        s = sValue;
+                    	s = sValue;
+						key = IDGenerator.generateKey(o, 0);
                         break;
                     case 't':
-                        s = "" + o.getTime();
+                    	s = "" + o.getTime();
+						key = IDGenerator.generateKey(o, 0);
                         break;
                     case 'F':
                     default:
-                        s = sFarmName;
+                    	key = s = sFarmName;
                     }
 
-                    ts.add(s);
+                    tm.put(key, s);
                 }
             }
 
             if (logger.isLoggable(Level.FINER)) {
-                logger.log(Level.FINER, "Extracted values : " + ts);
+                logger.log(Level.FINER, "Extracted values : " + tm);
             }
 
-            final Iterator<String> it = ts.iterator();
+            final Iterator<String> it = tm.values().iterator();
 
             if (it.hasNext()) {
                 sbVal.append(it.next().toString());
