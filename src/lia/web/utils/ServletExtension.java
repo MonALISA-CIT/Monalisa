@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import lazyj.cache.ExpirationCache;
 import lia.Monitor.Store.Cache;
 import lia.Monitor.Store.Fast.DB;
+import lia.Monitor.Store.Fast.IDGenerator;
 import lia.Monitor.monitor.ExtResult;
 import lia.Monitor.monitor.Result;
 import lia.Monitor.monitor.eResult;
@@ -942,32 +943,35 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 							else
 								continue;
 
+					String key;
+					
 					switch (c) {
 						case 'C':
-							s = sClusterName;
+							key = s = sClusterName;
 							break;
 						case 'N':
-							s = sNodeName;
+							key = s = sNodeName;
 							break;
 						case 'f':
-							s = sParamName;
+							key = s = sParamName;
 							break;
 						case 'v':
 							s = sValue;
+							key = IDGenerator.generateKey(o, 0);
 							break;
 						case 't':
-							s = "" + lTime;
+							key = s = "" + lTime;
 							break;
 						case 'F':
 						default:
-							s = sFarmName;
+							key = s = sFarmName;
 					}
 
-					tm.put(s, s);
+					tm.put(key, s);
 				}
 			}
 
-			final Iterator<String> it = tm.keySet().iterator();
+			final Iterator<String> it = tm.values().iterator();
 			while (it.hasNext()) {
 				if (sbVal.length() > 0)
 					sbVal.append(',');
@@ -979,7 +983,7 @@ public abstract class ServletExtension extends HttpServlet implements SingleThre
 		}
 
 		if (sbVal.length() > 0) {
-			// some processing occured here
+			// some processing occurred here
 			if (sVal.length() > 0) {
 				if (sbVal.length() > 0)
 					sbVal.append(',');
