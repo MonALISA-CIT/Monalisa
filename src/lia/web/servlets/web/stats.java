@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -135,16 +134,7 @@ public final class stats extends CacheServlet {
 		p.modify("page", gets("page"));
 
 		// URL parameters override everything
-		final Enumeration<?> eParams = request.getParameterNames();
-		while (eParams.hasMoreElements()) {
-			final String sParameter = (String) eParams.nextElement();
-
-			if (sParameter.equals("page")) {
-				continue;
-			}
-
-			prop.setProperty(sParameter, gets(sParameter));
-		}
+		decorateProperties(request, prop);
 
 		String sCSV = null;
 
@@ -471,12 +461,11 @@ public final class stats extends CacheServlet {
 										ok = false;
 									}
 								}
-								else
-									if (er.iType == EvalResult.TYPE_STRING) {
-										if (!cv.matches(er.sRez)) {
-											ok = false;
-										}
+								else if (er.iType == EvalResult.TYPE_STRING) {
+									if (!cv.matches(er.sRez)) {
+										ok = false;
 									}
+								}
 							}
 
 							logTiming("Filter : " + iVR + " / " + iVR1 + " / " + colToTest + " = " + er + " : " + ok);
@@ -1560,75 +1549,72 @@ public final class stats extends CacheServlet {
 		if (((dValue < 0) && !fd.bAllowNegatives) || (fd.bAllowNegatives && (Math.abs(dValue - NO_DATA) < 1E-10))) {
 			sRez = "-";
 		}
-		else
-			if ((Math.abs(dValue) < 1E-10) && fd.bIgnoreZero) {
-				sRez = "-";
-			}
-			else {
-				if (fd.bRound) {
-					if (!fd.b0Point1) {
-						dValue = Math.round(dValue);
-					}
-					else {
-						if (dValue >= 1) {
-							dValue = Math.round(dValue);
-						}
-						else
-							if ((dValue > 0) && (dValue < 0.1)) {
-								dValue = 0.1;
-							}
-							else {
-								dValue = Math.round(dValue * 10) / 10d;
-							}
-					}
-				}
-
-				if (fd.bNoSize) {
-					if (fd.bDot) {
-						sRez = ServletExtension.showDottedInt((long) dValue);
-					}
-					else
-						if (fd.bDDot) {
-							sRez = ServletExtension.showDottedDouble(dValue, fd.iDDotDigits);
-						}
-						else {
-							sRez = DoubleFormat.point(dValue);
-						}
+		else if ((Math.abs(dValue) < 1E-10) && fd.bIgnoreZero) {
+			sRez = "-";
+		}
+		else {
+			if (fd.bRound) {
+				if (!fd.b0Point1) {
+					dValue = Math.round(dValue);
 				}
 				else {
-					if (dValue > 0) {
-						sRez = DoubleFormat.size(dValue, fd.sSize, fd.b1000);
-
-						if ((fd.sPlus.length() == 0) && !sRez.endsWith("B")) {
-							sRez += "B";
-						}
+					if (dValue >= 1) {
+						dValue = Math.round(dValue);
+					}
+					else if ((dValue > 0) && (dValue < 0.1)) {
+						dValue = 0.1;
 					}
 					else {
-						sRez = "0";
-					}
-				}
-
-				if (fd.bTime) {
-					sRez = toTime(dValue);
-				}
-
-				if (fd.bTimestamp) {
-					sRez = toTimestamp(dValue);
-				}
-
-				if (fd.bIP) {
-					sRez = toIP(dValue);
-				}
-
-				if (((dValue > 0) || ((dValue == 0) && fd.bAlwaysShowUnit)) && (fd.sPlus.length() > 0)) {
-					if (sRez.toLowerCase().endsWith("b") && fd.sPlus.toLowerCase().startsWith("b")) {
-						sRez += fd.sPlus.substring(1);
-					}
-					else {
-						sRez += fd.sPlus;
+						dValue = Math.round(dValue * 10) / 10d;
 					}
 				}
 			}
+
+			if (fd.bNoSize) {
+				if (fd.bDot) {
+					sRez = ServletExtension.showDottedInt((long) dValue);
+				}
+				else if (fd.bDDot) {
+					sRez = ServletExtension.showDottedDouble(dValue, fd.iDDotDigits);
+				}
+				else {
+					sRez = DoubleFormat.point(dValue);
+				}
+			}
+			else {
+				if (dValue > 0) {
+					sRez = DoubleFormat.size(dValue, fd.sSize, fd.b1000);
+
+					if ((fd.sPlus.length() == 0) && !sRez.endsWith("B")) {
+						sRez += "B";
+					}
+				}
+				else {
+					sRez = "0";
+				}
+			}
+
+			if (fd.bTime) {
+				sRez = toTime(dValue);
+			}
+
+			if (fd.bTimestamp) {
+				sRez = toTimestamp(dValue);
+			}
+
+			if (fd.bIP) {
+				sRez = toIP(dValue);
+			}
+
+			if (((dValue > 0) || ((dValue == 0) && fd.bAlwaysShowUnit)) && (fd.sPlus.length() > 0)) {
+				if (sRez.toLowerCase().endsWith("b") && fd.sPlus.toLowerCase().startsWith("b")) {
+					sRez += fd.sPlus.substring(1);
+				}
+				else {
+					sRez += fd.sPlus;
+				}
+			}
+		}
 
 		return sRez;
 	}
@@ -2530,64 +2516,61 @@ public final class stats extends CacheServlet {
 			sRez = "-";
 			dValue = NO_DATA;
 		}
-		else
-			if ((Math.abs(dValue) < 1E-10) && fd.bIgnoreZero) {
-				dValue = NO_DATA;
-				sRez = "-";
-			}
-			else {
-				if (fd.bRound) {
-					if (!fd.b0Point1) {
-						dValue = Math.round(dValue);
-					}
-					else {
-						if (dValue >= 1) {
-							dValue = Math.round(dValue);
-						}
-						else
-							if ((dValue > 0) && (dValue < 0.1)) {
-								dValue = 0.1;
-							}
-							else {
-								dValue = Math.round(dValue * 10) / 10d;
-							}
-					}
-				}
-
-				if (fd.bNoSize) {
-					if (fd.bDot) {
-						sRez = ServletExtension.showDottedInt((long) dValue);
-					}
-					else
-						if (fd.bDDot) {
-							sRez = ServletExtension.showDottedDouble(dValue, fd.iDDotDigits);
-						}
-						else {
-							sRez = DoubleFormat.point(dValue);
-						}
+		else if ((Math.abs(dValue) < 1E-10) && fd.bIgnoreZero) {
+			dValue = NO_DATA;
+			sRez = "-";
+		}
+		else {
+			if (fd.bRound) {
+				if (!fd.b0Point1) {
+					dValue = Math.round(dValue);
 				}
 				else {
-					if (dValue > 0) {
-						sRez = DoubleFormat.size(dValue, fd.sSize, fd.b1000);
-
-						if ((fd.sPlus.length() == 0) && !sRez.endsWith("B")) {
-							sRez += "B";
-						}
+					if (dValue >= 1) {
+						dValue = Math.round(dValue);
+					}
+					else if ((dValue > 0) && (dValue < 0.1)) {
+						dValue = 0.1;
 					}
 					else {
-						sRez = "0";
-					}
-				}
-
-				if (((dValue > 0) || ((dValue == 0) && fd.bAlwaysShowUnit)) && (fd.sPlus.length() > 0)) {
-					if (sRez.toLowerCase().endsWith("b") && fd.sPlus.toLowerCase().startsWith("b")) {
-						sRez += fd.sPlus.substring(1);
-					}
-					else {
-						sRez += fd.sPlus;
+						dValue = Math.round(dValue * 10) / 10d;
 					}
 				}
 			}
+
+			if (fd.bNoSize) {
+				if (fd.bDot) {
+					sRez = ServletExtension.showDottedInt((long) dValue);
+				}
+				else if (fd.bDDot) {
+					sRez = ServletExtension.showDottedDouble(dValue, fd.iDDotDigits);
+				}
+				else {
+					sRez = DoubleFormat.point(dValue);
+				}
+			}
+			else {
+				if (dValue > 0) {
+					sRez = DoubleFormat.size(dValue, fd.sSize, fd.b1000);
+
+					if ((fd.sPlus.length() == 0) && !sRez.endsWith("B")) {
+						sRez += "B";
+					}
+				}
+				else {
+					sRez = "0";
+				}
+			}
+
+			if (((dValue > 0) || ((dValue == 0) && fd.bAlwaysShowUnit)) && (fd.sPlus.length() > 0)) {
+				if (sRez.toLowerCase().endsWith("b") && fd.sPlus.toLowerCase().startsWith("b")) {
+					sRez += fd.sPlus.substring(1);
+				}
+				else {
+					sRez += fd.sPlus;
+				}
+			}
+		}
 
 		final double dRealValue = dValue;
 
@@ -2619,18 +2602,17 @@ public final class stats extends CacheServlet {
 
 				dValue = 0;
 			}
-			else
-				if (dValue == 0) {
-					if (fd.bCountZero) {
-						dValue = 1; // in special cases we need to count the 0-producing nodes as active
-					}
-					// nodes ...
-					sRez = "warn";
+			else if (dValue == 0) {
+				if (fd.bCountZero) {
+					dValue = 1; // in special cases we need to count the 0-producing nodes as active
 				}
-				else {
-					dValue = 1; // count only the nodes with some data and where the value>0
-					sRez = "ok";
-				}
+				// nodes ...
+				sRez = "warn";
+			}
+			else {
+				dValue = 1; // count only the nodes with some data and where the value>0
+				sRez = "ok";
+			}
 		}
 
 		// System.err.println("sRez = "+sRez);
@@ -2669,13 +2651,12 @@ public final class stats extends CacheServlet {
 				if ((sParam == null) || sParam.equals("*") || sParam.equals("%") || sParam.equals("Status")) {
 					sParam = "Message";
 				}
-				else
-					if (sParam.indexOf("Status") >= 0) {
-						sParam = Formatare.replace(sParam, "Status", "Message");
-					}
-					else {
-						sParam = sParam + "Message";
-					}
+				else if (sParam.indexOf("Status") >= 0) {
+					sParam = Formatare.replace(sParam, "Status", "Message");
+				}
+				else {
+					sParam = sParam + "Message";
+				}
 
 				final monPredicate pTemp = new monPredicate(pred.Farm, pred.Cluster, pred.Node, -1, -1, new String[] { sParam }, null);
 
@@ -2829,13 +2810,12 @@ public final class stats extends CacheServlet {
 			if (d > 0) {
 				sRez = d + "d " + h + ":" + showZero(m);
 			}
-			else
-				if (h > 0) {
-					sRez = h + ":" + showZero(m);
-				}
-				else {
-					sRez = m + "min";
-				}
+			else if (h > 0) {
+				sRez = h + ":" + showZero(m);
+			}
+			else {
+				sRez = m + "min";
+			}
 		}
 
 		return sRez;
@@ -2889,26 +2869,21 @@ public final class stats extends CacheServlet {
 			if (sUnit.equals("s")) {
 				dInterval *= 1000d;
 			}
-			else
-				if (sUnit.equals("m")) {
-					dInterval *= 60 * 1000d;
-				}
-				else
-					if (sUnit.equals("h")) {
-						dInterval *= 60 * 60 * 1000d;
-					}
-					else
-						if (sUnit.equals("D")) {
-							dInterval *= 24 * 60 * 60 * 1000d;
-						}
-						else
-							if (sUnit.equals("M")) {
-								dInterval *= 30 * 24 * 60 * 60 * 1000d;
-							}
-							else
-								if (sUnit.equals("Y")) {
-									dInterval *= 365 * 24 * 60 * 60 * 1000d;
-								}
+			else if (sUnit.equals("m")) {
+				dInterval *= 60 * 1000d;
+			}
+			else if (sUnit.equals("h")) {
+				dInterval *= 60 * 60 * 1000d;
+			}
+			else if (sUnit.equals("D")) {
+				dInterval *= 24 * 60 * 60 * 1000d;
+			}
+			else if (sUnit.equals("M")) {
+				dInterval *= 30 * 24 * 60 * 60 * 1000d;
+			}
+			else if (sUnit.equals("Y")) {
+				dInterval *= 365 * 24 * 60 * 60 * 1000d;
+			}
 
 			// System.err.println("--- toInterval returning "+dInterval);
 
@@ -3504,19 +3479,18 @@ public final class stats extends CacheServlet {
 				// System.err.println("Column "+iCol+": creating stringsdef with: "+prop);
 
 			}
-			else
-				if ((sMin != null) && sMin.startsWith("complexgradient")) {
-					// the syntax is :
-					// N complexgradient(percent|abs) (valuemin^color^valuemax^color)*
-					// System.err.println("Column "+iCol+": creating complex with: "+sMin+", "+sMax+", "+sColorNoData+", "+sColorSingleData);
+			else if ((sMin != null) && sMin.startsWith("complexgradient")) {
+				// the syntax is :
+				// N complexgradient(percent|abs) (valuemin^color^valuemax^color)*
+				// System.err.println("Column "+iCol+": creating complex with: "+sMin+", "+sMax+", "+sColorNoData+", "+sColorSingleData);
 
-					mmrTemp = new MinMaxComplex(sMin, sMax, sColorNoData, sColorSingleData);
-				}
-				else {
-					// System.err.println("Column "+iCol+": creating simple with: "+sMin+", "+sMax+", "+sColorNoData+", "+sColorSingleData);
+				mmrTemp = new MinMaxComplex(sMin, sMax, sColorNoData, sColorSingleData);
+			}
+			else {
+				// System.err.println("Column "+iCol+": creating simple with: "+sMin+", "+sMax+", "+sColorNoData+", "+sColorSingleData);
 
-					mmrTemp = new MinMaxSimple(sMin, sMax, sColorNoData, sColorSingleData);
-				}
+				mmrTemp = new MinMaxSimple(sMin, sMax, sColorNoData, sColorSingleData);
+			}
 
 			if (iCol >= 0) {
 				mmr[iCol] = mmrTemp;

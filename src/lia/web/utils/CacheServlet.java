@@ -20,9 +20,12 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
 
 import lazyj.RequestWrapper;
 import lia.Monitor.monitor.AppConfig;
@@ -206,7 +209,8 @@ public abstract class CacheServlet extends ThreadedPage {
 			while (true) {
 				try {
 					sleep(2 * 1000); // every 2 seconds clean/refresh the cache
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 
@@ -299,7 +303,8 @@ public abstract class CacheServlet extends ThreadedPage {
 						}
 					}
 
-				} catch (Throwable t) {
+				}
+				catch (Throwable t) {
 					System.err.println("Exception in cache management : " + t + " (" + t.getMessage() + ")");
 					t.printStackTrace();
 
@@ -456,7 +461,8 @@ public abstract class CacheServlet extends ThreadedPage {
 
 					try {
 						Thread.sleep(50);
-					} catch (InterruptedException ie) {
+					}
+					catch (InterruptedException ie) {
 						break;
 					}
 				} while ((--iWait > 0) && ((cs = get(sKey)) == null));
@@ -481,32 +487,37 @@ public abstract class CacheServlet extends ThreadedPage {
 					osOut.write(b);
 
 					iLength = b.length;
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					System.err.println("CacheServlet: exception writing the cached content: " + e + " (" + e.getMessage() + ")");
 					e.printStackTrace();
 				}
 
 				try {
 					osOut.flush();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 
 				try {
 					pwOut.flush();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 
 				try {
 					pwOut.close();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 
 				try {
 					osOut.close();
-				} catch (Exception e) {
+				}
+				catch (Exception e) {
 					// ignore
 				}
 
@@ -629,9 +640,8 @@ public abstract class CacheServlet extends ThreadedPage {
 				else {
 					if (sAddr.indexOf("?") < 0)
 						sAddr += "?";
-					else
-						if (!sAddr.endsWith("?") && !sAddr.endsWith("&"))
-							sAddr += "&";
+					else if (!sAddr.endsWith("?") && !sAddr.endsWith("&"))
+						sAddr += "&";
 
 					sAddr += "cache_refresh_request=true";
 
@@ -651,7 +661,8 @@ public abstract class CacheServlet extends ThreadedPage {
 
 				pw.close();
 				br.close();
-			} catch (Throwable t) {
+			}
+			catch (Throwable t) {
 				System.err.println("Cache: cannot refresh because: " + t + " (" + t.getMessage() + ")");
 				t.printStackTrace();
 			}
@@ -761,7 +772,8 @@ public abstract class CacheServlet extends ThreadedPage {
 		public void close() throws IOException {
 			try {
 				pwOut.flush();
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				// ignore
 			}
 
@@ -796,7 +808,8 @@ public abstract class CacheServlet extends ThreadedPage {
 					try {
 						cs.content = compress(cs.content);
 						cs.bZip = true;
-					} catch (Exception e) {
+					}
+					catch (Exception e) {
 						System.err.println("CacheServlet: exception compressing: " + e + " (" + e.getMessage() + ")");
 						e.printStackTrace();
 					}
@@ -887,5 +900,4 @@ public abstract class CacheServlet extends ThreadedPage {
 
 		return baos.toByteArray();
 	}
-
 }

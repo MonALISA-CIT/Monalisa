@@ -6,7 +6,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
@@ -15,6 +14,8 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
+import org.jfree.chart.ChartUtilities;
+
 import lia.Monitor.Store.Cache;
 import lia.Monitor.monitor.Result;
 import lia.Monitor.monitor.monPredicate;
@@ -22,8 +23,6 @@ import lia.web.utils.ColorFactory;
 import lia.web.utils.DoubleFormat;
 import lia.web.utils.Page;
 import lia.web.utils.ThreadedPage;
-
-import org.jfree.chart.ChartUtilities;
 
 /**
  * Old style map
@@ -50,12 +49,7 @@ public class genimage extends ThreadedPage {
 			Properties prop = Utils.getProperties(sConfDir, gets("page"));
 
 			// override the configuration options with the url parameters
-			Enumeration<?> eParams = request.getParameterNames();
-			while (eParams.hasMoreElements()) {
-				String sParameter = (String) eParams.nextElement();
-				if (!sParameter.equals("page"))
-					prop.setProperty(sParameter, gets(sParameter));
-			}
+			decorateProperties(request, prop);
 
 			p.modify("page", gets("page"));
 

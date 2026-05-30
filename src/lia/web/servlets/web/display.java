@@ -503,7 +503,7 @@ public class display extends CacheServlet {
 					bSet = !pgetb(prop, sProp + ".cookie.ignore", false);
 
 					if (bSet)
-						prop.setProperty(sProp, v);
+						conditionalSet(prop, sProp, v);
 				}
 
 				if (bSet)
@@ -623,23 +623,22 @@ public class display extends CacheServlet {
 				pMaster.append("alternates", new Page(sResDir + "masterpage/alt_sep.res"));
 				bFirst = true;
 			}
-			else
-				if (sAlternate.equals("DESCRIPTION")) {
-					pMaster.append("alternates", sDescr);
-					bFirst = true;
-				}
-				else {
-					pAlternate.modify("page", sAlternate);
-					pAlternate.modify("pagehref", Format.replace(sAlternate, "CLEAR", ""));
-					pAlternate.modify("descr", sDescr);
-					pAlternate.modify("explain", sExplain);
+			else if (sAlternate.equals("DESCRIPTION")) {
+				pMaster.append("alternates", sDescr);
+				bFirst = true;
+			}
+			else {
+				pAlternate.modify("page", sAlternate);
+				pAlternate.modify("pagehref", Format.replace(sAlternate, "CLEAR", ""));
+				pAlternate.modify("descr", sDescr);
+				pAlternate.modify("explain", sExplain);
 
-					pAlternate.comment("com_first", !bFirst);
+				pAlternate.comment("com_first", !bFirst);
 
-					bFirst = false;
+				bFirst = false;
 
-					pMaster.append("alternates", pAlternate);
-				}
+				pMaster.append("alternates", pAlternate);
+			}
 		}
 
 		pMaster.comment("com_alternates", vAlternate.size() > 0);
@@ -767,7 +766,7 @@ public class display extends CacheServlet {
 
 		setLogTiming(prop);
 
-		final boolean bIgnoreInterval = geti("allow.future.timestamps", 0 )==0 && ((getl("interval.min", 0) < 0) || (getl("interval.max") < 0));
+		final boolean bIgnoreInterval = geti("allow.future.timestamps", 0) == 0 && ((getl("interval.min", 0) < 0) || (getl("interval.max") < 0));
 
 		if (bIgnoreInterval) {
 			prop.setProperty("interval.min.cookie.ignore", "true");
@@ -778,19 +777,8 @@ public class display extends CacheServlet {
 		setCookieParameters(request, prop);
 
 		// URL parameters override everything
-		Enumeration<?> eParams = request.getParameterNames();
-		while (eParams.hasMoreElements()) {
-			final String sParameter = (String) eParams.nextElement();
-
-			if (sParameter.equals("page"))
-				continue;
-
-			if (bIgnoreInterval && (sParameter.equals("interval.min") || sParameter.equals("interval.max")))
-				continue;
-
-			prop.setProperty(sParameter, gets(sParameter));
-		}
-
+		decorateProperties(request, prop, bIgnoreInterval);
+	
 		final Vector<String> vSetCookies = toVector(prop, "cookies", null);
 
 		vSetCookies.add("err");
@@ -846,12 +834,12 @@ public class display extends CacheServlet {
 
 		// some redirects in case i'm not the one who should be executing the request
 		if ((pgets(prop, "resolution").length() > 0) || (pgets(prop, "pagetitle").length() > 0) || pgets(prop, "page", "").equals("stats")) {
-			eParams = request.getParameterNames();
+			Enumeration<String> eParams = request.getParameterNames();
 
 			final StringBuilder sb = new StringBuilder();
 
 			while (eParams.hasMoreElements()) {
-				final String sParameter = (String) eParams.nextElement();
+				final String sParameter = eParams.nextElement();
 
 				final String[] vsValues = request.getParameterValues(sParameter);
 
@@ -908,29 +896,24 @@ public class display extends CacheServlet {
 				synchronized (oHistoryLock) {
 					p.append(buildHistoryPage(prop, hmSeries));
 				}
+			else if (kind.equals("combined_bar"))
+				p.append(buildCombinedBar(prop, hmSeries, request.getParameterValues("modules")));
+			else if (kind.equals("combined_hist"))
+				synchronized (oHistoryLock) {
+					p.append(buildCombinedHistory(prop, hmSeries, request.getParameterValues("modules")));
+				}
+			else if (kind.equals("image")) {
+				final String sFileName = buildImage(prop, hmSeries, null);
+				ServletUtilities.sendTempFile(sFileName, response);
+				bAuthOK = true;
+				return;
+			}
+			else if (kind.equals("farminfo"))
+				p.append(buildFarmInfo(prop));
+			else if (kind.startsWith("pie"))
+				p.append(buildPiePage(prop, hmSeries));
 			else
-				if (kind.equals("combined_bar"))
-					p.append(buildCombinedBar(prop, hmSeries, request.getParameterValues("modules")));
-				else
-					if (kind.equals("combined_hist"))
-						synchronized (oHistoryLock) {
-							p.append(buildCombinedHistory(prop, hmSeries, request.getParameterValues("modules")));
-						}
-					else
-						if (kind.equals("image")) {
-							final String sFileName = buildImage(prop, hmSeries, null);
-							ServletUtilities.sendTempFile(sFileName, response);
-							bAuthOK = true;
-							return;
-						}
-						else
-							if (kind.equals("farminfo"))
-								p.append(buildFarmInfo(prop));
-							else
-								if (kind.startsWith("pie"))
-									p.append(buildPiePage(prop, hmSeries));
-								else
-									p.append(buildRealTimePage(prop, hmSeries));
+				p.append(buildRealTimePage(prop, hmSeries));
 		}
 		catch (final Throwable e) {
 			System.out.println("Caught exception while building the '" + kind + "' page : " + e + " (" + e.getMessage() + ")");
@@ -1379,35 +1362,31 @@ public class display extends CacheServlet {
 			vsMultiSeries = vsFarms;
 			iMultiSeriesID = 0;
 		}
-		else
-			if (!vsWildcards[w].equals("C") && (vsClusters != null) && (vsClusters.length > 1)) {
-				vsMultiSeries = vsClusters;
-				iMultiSeriesID = 1;
+		else if (!vsWildcards[w].equals("C") && (vsClusters != null) && (vsClusters.length > 1)) {
+			vsMultiSeries = vsClusters;
+			iMultiSeriesID = 1;
+		}
+		else if (!vsWildcards[w].equals("N") && (vsNodes != null) && (vsNodes.length > 1)) {
+			vsMultiSeries = vsNodes;
+			iMultiSeriesID = 2;
+		}
+		else if (!vsWildcards[w].equals("f") && (vsFunctions != null) && (vsFunctions.length >= 1)) {
+			vsMultiSeries = vsFunctions;
+			iMultiSeriesID = 3;
+
+			if (vsFunctionSuff.length >= 1) {
+				iMultiSeriesID = 4;
+				vsMultiSeries = new String[vsFunctions.length * vsFunctionSuff.length];
+
+				for (i = 0; i < vsFunctions.length; i++)
+					for (int j = 0; j < vsFunctionSuff.length; j++)
+						vsMultiSeries[(i * vsFunctionSuff.length) + j] = vsFunctions[i] + vsFunctionSuff[j];
 			}
-			else
-				if (!vsWildcards[w].equals("N") && (vsNodes != null) && (vsNodes.length > 1)) {
-					vsMultiSeries = vsNodes;
-					iMultiSeriesID = 2;
-				}
-				else
-					if (!vsWildcards[w].equals("f") && (vsFunctions != null) && (vsFunctions.length >= 1)) {
-						vsMultiSeries = vsFunctions;
-						iMultiSeriesID = 3;
-
-						if (vsFunctionSuff.length >= 1) {
-							iMultiSeriesID = 4;
-							vsMultiSeries = new String[vsFunctions.length * vsFunctionSuff.length];
-
-							for (i = 0; i < vsFunctions.length; i++)
-								for (int j = 0; j < vsFunctionSuff.length; j++)
-									vsMultiSeries[(i * vsFunctionSuff.length) + j] = vsFunctions[i] + vsFunctionSuff[j];
-						}
-					}
-					else
-						if (vsFunctionSuff.length > 1) {
-							iMultiSeriesID = 5;
-							vsMultiSeries = vsFunctionSuff;
-						}
+		}
+		else if (vsFunctionSuff.length > 1) {
+			iMultiSeriesID = 5;
+			vsMultiSeries = vsFunctionSuff;
+		}
 
 		vsDescr = Utils.getValues(prop, "charts.descr");
 		if (vsDescr == null)
@@ -1513,11 +1492,10 @@ public class display extends CacheServlet {
 
 					if ((iMultiSeriesID == 3) || (iMultiSeriesID == 4))
 						pTemp.parameters = new String[] { vsMultiSeries[j] };
+					else if (iMultiSeriesID == 5)
+						pTemp.parameters = new String[] { p.parameters[j] };
 					else
-						if (iMultiSeriesID == 5)
-							pTemp.parameters = new String[] { p.parameters[j] };
-						else
-							pTemp.parameters = p.parameters;
+						pTemp.parameters = p.parameters;
 
 					vPreds.add(pTemp);
 				}
@@ -1555,11 +1533,10 @@ public class display extends CacheServlet {
 
 				if ((iMultiSeriesID == 3) || (iMultiSeriesID == 4))
 					pTemp.parameters = new String[] { vsMultiSeries[j] };
+				else if (iMultiSeriesID == 5)
+					pTemp.parameters = new String[] { p.parameters[j] };
 				else
-					if (iMultiSeriesID == 5)
-						pTemp.parameters = new String[] { p.parameters[j] };
-					else
-						pTemp.parameters = p.parameters;
+					pTemp.parameters = p.parameters;
 
 				if (logTiming())
 					logTiming("Predicate is : " + pTemp.toString());
@@ -1705,17 +1682,15 @@ public class display extends CacheServlet {
 
 						bSomeValue = true;
 					}
+					else if (bSpiderWebPlot)
+						categoryDataset.addValue(1E-10, vsDescr[j], sLabel);
 					else
-						if (bSpiderWebPlot)
-							categoryDataset.addValue(1E-10, vsDescr[j], sLabel);
-						else
-							categoryDataset.addValue(null, vsDescr[j], sLabel);
+						categoryDataset.addValue(null, vsDescr[j], sLabel);
 				}
-				else
-					if (rTemp != null) {
-						hmActualSeries.put(series[i], "");
-						break;
-					}
+				else if (rTemp != null) {
+					hmActualSeries.put(series[i], "");
+					break;
+				}
 			}
 
 			if (!bSomeValue)
@@ -1725,14 +1700,12 @@ public class display extends CacheServlet {
 			if (bEnabled && (cdSecondary != null) && (pSecondary != null)) {
 				if (vsWildcards[w].equals("F"))
 					pSecondary.Farm = preds[i].Farm;
+				else if (vsWildcards[w].equals("C"))
+					pSecondary.Cluster = preds[i].Cluster;
+				else if (vsWildcards[w].equals("N"))
+					pSecondary.Node = preds[i].Node;
 				else
-					if (vsWildcards[w].equals("C"))
-						pSecondary.Cluster = preds[i].Cluster;
-					else
-						if (vsWildcards[w].equals("N"))
-							pSecondary.Node = preds[i].Node;
-						else
-							pSecondary.parameters = new String[] { preds[i].parameters[0] };
+					pSecondary.parameters = new String[] { preds[i].parameters[0] };
 
 				final Object oTemp = Cache.getLastValue(pSecondary);
 
@@ -1951,11 +1924,10 @@ public class display extends CacheServlet {
 				else
 					cir = new StackedBarRenderer();
 			}
+			else if (b3D)
+				cir = new BarRenderer3D(5, 4);
 			else
-				if (b3D)
-					cir = new BarRenderer3D(5, 4);
-				else
-					cir = new BarRenderer();
+				cir = new BarRenderer();
 
 			String sSizeIn = pgets(prop, "sizein", "M");
 			String sYLabel = pgets(prop, "ylabel", "");
@@ -2190,19 +2162,17 @@ public class display extends CacheServlet {
 
 			if (bVertical)
 				height = 150 + 250;
+			else if (bStack)
+				height = 120 + (hmActualSeries.size() * 30);
 			else
-				if (bStack)
-					height = 120 + (hmActualSeries.size() * 30);
-				else
-					height = 120 + (cd.getRowCount() * cd.getColumnCount() * 20) + (cd.getColumnCount() * 10);
+				height = 120 + (cd.getRowCount() * cd.getColumnCount() * 20) + (cd.getColumnCount() * 10);
 
 			iDefaultHeight = height;
 			iDefaultWidth = 800;
 		}
-		else
-			if (plot instanceof SpiderWebPlot) {
-				// nothing to do in this case, but kept here for future use
-			}
+		else if (plot instanceof SpiderWebPlot) {
+			// nothing to do in this case, but kept here for future use
+		}
 
 		final String sChartTitle = pgets(prop, "title");
 
@@ -2527,9 +2497,8 @@ public class display extends CacheServlet {
 
 				if (p instanceof CategoryPlot)
 					va = ((CategoryPlot) p).getRangeAxis();
-				else
-					if (p instanceof XYPlot)
-						va = ((XYPlot) p).getRangeAxis();
+				else if (p instanceof XYPlot)
+					va = ((XYPlot) p).getRangeAxis();
 
 				dWeights[i] = va != null ? va.getUpperBound() : 50;
 			}
@@ -2620,17 +2589,15 @@ public class display extends CacheServlet {
 
 				if (plot instanceof CombinedDomainCategoryPlot)
 					((CombinedDomainCategoryPlot) plot).add(subplot, weights[i]);
-				else
-					if (plot instanceof CombinedRangeCategoryPlot)
-						((CombinedRangeCategoryPlot) plot).add(subplot, weights[i]);
+				else if (plot instanceof CombinedRangeCategoryPlot)
+					((CombinedRangeCategoryPlot) plot).add(subplot, weights[i]);
 			}
-			else
-				if (plot instanceof CombinedDomainXYPlot) {
+			else if (plot instanceof CombinedDomainXYPlot) {
 
-					final XYPlot subplot = (XYPlot) lPlots.get(i);
+				final XYPlot subplot = (XYPlot) lPlots.get(i);
 
-					((CombinedDomainXYPlot) plot).add(subplot, weights[i]);
-				}
+				((CombinedDomainXYPlot) plot).add(subplot, weights[i]);
+			}
 	}
 
 	private static final double log(final double d) {
@@ -2814,7 +2781,7 @@ public class display extends CacheServlet {
 
 		for (int i = 0; i < vp.length; i++) {
 			vp[i].tmin = lMinOffset <= 0 ? lMinOffset : NTPDate.currentTimeMillis() + lMinOffset;
-			vp[i].tmax = lMaxOffset <=0 ? lMaxOffset : NTPDate.currentTimeMillis() + lMaxOffset;
+			vp[i].tmax = lMaxOffset <= 0 ? lMaxOffset : NTPDate.currentTimeMillis() + lMaxOffset;
 		}
 
 		return store.getDataSplitter(vp, lCompactInterval);
@@ -3067,17 +3034,14 @@ public class display extends CacheServlet {
 		// now let's figure out what is the time frame for a bar
 		if (lRecompactInterval <= Utils.TIME_MINUTE)
 			lRecompactInterval = Utils.TIME_MINUTE;
+		else if (lRecompactInterval <= Utils.TIME_HOUR)
+			lRecompactInterval = Utils.TIME_HOUR;
+		else if (lRecompactInterval <= Utils.TIME_DAY)
+			lRecompactInterval = Utils.TIME_DAY;
+		else if (lRecompactInterval <= Utils.TIME_WEEK)
+			lRecompactInterval = Utils.TIME_WEEK;
 		else
-			if (lRecompactInterval <= Utils.TIME_HOUR)
-				lRecompactInterval = Utils.TIME_HOUR;
-			else
-				if (lRecompactInterval <= Utils.TIME_DAY)
-					lRecompactInterval = Utils.TIME_DAY;
-				else
-					if (lRecompactInterval <= Utils.TIME_WEEK)
-						lRecompactInterval = Utils.TIME_WEEK;
-					else
-						lRecompactInterval = Utils.TIME_MONTH;
+			lRecompactInterval = Utils.TIME_MONTH;
 
 		// prop.setProperty("compact.min_interval", ""+lCompactInterval);
 		prop.setProperty("disableerr", "true");
@@ -3371,12 +3335,10 @@ public class display extends CacheServlet {
 			String sTemp = sSuffix;
 			if (sTemp.endsWith("ps"))
 				sTemp = sTemp.substring(0, sTemp.length() - 2);
-			else
-				if (sTemp.endsWith("/s"))
-					sTemp = sTemp.substring(0, sTemp.length() - 2);
-				else
-					if (sTemp.endsWith("s"))
-						sTemp = sTemp.substring(0, sTemp.length() - 1);
+			else if (sTemp.endsWith("/s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 2);
+			else if (sTemp.endsWith("s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 1);
 
 			if (sTemp.equals("b"))
 				sTemp = "B";
@@ -3472,13 +3434,12 @@ public class display extends CacheServlet {
 
 		if (sKind.startsWith("pie"))
 			chart = buildPieChart(prop);
+		else if (sKind.startsWith("hist"))
+			synchronized (oHistoryLock) {
+				chart = buildHistoryChart(prop, hmSeries);
+			}
 		else
-			if (sKind.startsWith("hist"))
-				synchronized (oHistoryLock) {
-					chart = buildHistoryChart(prop, hmSeries);
-				}
-			else
-				chart = buildCategoryChart(prop, hmSeries);
+			chart = buildCategoryChart(prop, hmSeries);
 
 		final int height = pgeti(prop, "height", 200);
 		final int width = pgeti(prop, "width", 400);
@@ -3682,12 +3643,10 @@ public class display extends CacheServlet {
 			String sTemp = sMeasure;
 			if (sTemp.endsWith("ps"))
 				sTemp = sTemp.substring(0, sTemp.length() - 2);
-			else
-				if (sTemp.endsWith("/s"))
-					sTemp = sTemp.substring(0, sTemp.length() - 2);
-				else
-					if (sTemp.endsWith("s"))
-						sTemp = sTemp.substring(0, sTemp.length() - 1);
+			else if (sTemp.endsWith("/s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 2);
+			else if (sTemp.endsWith("s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 1);
 
 			if (sTemp.equals("b"))
 				sTemp = "B";
@@ -4031,11 +3990,10 @@ public class display extends CacheServlet {
 			while (lMinInterval > lSkipInterval)
 				lSkipInterval += lCompactInterval;
 		}
+		else if (skipNull > 0)
+			lSkipInterval = skipNull * lCompactInterval;
 		else
-			if (skipNull > 0)
-				lSkipInterval = skipNull * lCompactInterval;
-			else
-				lSkipInterval = lIntervalMin; // unite everything if skipNull<0
+			lSkipInterval = lIntervalMin; // unite everything if skipNull<0
 
 		if (pgetl(prop, "skipinterval", -1) > 0) {
 			lSkipInterval = pgetl(prop, "skipinterval", -1) * 1000;
@@ -4205,20 +4163,19 @@ public class display extends CacheServlet {
 
 								ttxyd.add(rtp, null, sLabel, false);
 							}
-							else
-								if (pgetb(prop, "single.first.point", true) && bArea && (lastMatchTime >= (lDataMinTime + lCompactInterval))
-										&& (lastMatchTime < (lDataMinTime + (2 * lCompactInterval)))) {
-									final long l = lastMatchTime - lCompactInterval;
+							else if (pgetb(prop, "single.first.point", true) && bArea && (lastMatchTime >= (lDataMinTime + lCompactInterval))
+									&& (lastMatchTime < (lDataMinTime + (2 * lCompactInterval)))) {
+								final long l = lastMatchTime - lCompactInterval;
 
-									final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
+								final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
 
-									if (logTiming()) {
-										logTiming("  FIRST SINGLE POINT : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
-										logTiming("  lMinTime=" + lMinTime + ", lDataMinTime=" + lDataMinTime);
-									}
-
-									ttxyd.add(rtp, Double.valueOf(er.param[0]), sLabel, false);
+								if (logTiming()) {
+									logTiming("  FIRST SINGLE POINT : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
+									logTiming("  lMinTime=" + lMinTime + ", lDataMinTime=" + lDataMinTime);
 								}
+
+								ttxyd.add(rtp, Double.valueOf(er.param[0]), sLabel, false);
+							}
 						}
 					}
 					else {
@@ -4246,26 +4203,25 @@ public class display extends CacheServlet {
 								}
 							}
 						}
-						else
-							if (bGap && bGapIfNoData) {
-								if (logTiming())
-									logTiming("  PAUZA POINT : " + lastMatchTime + " -> " + er.time);
+						else if (bGap && bGapIfNoData) {
+							if (logTiming())
+								logTiming("  PAUZA POINT : " + lastMatchTime + " -> " + er.time);
 
-								// we have a gap in a point series, just add some null values after the first value and before the last value
-								try {
-									chartSeries.add(new Second(new Date(lastMatchTime + 1002), tz), null);
-								}
-								catch (@SuppressWarnings("unused") final Exception e) {
-									// ignore
-								}
-
-								try {
-									chartSeries.add(new Second(new Date(er.time - 1002), tz), null);
-								}
-								catch (@SuppressWarnings("unused") final Exception e) {
-									// ignore
-								}
+							// we have a gap in a point series, just add some null values after the first value and before the last value
+							try {
+								chartSeries.add(new Second(new Date(lastMatchTime + 1002), tz), null);
 							}
+							catch (@SuppressWarnings("unused") final Exception e) {
+								// ignore
+							}
+
+							try {
+								chartSeries.add(new Second(new Date(er.time - 1002), tz), null);
+							}
+							catch (@SuppressWarnings("unused") final Exception e) {
+								// ignore
+							}
+						}
 
 						lastMatchTime = er.time;
 					}
@@ -4352,33 +4308,31 @@ public class display extends CacheServlet {
 						ttxyd.add(rtp, Double.valueOf(er.param[0]), sLabel, false);
 					}
 				}
-				else
-					if (pgetb(prop, "last.null", false) && bArea && (lastMatchTime > 0) && (lastMatchTime <= (lDataMaxTime - lCompactInterval))) {
-						final long l = lastMatchTime + lCompactInterval;
+				else if (pgetb(prop, "last.null", false) && bArea && (lastMatchTime > 0) && (lastMatchTime <= (lDataMaxTime - lCompactInterval))) {
+					final long l = lastMatchTime + lCompactInterval;
 
-						final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
+					final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
 
-						if (logTiming()) {
-							logTiming("  LAST NULL VALUE : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
-							logTiming("lMaxTime=" + lMaxTime + ", lDataMaxTime=" + lDataMaxTime);
-						}
-
-						ttxyd.add(rtp, null, sLabel, false);
+					if (logTiming()) {
+						logTiming("  LAST NULL VALUE : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
+						logTiming("lMaxTime=" + lMaxTime + ", lDataMaxTime=" + lDataMaxTime);
 					}
-					else
-						if (pgetb(prop, "single.final.point", true) && bArea && (lastMatchTime > 0) && (lastMatchTime <= (lDataMaxTime - lCompactInterval))
-								&& (lastMatchTime > (lDataMaxTime - (2 * lCompactInterval))) && (er != null)) {
-							final long l = lastMatchTime + lCompactInterval;
 
-							final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
+					ttxyd.add(rtp, null, sLabel, false);
+				}
+				else if (pgetb(prop, "single.final.point", true) && bArea && (lastMatchTime > 0) && (lastMatchTime <= (lDataMaxTime - lCompactInterval))
+						&& (lastMatchTime > (lDataMaxTime - (2 * lCompactInterval))) && (er != null)) {
+					final long l = lastMatchTime + lCompactInterval;
 
-							if (logTiming()) {
-								logTiming("  SINGLE LAST VALUE : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
-								logTiming("lMaxTime=" + lMaxTime + ", lDataMaxTime=" + lDataMaxTime);
-							}
+					final RegularTimePeriod rtp = getTableTime(l, tz, lCompactInterval);
 
-							ttxyd.add(rtp, Double.valueOf(er.param[0]), sLabel, false);
-						}
+					if (logTiming()) {
+						logTiming("  SINGLE LAST VALUE : " + l + " -> " + rtp.getFirstMillisecond() + " -> " + rtp.getLastMillisecond());
+						logTiming("lMaxTime=" + lMaxTime + ", lDataMaxTime=" + lDataMaxTime);
+					}
+
+					ttxyd.add(rtp, Double.valueOf(er.param[0]), sLabel, false);
+				}
 
 				vLocalActualSeries.add(hdw.series[i]);
 			}
@@ -4565,12 +4519,10 @@ public class display extends CacheServlet {
 			String sTemp = sSuffix;
 			if (sTemp.endsWith("ps"))
 				sTemp = sTemp.substring(0, sTemp.length() - 2);
-			else
-				if (sTemp.endsWith("/s"))
-					sTemp = sTemp.substring(0, sTemp.length() - 2);
-				else
-					if (sTemp.endsWith("s"))
-						sTemp = sTemp.substring(0, sTemp.length() - 1);
+			else if (sTemp.endsWith("/s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 2);
+			else if (sTemp.endsWith("s"))
+				sTemp = sTemp.substring(0, sTemp.length() - 1);
 
 			if (sTemp.equals("b"))
 				sTemp = "B";
@@ -4627,9 +4579,8 @@ public class display extends CacheServlet {
 
 		if (bShowShapes)
 			iOption = bShowLines ? StandardXYItemRenderer.SHAPES_AND_LINES : StandardXYItemRenderer.SHAPES;
-		else
-			if (bShowLines)
-				iOption = StandardXYItemRenderer.LINES;
+		else if (bShowLines)
+			iOption = StandardXYItemRenderer.LINES;
 
 		XYItemRenderer renderer;
 
@@ -5021,9 +4972,8 @@ public class display extends CacheServlet {
 				lILength = 1000L * 60L * 60L;
 				sFormat = pgets(prop, "intervalselection.method2.stringformat", "MMM d, HH:00");
 			}
-			else
-				if (lILength < (1000L * 60L * 60L * 24L))
-					sFormat = "MMM d, HH:mm";
+			else if (lILength < (1000L * 60L * 60L * 24L))
+				sFormat = "MMM d, HH:mm";
 
 			final TimeZone tz = getTimeZone(prop);
 
@@ -5311,30 +5261,22 @@ public class display extends CacheServlet {
 			int iFunc = 0; // average
 			if (sFunction.equals("sum"))
 				iFunc = 1;
-			else
-				if (sFunction.equals("min"))
-					iFunc = 2;
-				else
-					if (sFunction.equals("min0"))
-						iFunc = 5;
-					else
-						if (sFunction.equals("max"))
-							iFunc = 3;
-						else
-							if (sFunction.equals("int"))
-								iFunc = 4;
-							else
-								if (sFunction.equals("dif"))
-									iFunc = 6;
-								else
-									if (sFunction.equals("int2"))
-										iFunc = 7;
-									else
-										if (sFunction.equals("last"))
-											iFunc = 8;
-										else
-											if (sFunction.equals("dblast"))
-												iFunc = 9;
+			else if (sFunction.equals("min"))
+				iFunc = 2;
+			else if (sFunction.equals("min0"))
+				iFunc = 5;
+			else if (sFunction.equals("max"))
+				iFunc = 3;
+			else if (sFunction.equals("int"))
+				iFunc = 4;
+			else if (sFunction.equals("dif"))
+				iFunc = 6;
+			else if (sFunction.equals("int2"))
+				iFunc = 7;
+			else if (sFunction.equals("last"))
+				iFunc = 8;
+			else if (sFunction.equals("dblast"))
+				iFunc = 9;
 
 			double dVal = 0;
 

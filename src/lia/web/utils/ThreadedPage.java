@@ -1132,4 +1132,30 @@ public abstract class ThreadedPage extends ServletExtension implements Runnable 
 		System.err.println(toHttpDate(new Date()));
 	}
 
+
+	protected void decorateProperties(HttpServletRequest request, Properties prop) {
+		decorateProperties(request, prop, false);
+	}
+
+	protected void decorateProperties(HttpServletRequest request, Properties prop, boolean bIgnoreInterval) {
+		Enumeration<?> eParams = request.getParameterNames();
+		while (eParams.hasMoreElements()) {
+			final String sParameter = (String) eParams.nextElement();
+
+			if (bIgnoreInterval && (sParameter.equals("interval.min") || sParameter.equals("interval.max")))
+				continue;
+
+			String paramValue = gets(sParameter);
+
+			conditionalSet(prop, sParameter, paramValue);
+		}
+	}
+
+	protected static void conditionalSet(Properties prop, String sParameter, String paramValue) {
+		if ("page".equals(sParameter) || "include".equals(sParameter))
+			return;
+
+		if (!paramValue.contains("$Q"))
+			prop.setProperty(sParameter, paramValue);
+	}
 }

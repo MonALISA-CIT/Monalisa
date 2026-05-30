@@ -13,7 +13,6 @@ import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
 import java.text.ParsePosition;
-import java.util.Enumeration;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -84,13 +83,8 @@ public class simple extends CacheServlet {
 		final Properties prop = Utils.getProperties(sConfDir, gets("page"), null, true);
 
 		setLogTiming(prop);
-
-		final Enumeration<?> e = request.getParameterNames();
-
-		while (e.hasMoreElements()) {
-			String sParam = (String) e.nextElement();
-			prop.setProperty(sParam, gets(sParam));
-		}
+		
+		decorateProperties(request, prop);
 
 		Vector<String> vStrings = toVector(prop, "values", null, true, true);
 
