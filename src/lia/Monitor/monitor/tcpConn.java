@@ -472,6 +472,7 @@ public class tcpConn implements Runnable {
 
                 final boolean bByteCounter = AppConfig.getb("lia.Monitor.tcpConn.ByteCounter", false);
                 in = new ObjectInputStream(socket.getInputStream());
+                in.setObjectInputFilter(new MLObjectFilter());
 
                 while (connected.get()) {
                     try {
