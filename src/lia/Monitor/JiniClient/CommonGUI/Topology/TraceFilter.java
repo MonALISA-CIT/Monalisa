@@ -206,7 +206,7 @@ public class TraceFilter extends Thread {
                 br.close();
             } catch (Throwable t) {
                 //if (logger.isLoggable(Level.FINE)) {
-                logger.log(Level.WARNING, "Error filling whois data (" + allQuery + ") line: '" + line + "'", t);
+                logger.log(Level.FINE, "Error filling whois data (" + allQuery + ") line: '" + line + "'", t);
                 //}
                 return false;
             } finally {
