@@ -1,9 +1,7 @@
 package lia.Monitor.monitor;
 
 import java.io.ObjectInputFilter;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,9 +9,6 @@ import java.util.logging.Logger;
  * @since 2026-06-08
  */
 public class MLObjectFilter implements ObjectInputFilter {
-
-	static final Set<String> seenClasses = new TreeSet<>();
-
 	private static final Logger logger = Logger.getLogger(MLObjectFilter.class.getName());
 
 	static final Set<String> ALLOWED_CLASS_NAMES = Set.of("[B", "[D",
