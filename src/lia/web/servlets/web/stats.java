@@ -24,6 +24,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lazyj.Format;
 import lia.Monitor.DataCache.DataSelect;
@@ -3354,6 +3356,8 @@ public final class stats extends CacheServlet {
 		}
 	}
 
+	private static final Pattern DIGITS = Pattern.compile(".*?(\\d+).*?");
+
 	/**
 	 * Parse the version string and return the numeric value
 	 *
@@ -3379,18 +3383,10 @@ public final class stats extends CacheServlet {
 
 			if (st.hasMoreTokens()) {
 				try {
-					String stok = st.nextToken();
-
-					for (int j = 0; j < stok.length(); j++) {
-						final char c = stok.charAt(j);
-
-						if ((c < '0') || (c > '9')) {
-							stok = stok.substring(0, j);
-							break;
-						}
-					}
-
-					lResult += Integer.parseInt(stok);
+					final Matcher m = DIGITS.matcher(st.nextToken());
+					
+					if (m.matches())
+						lResult += Integer.parseInt(m.group(1));
 				}
 				catch (@SuppressWarnings("unused") final Exception e) {
 					// ignore
