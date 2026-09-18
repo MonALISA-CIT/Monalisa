@@ -478,7 +478,7 @@ public class RegFarmMonitor extends BasicService implements Runnable, DataStore,
         public void getGeoServiceAddress() {
             ServiceItem[] si = MLLUSHelper.getInstance().getTopologyServices();
             if ((si == null) || (si.length == 0) || (si[0].attributeSets.length == 0)) {
-                logger.log(Level.INFO, "No Geo service was found (yet)");
+                logger.log(Level.FINE, "No Geo service was found (yet)");
                 topoServices.clear();
                 asResolverErrors++;
             } else {

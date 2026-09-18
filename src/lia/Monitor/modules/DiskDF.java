@@ -343,8 +343,10 @@ public class DiskDF extends AbstractSchJobMonitoring {
 			r.addSet(s + "_usedMB", used);
 			r.addSet(s + "_availMB", available);
 
-			r.addSet(s + "_usage", (used * 100) / size);
-			r.addSet(s + "_available", (available * 100) / size);
+			if (size > 0) {
+				r.addSet(s + "_usage", (used * 100) / size);
+				r.addSet(s + "_available", (available * 100) / size);
+			}
 		}
 
 		public void addToeResult(final eResult er) {
@@ -393,7 +395,8 @@ public class DiskDF extends AbstractSchJobMonitoring {
 				if (!mp.getDF())
 					// System.err.println("DF failed");
 					continue;
-			} catch (final Throwable t) {
+			}
+			catch (final Throwable t) {
 				// System.err.println("DF exception : "+e);
 				continue;
 			}

@@ -71,9 +71,9 @@ public class AliEnFilter extends GenericMLFilter implements AppConfigChangeListe
 	public static final long AF_SLEEP_TIME = AppConfig.getl("lia.Monitor.Filters.AliEnFilter.SLEEP_TIME", 120) * 1000;
 
 	/**
-	 * Consider a param no longer available after PARAM_EXPIRE time (given in ml.properties in seconds) Default value: 15 minutes
+	 * Consider a param no longer available after PARAM_EXPIRE time (given in ml.properties in seconds) Default value: 2.5 minutes since the values should be reported every 2 min by the jobs.
 	 */
-	static long PARAM_EXPIRE = AppConfig.getl("lia.Monitor.Filters.AliEnFilter.PARAM_EXPIRE", 900) * 1000;
+	static long PARAM_EXPIRE = AppConfig.getl("lia.Monitor.Filters.AliEnFilter.PARAM_EXPIRE", 150) * 1000;
 
 	/**
 	 * Consider a job from the central services expired after this amount of time (given in ml.prop in seconds) Default value: 1 week

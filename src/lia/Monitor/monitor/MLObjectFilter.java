@@ -11,14 +11,14 @@ import java.util.logging.Logger;
 public class MLObjectFilter implements ObjectInputFilter {
 	private static final Logger logger = Logger.getLogger(MLObjectFilter.class.getName());
 
-	static final Set<String> ALLOWED_CLASS_NAMES = Set.of("[B", "[D",
+	static final Set<String> ALLOWED_CLASS_NAMES = Set.of("[B", "[D", "[I",
 			"[Ljava.lang.Object;", "[Ljava.lang.String;", "[Ljava.util.Map$Entry;", "[Lnet.jini.core.entry.Entry;", "[Llia.Monitor.monitor.MFarm;",
 			"java.lang.Double", "java.lang.Integer", "java.lang.Number", "java.util.Hashtable", "java.util.Vector",
 			"lia.Monitor.JiniSerFarmMon.NoImplProxy",
 			"lia.Monitor.monitor.ABPingEntry", "lia.Monitor.monitor.EMsg", "lia.Monitor.monitor.ExtendedSiteInfoEntry", "lia.Monitor.monitor.GenericMLEntry", "lia.Monitor.monitor.MCluster",
 			"lia.Monitor.monitor.MFarm", "lia.Monitor.monitor.MLControlEntry", "lia.Monitor.monitor.MNode", "lia.Monitor.monitor.MonMessageClientsProxy",
 			"lia.Monitor.monitor.MonaLisaEntry", "lia.Monitor.monitor.Result", "lia.Monitor.monitor.SiteInfoEntry",
-			"lia.Monitor.monitor.cmonMessage", "lia.Monitor.monitor.eResult", "lia.Monitor.monitor.monMessage", "lia.Monitor.monitor.monPredicate",
+			"lia.Monitor.monitor.cmonMessage", "lia.Monitor.monitor.eResult", "lia.Monitor.monitor.monMessage", "lia.Monitor.monitor.monPredicate", "lia.Monitor.monitor.Gresult",
 			"lia.util.UUID",
 			"net.jini.core.lookup.ServiceID", "net.jini.core.lookup.ServiceItem", "net.jini.entry.AbstractEntry", "net.jini.lookup.entry.Name");
 

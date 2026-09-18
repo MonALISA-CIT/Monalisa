@@ -188,18 +188,21 @@ public final class Cache {
 		if (o instanceof Result) {
 			addToCache((Result) o);
 		}
-		else if (o instanceof eResult) {
-			addToCache((eResult) o);
-		}
-		else if (o instanceof ExtResult) {
-			addToCache((ExtResult) o);
-		}
-		else if (o instanceof Collection<?>) {
-			Collection<?> col = (Collection<?>) o;
-			for (Object name : col) {
-				addToCache(name);
+		else
+			if (o instanceof eResult) {
+				addToCache((eResult) o);
 			}
-		}
+			else
+				if (o instanceof ExtResult) {
+					addToCache((ExtResult) o);
+				}
+				else
+					if (o instanceof Collection<?>) {
+						Collection<?> col = (Collection<?>) o;
+						for (Object name : col) {
+							addToCache(name);
+						}
+					}
 	}
 
 	/**
@@ -895,6 +898,11 @@ public final class Cache {
 			this.work = rWork;
 			this.resultsQueue = lbqResultsQueue;
 		}
+		
+		@Override
+		public String toString() {
+			return work.toString();
+		}
 	}
 
 	/**
@@ -941,7 +949,7 @@ public final class Cache {
 					setName(name + ": IDLE");
 				}
 				catch (Throwable t) {
-					System.err.println("Work produced error : " + t);
+					System.err.println("Work produced error : " + t + " for " + getName());
 					t.printStackTrace();
 				}
 			}
