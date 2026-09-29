@@ -1696,7 +1696,13 @@ public final class Utils {
 					ThreadedPage.addJSPMeasurement(executionTimeReal);
 			}
 
-			final String line = sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" 200 " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" " + Format.point(executionTimeReal);
+			Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+
+			if (statusCode == null)
+				statusCode = Integer.valueOf(200);
+
+			final String line = sIP + " " + port + " " + account + " [" + sDate + "] \"" + sURL + "\" " + statusCode + " " + iSize + " \"" + sReferer + "\" \"" + sBrowser + "\" "
+					+ Format.point(executionTimeReal);
 
 			logLine(sLogFile, line);
 		}
